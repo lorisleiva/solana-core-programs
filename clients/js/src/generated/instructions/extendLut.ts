@@ -24,7 +24,12 @@ import {
   getStructDecoder,
   getStructEncoder,
 } from '@solana/codecs-data-structures';
-import { getU32Decoder, getU32Encoder } from '@solana/codecs-numbers';
+import {
+  getU32Decoder,
+  getU32Encoder,
+  getU64Decoder,
+  getU64Encoder,
+} from '@solana/codecs-numbers';
 import {
   AccountRole,
   IAccountMeta,

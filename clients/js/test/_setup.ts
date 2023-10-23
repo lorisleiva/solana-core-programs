@@ -2,11 +2,6 @@
 import { getBase58Encoder, getBase64Encoder } from '@solana/codecs-strings';
 import {
   Base58EncodedAddress,
-  BaseTransaction,
-  IDurableNonceTransaction,
-  ITransactionWithBlockhashLifetime,
-  ITransactionWithFeePayer,
-  Transaction,
   createDefaultRpcSubscriptionsTransport,
   createDefaultRpcTransport,
   createSolanaRpc,
@@ -15,6 +10,7 @@ import {
   getAddressFromPublicKey,
   signTransaction,
 } from '@solana/web3.js';
+import '@solana/webcrypto-ed25519-polyfill';
 import {
   Context,
   FetchEncodedAccountOptions,
@@ -49,7 +45,7 @@ export const createContext = (): Context & {
       lamports: response.value.lamports,
       executable: response.value.executable,
       programAddress: response.value.owner,
-      rentEpoch: Number(response.value.rentEpoch), // TODO: make bigint.
+      rentEpoch: response.value.rentEpoch,
       data: getBase58Encoder().encode(response.value.data),
     };
   };
@@ -69,7 +65,7 @@ export const createContext = (): Context & {
         lamports: account.lamports,
         executable: account.executable,
         programAddress: account.owner,
-        rentEpoch: Number(account.rentEpoch), // TODO: make bigint.
+        rentEpoch: account.rentEpoch,
         data: getBase64Encoder().encode(account.data[0]),
       };
     });
@@ -86,26 +82,14 @@ export const createContext = (): Context & {
 export type KeypairSigner<TAddress extends string = string> =
   TransactionSigner<TAddress> & { keypair: CryptoKeyPair };
 
-type CompilableTransaction = BaseTransaction &
-  ITransactionWithFeePayer &
-  (ITransactionWithBlockhashLifetime | IDurableNonceTransaction);
-
 export const createSignerFromKeypair = async (
   keypair: CryptoKeyPair
 ): Promise<KeypairSigner> => ({
   keypair,
   address: await getAddressFromPublicKey(keypair.publicKey),
-  signTransaction: async <T extends Transaction = Transaction>(
-    transactions: T[]
-  ): Promise<T[]> =>
+  signTransaction: async (transactions) =>
     Promise.all(
-      transactions.map(
-        (transaction) =>
-          signTransaction(
-            [keypair],
-            transaction as CompilableTransaction
-          ) as unknown as T // TODO: Make Signer type use CompilableTransaction instead of Transaction.
-      )
+      transactions.map((transaction) => signTransaction([keypair], transaction))
     ),
 });
 

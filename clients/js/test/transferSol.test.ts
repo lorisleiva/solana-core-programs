@@ -14,6 +14,8 @@ import { transferSol } from '../src';
 import { createContext, generateKeypairSigner } from './_setup';
 
 test('it can transfer SOL from one account to another', async (t) => {
+  t.timeout(60_000);
+
   // Given a context object.
   const context = createContext();
   const airdropRequester = createDefaultAirdropRequester(context);
@@ -24,7 +26,7 @@ test('it can transfer SOL from one account to another', async (t) => {
   await airdropRequester({
     recipientAddress: source.address,
     lamports: lamports(3_000_000_000n),
-    commitment: 'confirmed',
+    commitment: 'finalized',
   });
 
   // And a destination account with no SOL.
@@ -57,7 +59,7 @@ test('it can transfer SOL from one account to another', async (t) => {
 
   await transactionSender(fullySignedTx, {
     abortSignal: new AbortController().signal,
-    commitment: 'confirmed',
+    commitment: 'finalized',
   });
 
   // Then the source account new has less than 2 SOL.

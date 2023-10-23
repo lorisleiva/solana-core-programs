@@ -40,6 +40,7 @@
     "@solana/functional": "2.0.0-experimental.69a8ad2",
     "@solana/rpc-core": "2.0.0-experimental.69a8ad2",
     "@solana/web3.js": "2.0.0-experimental.69a8ad2",
+    "@solana/webcrypto-ed25519-polyfill": "2.0.0-experimental.69a8ad2",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.46.1",
     "ava": "^5.1.0",
