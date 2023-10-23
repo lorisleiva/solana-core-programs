@@ -241,7 +241,7 @@ export async function getProgramAddress<TAddress extends string = string>(
   name: string,
   address: TAddress
 ): Promise<
-  (typeof context)['getProgramAddress'] extends undefined
+  typeof context['getProgramAddress'] extends undefined
     ? Base58EncodedAddress<TAddress>
     : Base58EncodedAddress
 > {
