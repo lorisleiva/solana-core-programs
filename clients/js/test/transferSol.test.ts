@@ -26,7 +26,7 @@ test('it can transfer SOL from one account to another', async (t) => {
   await airdropRequester({
     recipientAddress: source.address,
     lamports: lamports(3_000_000_000n),
-    commitment: 'finalized',
+    commitment: 'confirmed',
   });
 
   // And a destination account with no SOL.
@@ -59,17 +59,25 @@ test('it can transfer SOL from one account to another', async (t) => {
 
   await transactionSender(fullySignedTx, {
     abortSignal: new AbortController().signal,
-    commitment: 'finalized',
+    commitment: 'confirmed',
   });
 
   // Then the source account new has less than 2 SOL.
   t.true(
-    (await context.rpc.getBalance(source.address).send()).value < 2_000_000_000n
+    (
+      await context.rpc
+        .getBalance(source.address, { commitment: 'confirmed' })
+        .send()
+    ).value < 2_000_000_000n
   );
 
   // And the destination account has exactly 1 SOL.
   t.is(
-    (await context.rpc.getBalance(destination.address).send()).value,
+    (
+      await context.rpc
+        .getBalance(destination.address, { commitment: 'confirmed' })
+        .send()
+    ).value,
     lamports(1_000_000_000n)
   );
 });
