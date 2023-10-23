@@ -23,11 +23,11 @@ export const createContext = (): Context & {
   rpcSubscriptions: ReturnType<typeof createSolanaRpcSubscriptions>;
 } => {
   const rpc = createSolanaRpc({
-    transport: createDefaultRpcTransport({ url: 'http://localhost:8899' }),
+    transport: createDefaultRpcTransport({ url: 'http://127.0.0.1:8899' }),
   });
   const rpcSubscriptions = createSolanaRpcSubscriptions({
     transport: createDefaultRpcSubscriptionsTransport({
-      url: 'ws://localhost:8900',
+      url: 'ws://127.0.0.1:8900',
     }),
   });
 
