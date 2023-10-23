@@ -6,4 +6,15 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
-export * from './create';
+export * from './addMemo';
+export * from './closeLut';
+export * from './createAccount';
+export * from './createEmptyLut';
+export * from './deactivateLut';
+export * from './extendLut';
+export * from './freezeLut';
+export * from './requestHeapFrame';
+export * from './requestUnits';
+export * from './setComputeUnitLimit';
+export * from './setComputeUnitPrice';
+export * from './transferSol';

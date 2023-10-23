@@ -1,7 +1,7 @@
 {
-  "name": "@metaplex-foundation/mpl-project-name",
+  "name": "@metaplex-foundation/spl-core",
   "version": "0.1.0",
-  "description": "My project description",
+  "description": "Core Solana programs",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "scripts": {
@@ -25,10 +25,15 @@
   "author": "Metaplex Maintainers <contact@metaplex.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@metaplex-foundation/mpl-toolbox": "^0.8.0"
-  },
-  "peerDependencies": {
-    "@metaplex-foundation/umi": "^0.8.2"
+    "@solana/addresses": "2.0.0-experimental.398c396",
+    "@solana/codecs-core": "2.0.0-experimental.398c396",
+    "@solana/codecs-data-structures": "2.0.0-experimental.398c396",
+    "@solana/codecs-numbers": "2.0.0-experimental.398c396",
+    "@solana/codecs-strings": "2.0.0-experimental.398c396",
+    "@solana/instructions": "2.0.0-experimental.99a64e9",
+    "@solana/keys": "2.0.0-experimental.398c396",
+    "@solana/options": "2.0.0-experimental.398c396",
+    "@solana/transactions": "2.0.0-experimental.99a64e9"
   },
   "devDependencies": {
     "@ava/typescript": "^3.0.1",

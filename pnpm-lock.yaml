@@ -5,11 +5,8 @@ devDependencies:
     specifier: ^0.12.1
     version: 0.12.1(typescript@4.9.5)
   '@metaplex-foundation/kinobi':
-    specifier: ^0.16.0
-    version: 0.16.0
-  '@metaplex-foundation/shank-js':
-    specifier: ^0.1.0
-    version: 0.1.0
+    specifier: ^0.16.2
+    version: 0.16.2
   typescript:
     specifier: ^4.9.4
     version: 4.9.5
@@ -85,8 +82,8 @@ packages:
     resolution: {integrity: sha512-S9RulC2fFCFOQraz61bij+5YCHhSO9llJegK8c8Y6731fSi6snUSQJdCUqYS8AIgR0TKbQvdvgSyIIdbDFZbBA==}
     dev: true
 
-  /@metaplex-foundation/kinobi@0.16.0:
-    resolution: {integrity: sha512-/fYOLJy0fWZFRRIht2iFoWNOrdcmI4RblwLq0iA2cpcF8Im11uY/2tqrrD5noGKMhR1sBVUJHytiFDaP4CbtuQ==}
+  /@metaplex-foundation/kinobi@0.16.2:
+    resolution: {integrity: sha512-/WnYsCOKfqjHwkd4+eLOQA5eQKohAsnI3RaC6+z7S6vXmZ+G08jmEyezfggmA5D759s01UN1ty3sikBr74Axog==}
     dependencies:
       '@noble/hashes': 1.3.0
       chalk: 4.1.2
@@ -94,27 +91,6 @@ packages:
       prettier: 2.8.8
     transitivePeerDependencies:
       - chokidar
-    dev: true
-
-  /@metaplex-foundation/rustbin@0.3.1:
-    resolution: {integrity: sha512-hWd2JPrnt2/nJzkBpZD3Y6ZfCUlJujv2K7qUfsxdS0jSwLrSrOvYwmNWFw6mc3lbULj6VP4WDyuy9W5/CHU/lQ==}
-    dependencies:
-      debug: 4.3.4
-      semver: 7.5.0
-      text-table: 0.2.0
-      toml: 3.0.0
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
-
-  /@metaplex-foundation/shank-js@0.1.0:
-    resolution: {integrity: sha512-ExTOIIZFJw8WNHfv+anJifP6/Al9gcWJaUXMifGOB6BxV/J0+jfMg13sm0uMlovU7/tiZSPboS09HXnKaykETg==}
-    dependencies:
-      '@metaplex-foundation/rustbin': 0.3.1
-      ansi-colors: 4.1.3
-      debug: 4.3.4
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /@noble/ed25519@1.7.3:
@@ -754,13 +730,6 @@ packages:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
     dev: true
 
-  /lru-cache@6.0.0:
-    resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
-    engines: {node: '>=10'}
-    dependencies:
-      yallist: 4.0.0
-    dev: true
-
   /map-stream@0.1.0:
     resolution: {integrity: sha512-CkYQrPYZfWnu/DAmVCpTSX/xHpKZ80eKh2lAkyA6AJTef6bW+6JpbQZN5rofum7da+SyN1bi5ctTm+lTfcCW3g==}
     dev: true
@@ -938,14 +907,6 @@ packages:
       tokenize-whitespace: 0.0.1
     dev: true
 
-  /semver@7.5.0:
-    resolution: {integrity: sha512-+XC0AD/R7Q2mPSRuy2Id0+CGTZ98+8f+KvwirxOKIEyid+XSx6HbC63p+O4IndTHuX5Z+JxQ0TghCkO5Cg/2HA==}
-    engines: {node: '>=10'}
-    hasBin: true
-    dependencies:
-      lru-cache: 6.0.0
-    dev: true
-
   /shebang-command@2.0.0:
     resolution: {integrity: sha512-kHxr2zZpYtdmrN1qDjrrX/Z1rR1kG8Dx+gkpK1G4eXmvXswmcE1hTWBWYUzlraYw1/yZp6YuDY77YtvbN0dmDA==}
     engines: {node: '>=8'}
@@ -1090,10 +1051,6 @@ packages:
 
   /tokenize-whitespace@0.0.1:
     resolution: {integrity: sha512-OxbdMHTjVs0ccBMfjo1v5OH6bq8yhydewCd9n6xihgtZvI3wSqR00EsM86DjELLl6VtMkY2z99r5q+uNW79E+Q==}
-    dev: true
-
-  /toml@3.0.0:
-    resolution: {integrity: sha512-y/mWCZinnvxjTKYhJ+pYxwD0mRLVvOtdS2Awbgxln6iEnt4rk0yBxeSBHkGJcPucRiG0e55mwWp+g/05rsrd6w==}
     dev: true
 
   /tr46@0.0.3:
@@ -1246,10 +1203,6 @@ packages:
   /y18n@5.0.8:
     resolution: {integrity: sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==}
     engines: {node: '>=10'}
-    dev: true
-
-  /yallist@4.0.0:
-    resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
     dev: true
 
   /yargs-parser@21.1.1:

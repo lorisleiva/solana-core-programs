@@ -6,24 +6,31 @@ const clientDir = path.join(__dirname, "..", "clients");
 const idlDir = path.join(__dirname, "..", "idls");
 
 // Instanciate Kinobi.
-const kinobi = k.createFromIdls([path.join(idlDir, "mpl_project_name_program.json")]);
+const kinobi = k.createFromIdls([
+  path.join(idlDir, "spl_address_lookup_table.json"),
+  path.join(idlDir, "spl_compute_budget.json"),
+  path.join(idlDir, "spl_memo.json"),
+  path.join(idlDir, "spl_system.json"),
+]);
 
 // Update programs.
 kinobi.update(
   new k.UpdateProgramsVisitor({
-    mplProjectNameProgram: { name: "mplProjectName" },
+    //
   })
 );
 
 // Update accounts.
 kinobi.update(
   new k.UpdateAccountsVisitor({
-    myPdaAccount: {
+    addressLookupTable: {
       seeds: [
-        k.stringConstantSeed("myPdaAccount"),
-        k.programSeed(),
-        k.publicKeySeed("authority", "The address of the authority"),
-        k.stringSeed("name", "The name of the account"),
+        k.publicKeySeed("authority", "The address of the LUT's authority"),
+        k.variableSeed(
+          "recentSlot",
+          k.numberTypeNode("u64"),
+          "The recent slot associated with the LUT"
+        ),
       ],
     },
   })
@@ -32,32 +39,28 @@ kinobi.update(
 // Update instructions.
 kinobi.update(
   new k.UpdateInstructionsVisitor({
-    create: {
-      bytesCreatedOnChain: k.bytesFromAccount("myAccount"),
-    },
+    //
   })
 );
 
-// Set ShankAccount discriminator.
-const key = (name) => ({ field: "key", value: k.vEnum("Key", name) });
+// Set account discriminators.
 kinobi.update(
   new k.SetAccountDiscriminatorFromFieldVisitor({
-    myAccount: key("MyAccount"),
-    myPdaAccount: key("MyPdaAccount"),
+    addressLookupTable: { field: "discriminator", value: k.vScalar(1) },
   })
 );
 
 // Render JavaScript.
 const jsDir = path.join(clientDir, "js", "src", "generated");
 const prettier = require(path.join(clientDir, "js", ".prettierrc.json"));
-kinobi.accept(new k.RenderJavaScriptVisitor(jsDir, { prettier }));
+kinobi.accept(new k.RenderJavaScriptExperimentalVisitor(jsDir, { prettier }));
 
 // Render Rust.
-const crateDir = path.join(clientDir, "rust");
-const rustDir = path.join(clientDir, "rust", "src", "generated");
-kinobi.accept(
-  new k.RenderRustVisitor(rustDir, {
-    formatCode: true,
-    crateFolder: crateDir,
-  })
-);
+// const crateDir = path.join(clientDir, "rust");
+// const rustDir = path.join(clientDir, "rust", "src", "generated");
+// kinobi.accept(
+//   new k.RenderRustVisitor(rustDir, {
+//     formatCode: true,
+//     crateFolder: crateDir,
+//   })
+// );

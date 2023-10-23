@@ -6,4 +6,7 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
-export * from './mplProjectName';
+export * from './splAddressLookupTable';
+export * from './splComputeBudget';
+export * from './splMemo';
+export * from './splSystem';
