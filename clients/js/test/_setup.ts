@@ -2,7 +2,12 @@
 import { getBase58Encoder, getBase64Encoder } from '@solana/codecs-strings';
 import {
   Base58EncodedAddress,
+  BaseTransaction,
+  IDurableNonceTransaction,
+  IFullySignedTransaction,
   IInstruction,
+  ITransactionWithBlockhashLifetime,
+  ITransactionWithFeePayer,
   Transaction,
   appendTransactionInstruction,
   createDefaultRpcSubscriptionsTransport,
@@ -140,3 +145,18 @@ export const createSignerFromKeypair = async (
 
 export const generateKeypairSigner = async (): Promise<KeypairSigner> =>
   createSignerFromKeypair(await generateKeyPair());
+
+type CompilableTransaction = BaseTransaction &
+  ITransactionWithFeePayer &
+  (ITransactionWithBlockhashLifetime | IDurableNonceTransaction);
+
+export async function signTransactionWithSigners<
+  T extends CompilableTransaction & ITransactionWithSigners
+>(tx: T): Promise<T & IFullySignedTransaction> {
+  const [signedTx] = await tx.signers.reduce(
+    async (txs, signer) =>
+      'signTransaction' in signer ? signer.signTransaction(await txs) : txs,
+    Promise.resolve([tx])
+  );
+  return signedTx as T & IFullySignedTransaction;
+}

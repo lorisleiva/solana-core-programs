@@ -1,7 +1,6 @@
 import { pipe } from '@solana/functional';
 import { lamports } from '@solana/rpc-core';
 import {
-  IFullySignedTransaction,
   createDefaultAirdropRequester,
   createDefaultTransactionSender,
   createTransaction,
@@ -10,7 +9,11 @@ import {
 } from '@solana/web3.js';
 import test from 'ava';
 import { transferSol } from '../src';
-import { createContext, generateKeypairSigner } from './_setup';
+import {
+  createContext,
+  generateKeypairSigner,
+  signTransactionWithSigners,
+} from './_setup';
 
 test('it can transfer SOL from one account to another', async (t) => {
   // Given a context object.
@@ -45,12 +48,7 @@ test('it can transfer SOL from one account to another', async (t) => {
     })
   );
 
-  const [signedTx] = await transaction.signers.reduce(
-    async (txs, signer) =>
-      'signTransaction' in signer ? signer.signTransaction(await txs) : txs,
-    Promise.resolve([transaction])
-  );
-  const fullySignedTx = signedTx as typeof signedTx & IFullySignedTransaction;
+  const fullySignedTx = await signTransactionWithSigners(transaction);
 
   await transactionSender(fullySignedTx, {
     abortSignal: new AbortController().signal,
