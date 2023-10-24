@@ -181,7 +181,8 @@ export async function requestHeapFrame<
   // Bytes created on chain.
   const bytesCreatedOnChain = 0;
 
-  return {
+  // Wrapped instruction.
+  const wrappedInstruction = {
     instruction: requestHeapFrameInstruction(
       args as RequestHeapFrameInstructionDataArgs,
       programAddress,
@@ -190,4 +191,8 @@ export async function requestHeapFrame<
     signers: [],
     bytesCreatedOnChain,
   };
+
+  return 'getGeneratedInstruction' in context && context.getGeneratedInstruction
+    ? context.getGeneratedInstruction(wrappedInstruction)
+    : wrappedInstruction;
 }

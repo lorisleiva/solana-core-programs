@@ -175,7 +175,8 @@ export async function setComputeUnitPrice<
   // Bytes created on chain.
   const bytesCreatedOnChain = 0;
 
-  return {
+  // Wrapped instruction.
+  const wrappedInstruction = {
     instruction: setComputeUnitPriceInstruction(
       args as SetComputeUnitPriceInstructionDataArgs,
       programAddress,
@@ -184,4 +185,8 @@ export async function setComputeUnitPrice<
     signers: [],
     bytesCreatedOnChain,
   };
+
+  return 'getGeneratedInstruction' in context && context.getGeneratedInstruction
+    ? context.getGeneratedInstruction(wrappedInstruction)
+    : wrappedInstruction;
 }

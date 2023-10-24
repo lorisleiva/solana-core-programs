@@ -181,7 +181,8 @@ export async function requestUnits<
   // Bytes created on chain.
   const bytesCreatedOnChain = 0;
 
-  return {
+  // Wrapped instruction.
+  const wrappedInstruction = {
     instruction: requestUnitsInstruction(
       args as RequestUnitsInstructionDataArgs,
       programAddress,
@@ -190,4 +191,8 @@ export async function requestUnits<
     signers: [],
     bytesCreatedOnChain,
   };
+
+  return 'getGeneratedInstruction' in context && context.getGeneratedInstruction
+    ? context.getGeneratedInstruction(wrappedInstruction)
+    : wrappedInstruction;
 }
