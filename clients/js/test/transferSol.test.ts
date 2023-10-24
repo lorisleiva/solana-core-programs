@@ -3,21 +3,20 @@ import { lamports } from '@solana/rpc-types';
 import {
   createDefaultAirdropRequester,
   createDefaultTransactionSender,
-  createTransaction,
-  setTransactionFeePayer,
 } from '@solana/web3.js';
 import test from 'ava';
 import { transferSol } from '../src';
 import {
   createContext,
+  createDefaultTransactionUsingLatestBlockhash,
   generateKeypairSigner,
   signTransactionWithSigners,
-  setTransactionLifetimeUsingLatestBlockhash,
 } from './_setup';
 
 test('it can transfer SOL from one account to another', async (t) => {
   // Given a context object.
   const context = createContext();
+  const { rpc } = context;
   const airdropRequester = createDefaultAirdropRequester(context);
   const transactionSender = createDefaultTransactionSender(context);
 
@@ -34,9 +33,7 @@ test('it can transfer SOL from one account to another', async (t) => {
 
   // When the source account transfers 1 SOL to the destination account.
   await pipe(
-    createTransaction({ version: 0 }),
-    (tx) => setTransactionFeePayer(source.address, tx),
-    await setTransactionLifetimeUsingLatestBlockhash(context.rpc),
+    await createDefaultTransactionUsingLatestBlockhash(rpc, source.address), // V0 + feePayer + blockhash
     await transferSol(context, { source, destination, amount: 1_000_000_000 }),
     (tx) => signTransactionWithSigners(tx),
     async (tx) => transactionSender(await tx, { commitment: 'confirmed' })

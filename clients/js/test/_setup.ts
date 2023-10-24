@@ -16,8 +16,10 @@ import {
   createDefaultRpcTransport,
   createSolanaRpc,
   createSolanaRpcSubscriptions,
+  createTransaction,
   generateKeyPair,
   getAddressFromPublicKey,
+  setTransactionFeePayer,
   setTransactionLifetimeUsingBlockhash,
   signTransaction,
 } from '@solana/web3.js';
@@ -182,4 +184,28 @@ export async function setTransactionLifetimeUsingLatestBlockhash(
   return <T extends Parameters<typeof setTransactionLifetimeUsingBlockhash>[1]>(
     tx: T
   ) => setTransactionLifetimeUsingBlockhash(latestBlockhash, tx);
+}
+
+export function createDefaultTransaction(feePayer: Base58EncodedAddress) {
+  return setTransactionFeePayer(feePayer, createTransaction({ version: 0 }));
+}
+
+export function createDefaultTransactionUsingBlockhash(
+  feePayer: Base58EncodedAddress,
+  blockhashLifetimeConstraint: Parameters<
+    typeof setTransactionLifetimeUsingBlockhash
+  >[0]
+) {
+  return setTransactionLifetimeUsingBlockhash(
+    blockhashLifetimeConstraint,
+    createDefaultTransaction(feePayer)
+  );
+}
+
+export async function createDefaultTransactionUsingLatestBlockhash(
+  rpc: Rpc<GetLatestBlockhashApi>,
+  feePayer: Base58EncodedAddress
+) {
+  const { value: latestBlockhash } = await rpc.getLatestBlockhash().send();
+  return createDefaultTransactionUsingBlockhash(feePayer, latestBlockhash);
 }
