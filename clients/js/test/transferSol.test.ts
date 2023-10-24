@@ -2,7 +2,6 @@ import { pipe } from '@solana/functional';
 import { lamports } from '@solana/rpc-core';
 import {
   IFullySignedTransaction,
-  appendTransactionInstruction,
   createDefaultAirdropRequester,
   createDefaultTransactionSender,
   createTransaction,
@@ -14,8 +13,6 @@ import { transferSol } from '../src';
 import { createContext, generateKeypairSigner } from './_setup';
 
 test('it can transfer SOL from one account to another', async (t) => {
-  t.timeout(60_000);
-
   // Given a context object.
   const context = createContext();
   const airdropRequester = createDefaultAirdropRequester(context);
@@ -33,24 +30,22 @@ test('it can transfer SOL from one account to another', async (t) => {
   const destination = await generateKeypairSigner();
 
   // When the source account transfers 1 SOL to the destination account.
-  const ix = await transferSol(context, {
-    source,
-    destination: destination.address,
-    amount: 1_000_000_000,
-  });
-
   const { value: latestBlockhash } = await context.rpc
     .getLatestBlockhash()
     .send();
 
   const transaction = pipe(
     createTransaction({ version: 0 }),
-    (tx) => appendTransactionInstruction(ix.instruction, tx),
     (tx) => setTransactionFeePayer(source.address, tx),
-    (tx) => setTransactionLifetimeUsingBlockhash(latestBlockhash, tx)
+    (tx) => setTransactionLifetimeUsingBlockhash(latestBlockhash, tx),
+    await transferSol(context, {
+      source,
+      destination: destination.address,
+      amount: 1_000_000_000,
+    })
   );
 
-  const [signedTx] = await ix.signers.reduce(
+  const [signedTx] = await transaction.signers.reduce(
     async (txs, signer) =>
       'signTransaction' in signer ? signer.signTransaction(await txs) : txs,
     Promise.resolve([transaction])

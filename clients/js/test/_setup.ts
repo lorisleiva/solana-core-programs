@@ -2,6 +2,9 @@
 import { getBase58Encoder, getBase64Encoder } from '@solana/codecs-strings';
 import {
   Base58EncodedAddress,
+  IInstruction,
+  Transaction,
+  appendTransactionInstruction,
   createDefaultRpcSubscriptionsTransport,
   createDefaultRpcTransport,
   createSolanaRpc,
@@ -13,15 +16,32 @@ import {
 import '@solana/webcrypto-ed25519-polyfill';
 import {
   Context,
+  CustomGeneratedInstruction,
   FetchEncodedAccountOptions,
   MaybeEncodedAccount,
+  Signer,
   TransactionSigner,
+  WrappedInstruction,
 } from '../src';
 
-export const createContext = (): Context & {
-  rpc: ReturnType<typeof createSolanaRpc>;
-  rpcSubscriptions: ReturnType<typeof createSolanaRpcSubscriptions>;
-} => {
+export type ITransactionWithSigners = {
+  signers: Signer[];
+};
+
+export type ITransactionWithBytesCreatedOnChain = {
+  bytesCreatedOnChain: number;
+};
+
+export const createContext = (): Context &
+  CustomGeneratedInstruction<
+    IInstruction,
+    <T extends Transaction>(
+      tx: T
+    ) => T & ITransactionWithSigners & ITransactionWithBytesCreatedOnChain
+  > & {
+    rpc: ReturnType<typeof createSolanaRpc>;
+    rpcSubscriptions: ReturnType<typeof createSolanaRpcSubscriptions>;
+  } => {
   const rpc = createSolanaRpc({
     transport: createDefaultRpcTransport({ url: 'http://127.0.0.1:8899' }),
   });
@@ -71,11 +91,36 @@ export const createContext = (): Context & {
     });
   };
 
+  const getGeneratedInstruction =
+    (wrappedInstruction: WrappedInstruction<IInstruction>) =>
+    <T extends Transaction>(
+      tx: T
+    ): T & ITransactionWithSigners & ITransactionWithBytesCreatedOnChain => {
+      const txWithInstruction = appendTransactionInstruction(
+        wrappedInstruction.instruction,
+        tx
+      ) as T &
+        Partial<ITransactionWithSigners & ITransactionWithBytesCreatedOnChain>;
+      const txOut = {
+        ...txWithInstruction,
+        signers: [
+          ...(txWithInstruction.signers ?? []),
+          ...wrappedInstruction.signers,
+        ],
+        bytesCreatedOnChain:
+          (txWithInstruction.bytesCreatedOnChain ?? 0) +
+          wrappedInstruction.bytesCreatedOnChain,
+      };
+      Object.freeze(txOut);
+      return txOut;
+    };
+
   return {
     rpc,
     rpcSubscriptions,
     fetchEncodedAccount,
     fetchEncodedAccounts,
+    getGeneratedInstruction,
   };
 };
 
