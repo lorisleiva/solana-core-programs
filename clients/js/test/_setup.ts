@@ -14,6 +14,7 @@ import {
   appendTransactionInstruction,
   createDefaultRpcSubscriptionsTransport,
   createDefaultRpcTransport,
+  createDefaultTransactionSender,
   createSolanaRpc,
   createSolanaRpcSubscriptions,
   createTransaction,
@@ -25,6 +26,7 @@ import {
 } from '@solana/web3.js';
 import '@solana/webcrypto-ed25519-polyfill';
 import {
+  Commitment,
   Context,
   CustomGeneratedInstruction,
   FetchEncodedAccountOptions,
@@ -147,6 +149,27 @@ export async function signTransactionWithSigners<
     Promise.resolve([tx])
   );
   return signedTx as T & IFullySignedTransaction;
+}
+
+export async function signSendAndConfirmTransactionWithSigners<
+  T extends CompilableTransaction &
+    ITransactionWithSigners &
+    ITransactionWithBlockhashLifetime
+>(
+  context: {
+    rpc: ReturnType<typeof createSolanaRpc>;
+    rpcSubscriptions: ReturnType<typeof createSolanaRpcSubscriptions>;
+  },
+  tx: T,
+  options: {
+    commitment: Commitment;
+    abortSignal?: AbortSignal;
+  }
+) {
+  const signedTx = await signTransactionWithSigners(tx);
+  const transactionSender = createDefaultTransactionSender(context);
+  // TODO: use TransactionSenderSigner if any.
+  return transactionSender(signedTx, options);
 }
 
 export function appendTransactionWrappedInstruction<

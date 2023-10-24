@@ -1,16 +1,13 @@
 import { pipe } from '@solana/functional';
 import { lamports } from '@solana/rpc-types';
-import {
-  createDefaultAirdropRequester,
-  createDefaultTransactionSender,
-} from '@solana/web3.js';
+import { createDefaultAirdropRequester } from '@solana/web3.js';
 import test from 'ava';
-import { transferSol } from '../src';
+import { addMemo, setComputeUnitLimit, transferSol } from '../src';
 import {
   createContext,
   createDefaultTransactionUsingLatestBlockhash,
   generateKeypairSigner,
-  signTransactionWithSigners,
+  signSendAndConfirmTransactionWithSigners,
 } from './_setup';
 
 test('it can transfer SOL from one account to another', async (t) => {
@@ -18,7 +15,6 @@ test('it can transfer SOL from one account to another', async (t) => {
   const context = createContext();
   const { rpc } = context;
   const airdropRequester = createDefaultAirdropRequester(context);
-  const transactionSender = createDefaultTransactionSender(context);
 
   // And a source account with 3 SOL.
   const source = await generateKeypairSigner();
@@ -32,12 +28,16 @@ test('it can transfer SOL from one account to another', async (t) => {
   const destination = (await generateKeypairSigner()).address;
 
   // When the source account transfers 1 SOL to the destination account.
-  await pipe(
+  const transaction = pipe(
     await createDefaultTransactionUsingLatestBlockhash(rpc, source.address), // V0 + feePayer + blockhash
+    await setComputeUnitLimit(context, { units: 600_000 }),
     await transferSol(context, { source, destination, amount: 1_000_000_000 }),
-    (tx) => signTransactionWithSigners(tx),
-    async (tx) => transactionSender(await tx, { commitment: 'confirmed' })
+    await addMemo(context, { memo: "I'm transferring some SOL!" })
   );
+
+  await signSendAndConfirmTransactionWithSigners(context, transaction, {
+    commitment: 'confirmed',
+  });
 
   // Then the source account new has less than 2 SOL.
   t.true(
