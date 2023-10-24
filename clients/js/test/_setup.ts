@@ -100,25 +100,8 @@ export const createContext = (): Context &
     (wrappedInstruction: WrappedInstruction<IInstruction>) =>
     <T extends Transaction>(
       tx: T
-    ): T & ITransactionWithSigners & ITransactionWithBytesCreatedOnChain => {
-      const txWithInstruction = appendTransactionInstruction(
-        wrappedInstruction.instruction,
-        tx
-      ) as T &
-        Partial<ITransactionWithSigners & ITransactionWithBytesCreatedOnChain>;
-      const txOut = {
-        ...txWithInstruction,
-        signers: [
-          ...(txWithInstruction.signers ?? []),
-          ...wrappedInstruction.signers,
-        ],
-        bytesCreatedOnChain:
-          (txWithInstruction.bytesCreatedOnChain ?? 0) +
-          wrappedInstruction.bytesCreatedOnChain,
-      };
-      Object.freeze(txOut);
-      return txOut;
-    };
+    ): T & ITransactionWithSigners & ITransactionWithBytesCreatedOnChain =>
+      appendTransactionWrappedInstruction(tx, wrappedInstruction);
 
   return {
     rpc,
@@ -159,4 +142,32 @@ export async function signTransactionWithSigners<
     Promise.resolve([tx])
   );
   return signedTx as T & IFullySignedTransaction;
+}
+
+export function appendTransactionWrappedInstruction<
+  TTransaction extends Transaction,
+  TInstruction extends IInstruction
+>(
+  tx: TTransaction,
+  wrappedInstruction: WrappedInstruction<TInstruction>
+): TTransaction &
+  ITransactionWithSigners &
+  ITransactionWithBytesCreatedOnChain {
+  const txWithInstruction = appendTransactionInstruction(
+    wrappedInstruction.instruction,
+    tx
+  ) as TTransaction &
+    Partial<ITransactionWithSigners & ITransactionWithBytesCreatedOnChain>;
+  const txOut = {
+    ...txWithInstruction,
+    signers: [
+      ...(txWithInstruction.signers ?? []),
+      ...wrappedInstruction.signers,
+    ],
+    bytesCreatedOnChain:
+      (txWithInstruction.bytesCreatedOnChain ?? 0) +
+      wrappedInstruction.bytesCreatedOnChain,
+  };
+  Object.freeze(txOut);
+  return txOut;
 }
