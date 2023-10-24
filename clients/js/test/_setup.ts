@@ -1,5 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { getBase58Encoder, getBase64Encoder } from '@solana/codecs-strings';
+import { GetLatestBlockhashApi } from '@solana/rpc-core/dist/types/rpc-methods/getLatestBlockhash';
+import { Rpc } from '@solana/rpc-transport/dist/types/json-rpc-types';
 import {
   Base58EncodedAddress,
   BaseTransaction,
@@ -16,6 +18,7 @@ import {
   createSolanaRpcSubscriptions,
   generateKeyPair,
   getAddressFromPublicKey,
+  setTransactionLifetimeUsingBlockhash,
   signTransaction,
 } from '@solana/web3.js';
 import '@solana/webcrypto-ed25519-polyfill';
@@ -170,4 +173,13 @@ export function appendTransactionWrappedInstruction<
   };
   Object.freeze(txOut);
   return txOut;
+}
+
+export async function setTransactionLifetimeUsingLatestBlockhash(
+  rpc: Rpc<GetLatestBlockhashApi>
+) {
+  const { value: latestBlockhash } = await rpc.getLatestBlockhash().send();
+  return <T extends Parameters<typeof setTransactionLifetimeUsingBlockhash>[1]>(
+    tx: T
+  ) => setTransactionLifetimeUsingBlockhash(latestBlockhash, tx);
 }

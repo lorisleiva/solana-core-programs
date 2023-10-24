@@ -5,7 +5,6 @@ import {
   createDefaultTransactionSender,
   createTransaction,
   setTransactionFeePayer,
-  setTransactionLifetimeUsingBlockhash,
 } from '@solana/web3.js';
 import test from 'ava';
 import { transferSol } from '../src';
@@ -13,6 +12,7 @@ import {
   createContext,
   generateKeypairSigner,
   signTransactionWithSigners,
+  setTransactionLifetimeUsingLatestBlockhash,
 } from './_setup';
 
 test('it can transfer SOL from one account to another', async (t) => {
@@ -33,14 +33,10 @@ test('it can transfer SOL from one account to another', async (t) => {
   const destination = await generateKeypairSigner();
 
   // When the source account transfers 1 SOL to the destination account.
-  const { value: latestBlockhash } = await context.rpc
-    .getLatestBlockhash()
-    .send();
-
   const transaction = pipe(
     createTransaction({ version: 0 }),
     (tx) => setTransactionFeePayer(source.address, tx),
-    (tx) => setTransactionLifetimeUsingBlockhash(latestBlockhash, tx),
+    await setTransactionLifetimeUsingLatestBlockhash(context.rpc),
     await transferSol(context, {
       source,
       destination: destination.address,
