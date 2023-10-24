@@ -1,5 +1,5 @@
 import { pipe } from '@solana/functional';
-import { lamports } from '@solana/rpc-core';
+import { lamports } from '@solana/rpc-types';
 import {
   createDefaultAirdropRequester,
   createDefaultTransactionSender,
@@ -30,26 +30,17 @@ test('it can transfer SOL from one account to another', async (t) => {
   });
 
   // And a destination account with no SOL.
-  const destination = await generateKeypairSigner();
+  const destination = (await generateKeypairSigner()).address;
 
   // When the source account transfers 1 SOL to the destination account.
-  const transaction = pipe(
+  await pipe(
     createTransaction({ version: 0 }),
     (tx) => setTransactionFeePayer(source.address, tx),
     await setTransactionLifetimeUsingLatestBlockhash(context.rpc),
-    await transferSol(context, {
-      source,
-      destination: destination.address,
-      amount: 1_000_000_000,
-    })
+    await transferSol(context, { source, destination, amount: 1_000_000_000 }),
+    (tx) => signTransactionWithSigners(tx),
+    async (tx) => transactionSender(await tx, { commitment: 'confirmed' })
   );
-
-  const fullySignedTx = await signTransactionWithSigners(transaction);
-
-  await transactionSender(fullySignedTx, {
-    abortSignal: new AbortController().signal,
-    commitment: 'confirmed',
-  });
 
   // Then the source account new has less than 2 SOL.
   t.true(
@@ -64,7 +55,7 @@ test('it can transfer SOL from one account to another', async (t) => {
   t.is(
     (
       await context.rpc
-        .getBalance(destination.address, { commitment: 'confirmed' })
+        .getBalance(destination, { commitment: 'confirmed' })
         .send()
     ).value,
     lamports(1_000_000_000n)
