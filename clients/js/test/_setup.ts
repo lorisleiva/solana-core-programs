@@ -200,15 +200,6 @@ export function appendTransactionWrappedInstruction<
   return txOut;
 }
 
-export async function setTransactionLifetimeUsingLatestBlockhash(
-  rpc: Rpc<GetLatestBlockhashApi>
-) {
-  const { value: latestBlockhash } = await rpc.getLatestBlockhash().send();
-  return <T extends Parameters<typeof setTransactionLifetimeUsingBlockhash>[1]>(
-    tx: T
-  ) => setTransactionLifetimeUsingBlockhash(latestBlockhash, tx);
-}
-
 export function createDefaultTransaction(feePayer: Base58EncodedAddress) {
   return setTransactionFeePayer(feePayer, createTransaction({ version: 0 }));
 }
