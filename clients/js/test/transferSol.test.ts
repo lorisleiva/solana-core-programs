@@ -14,13 +14,12 @@ import {
   signTransactionWithSigners,
 } from '@solana/signers';
 import { addMemo, setComputeUnitLimit, transferSol } from '../src';
-import { createContext } from './_setup';
+import { createClient } from './_setup';
 
 test('it can transfer SOL from one account to another', async (t) => {
   // Given a context object.
-  const context = createContext();
-  const { rpc } = context;
-  const airdropRequester = createDefaultAirdropRequester(context);
+  const client = createClient();
+  const airdropRequester = createDefaultAirdropRequester(client);
 
   // And a source account with 3 SOL.
   const source = await generateKeyPairSigner();
@@ -35,10 +34,10 @@ test('it can transfer SOL from one account to another', async (t) => {
 
   // When the source account transfers 1 SOL to the destination account.
   const [{ value: latestBlockhash }, ...instructions] = await Promise.all([
-    await rpc.getLatestBlockhash().send(),
-    await setComputeUnitLimit(context, { units: 600_000 }),
-    await transferSol(context, { source, destination, amount: 1_000_000_000 }),
-    await addMemo(context, { memo: "I'm transferring some SOL!" }),
+    await client.rpc.getLatestBlockhash().send(),
+    await setComputeUnitLimit({ units: 600_000 }),
+    await transferSol({ source, destination, amount: 1_000_000_000 }),
+    await addMemo({ memo: "I'm transferring some SOL!" }),
   ]);
 
   const transaction = pipe(
@@ -51,14 +50,14 @@ test('it can transfer SOL from one account to another', async (t) => {
   );
 
   const signedTransaction = await signTransactionWithSigners(transaction);
-  await createDefaultTransactionSender(context)(signedTransaction, {
+  await createDefaultTransactionSender(client)(signedTransaction, {
     commitment: 'confirmed',
   });
 
   // Then the source account new has less than 2 SOL.
   t.true(
     (
-      await context.rpc
+      await client.rpc
         .getBalance(source.address, { commitment: 'confirmed' })
         .send()
     ).value < 2_000_000_000n
@@ -67,7 +66,7 @@ test('it can transfer SOL from one account to another', async (t) => {
   // And the destination account has exactly 1 SOL.
   t.is(
     (
-      await context.rpc
+      await client.rpc
         .getBalance(destination, { commitment: 'confirmed' })
         .send()
     ).value,
