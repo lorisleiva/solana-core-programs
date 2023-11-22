@@ -7,7 +7,7 @@
  */
 
 import {
-  Base58EncodedAddress,
+  Address,
   ProgramDerivedAddress,
   getAddressDecoder,
   getAddressEncoder,
@@ -63,18 +63,18 @@ export type AddressLookupTableAccountData = {
   deactivationSlot: bigint;
   lastExtendedSlot: bigint;
   lastExtendedStartIndex: number;
-  authority: Option<Base58EncodedAddress>;
+  authority: Option<Address>;
   padding: number;
-  addresses: Array<Base58EncodedAddress>;
+  addresses: Array<Address>;
 };
 
 export type AddressLookupTableAccountDataArgs = {
   deactivationSlot: number | bigint;
   lastExtendedSlot: number | bigint;
   lastExtendedStartIndex: number;
-  authority: OptionOrNullable<Base58EncodedAddress>;
+  authority: OptionOrNullable<Address>;
   padding: number;
-  addresses: Array<Base58EncodedAddress>;
+  addresses: Array<Address>;
 };
 
 export function getAddressLookupTableAccountDataEncoder(): Encoder<AddressLookupTableAccountDataArgs> {
@@ -84,9 +84,9 @@ export function getAddressLookupTableAccountDataEncoder(): Encoder<AddressLookup
       deactivationSlot: number | bigint;
       lastExtendedSlot: number | bigint;
       lastExtendedStartIndex: number;
-      authority: OptionOrNullable<Base58EncodedAddress>;
+      authority: OptionOrNullable<Address>;
       padding: number;
-      addresses: Array<Base58EncodedAddress>;
+      addresses: Array<Address>;
     }>(
       [
         ['discriminator', getU32Encoder()],
@@ -145,7 +145,7 @@ export function decodeAddressLookupTable<TAddress extends string = string>(
 
 export async function fetchAddressLookupTable<TAddress extends string = string>(
   context: Pick<Context, 'fetchEncodedAccount'>,
-  address: Base58EncodedAddress<TAddress>,
+  address: Address<TAddress>,
   options?: FetchEncodedAccountOptions
 ): Promise<AddressLookupTable<TAddress>> {
   const maybeAccount = await context.fetchEncodedAccount(address, options);
@@ -157,7 +157,7 @@ export async function safeFetchAddressLookupTable<
   TAddress extends string = string
 >(
   context: Pick<Context, 'fetchEncodedAccount'>,
-  address: Base58EncodedAddress<TAddress>,
+  address: Address<TAddress>,
   options?: FetchEncodedAccountOptions
 ): Promise<AddressLookupTable<TAddress> | null> {
   const maybeAccount = await context.fetchEncodedAccount(address, options);
@@ -166,7 +166,7 @@ export async function safeFetchAddressLookupTable<
 
 export async function fetchAllAddressLookupTable(
   context: Pick<Context, 'fetchEncodedAccounts'>,
-  addresses: Array<Base58EncodedAddress>,
+  addresses: Array<Address>,
   options?: FetchEncodedAccountsOptions
 ): Promise<AddressLookupTable[]> {
   const maybeAccounts = await context.fetchEncodedAccounts(addresses, options);
@@ -178,7 +178,7 @@ export async function fetchAllAddressLookupTable(
 
 export async function safeFetchAllAddressLookupTable(
   context: Pick<Context, 'fetchEncodedAccounts'>,
-  addresses: Array<Base58EncodedAddress>,
+  addresses: Array<Address>,
   options?: FetchEncodedAccountsOptions
 ): Promise<AddressLookupTable[]> {
   const maybeAccounts = await context.fetchEncodedAccounts(addresses, options);
@@ -193,7 +193,7 @@ export async function findAddressLookupTablePda(
   context: Pick<Context, 'getProgramAddress' | 'getProgramDerivedAddress'>,
   seeds: {
     /** The address of the LUT's authority */
-    authority: Base58EncodedAddress;
+    authority: Address;
     /** The recent slot associated with the LUT */
     recentSlot: number | bigint;
   }

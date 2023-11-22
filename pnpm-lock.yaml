@@ -5,8 +5,8 @@ devDependencies:
     specifier: ^0.12.1
     version: 0.12.1(typescript@4.9.5)
   '@metaplex-foundation/kinobi':
-    specifier: ^0.16.5
-    version: 0.16.5
+    specifier: file:../@metaplex/kinobi
+    version: file:../@metaplex/kinobi
   typescript:
     specifier: ^4.9.4
     version: 4.9.5
@@ -80,17 +80,6 @@ packages:
 
   /@metaplex-foundation/cusper@0.0.2:
     resolution: {integrity: sha512-S9RulC2fFCFOQraz61bij+5YCHhSO9llJegK8c8Y6731fSi6snUSQJdCUqYS8AIgR0TKbQvdvgSyIIdbDFZbBA==}
-    dev: true
-
-  /@metaplex-foundation/kinobi@0.16.5:
-    resolution: {integrity: sha512-EK8nqJwuB4taIEGsBtx4PLQItNQTHfukSfs1OmeqR/5XQvLnHN/3hhIjxVEQMq0Vfu1NR/dGsRLF+R5NpnteSA==}
-    dependencies:
-      '@noble/hashes': 1.3.0
-      chalk: 4.1.2
-      nunjucks: 3.2.4
-      prettier: 2.8.8
-    transitivePeerDependencies:
-      - chokidar
     dev: true
 
   /@noble/ed25519@1.7.3:
@@ -1221,4 +1210,17 @@ packages:
       string-width: 4.2.3
       y18n: 5.0.8
       yargs-parser: 21.1.1
+    dev: true
+
+  file:../@metaplex/kinobi:
+    resolution: {directory: ../@metaplex/kinobi, type: directory}
+    name: '@metaplex-foundation/kinobi'
+    version: 0.16.8
+    dependencies:
+      '@noble/hashes': 1.3.0
+      chalk: 4.1.2
+      nunjucks: 3.2.4
+      prettier: 2.8.8
+    transitivePeerDependencies:
+      - chokidar
     dev: true

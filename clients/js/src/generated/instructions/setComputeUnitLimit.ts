@@ -6,7 +6,7 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
-import { Base58EncodedAddress } from '@solana/addresses';
+import { Address } from '@solana/addresses';
 import {
   Codec,
   Decoder,
@@ -30,10 +30,11 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
+import { IInstructionWithSigners } from '@solana/signers';
 import {
   Context,
   CustomGeneratedInstruction,
-  WrappedInstruction,
+  IInstructionWithBytesCreatedOnChain,
 } from '../shared';
 
 // Output.
@@ -97,7 +98,7 @@ export function setComputeUnitLimitInstruction<
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
 >(
   args: SetComputeUnitLimitInstructionDataArgs,
-  programAddress: Base58EncodedAddress<TProgram> = 'ComputeBudget111111111111111111111111111111' as Base58EncodedAddress<TProgram>,
+  programAddress: Address<TProgram> = 'ComputeBudget111111111111111111111111111111' as Address<TProgram>,
   remainingAccounts?: TRemainingAccounts
 ) {
   return {
@@ -128,12 +129,20 @@ export async function setComputeUnitLimit<
 >(
   context: Pick<Context, 'getProgramAddress'>,
   input: SetComputeUnitLimitInput
-): Promise<WrappedInstruction<SetComputeUnitLimitInstruction<TProgram>>>;
+): Promise<
+  SetComputeUnitLimitInstruction<TProgram> &
+    IInstructionWithSigners &
+    IInstructionWithBytesCreatedOnChain
+>;
 export async function setComputeUnitLimit<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
 >(
   input: SetComputeUnitLimitInput
-): Promise<WrappedInstruction<SetComputeUnitLimitInstruction<TProgram>>>;
+): Promise<
+  SetComputeUnitLimitInstruction<TProgram> &
+    IInstructionWithSigners &
+    IInstructionWithBytesCreatedOnChain
+>;
 export async function setComputeUnitLimit<
   TReturn,
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
@@ -144,7 +153,12 @@ export async function setComputeUnitLimit<
         CustomGeneratedInstruction<IInstruction, TReturn>)
     | SetComputeUnitLimitInput,
   rawInput?: SetComputeUnitLimitInput
-): Promise<TReturn | WrappedInstruction<IInstruction>> {
+): Promise<
+  | TReturn
+  | (IInstruction &
+      IInstructionWithSigners &
+      IInstructionWithBytesCreatedOnChain)
+> {
   // Resolve context and input arguments.
   const context = (rawInput === undefined ? {} : rawContext) as
     | Pick<Context, 'getProgramAddress'>
@@ -156,7 +170,7 @@ export async function setComputeUnitLimit<
 
   // Program address.
   const defaultProgramAddress =
-    'ComputeBudget111111111111111111111111111111' as Base58EncodedAddress<'ComputeBudget111111111111111111111111111111'>;
+    'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
   const programAddress = (
     context.getProgramAddress
       ? await context.getProgramAddress({
@@ -164,7 +178,7 @@ export async function setComputeUnitLimit<
           address: defaultProgramAddress,
         })
       : defaultProgramAddress
-  ) as Base58EncodedAddress<TProgram>;
+  ) as Address<TProgram>;
 
   // Original args.
   const args = { ...input };
@@ -175,18 +189,17 @@ export async function setComputeUnitLimit<
   // Bytes created on chain.
   const bytesCreatedOnChain = 0;
 
-  // Wrapped instruction.
-  const wrappedInstruction = {
-    instruction: setComputeUnitLimitInstruction(
+  // Instruction.
+  const instruction = {
+    ...setComputeUnitLimitInstruction(
       args as SetComputeUnitLimitInstructionDataArgs,
       programAddress,
       remainingAccounts
     ),
-    signers: [],
     bytesCreatedOnChain,
   };
 
   return 'getGeneratedInstruction' in context && context.getGeneratedInstruction
-    ? context.getGeneratedInstruction(wrappedInstruction)
-    : wrappedInstruction;
+    ? context.getGeneratedInstruction(instruction)
+    : instruction;
 }

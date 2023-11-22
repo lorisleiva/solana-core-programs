@@ -6,7 +6,7 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
-import { Base58EncodedAddress } from '@solana/addresses';
+import { Address } from '@solana/addresses';
 import {
   Codec,
   Decoder,
@@ -37,14 +37,14 @@ import {
   WritableAccount,
   WritableSignerAccount,
 } from '@solana/instructions';
+import { IInstructionWithSigners, TransactionSigner } from '@solana/signers';
 import {
   Context,
   CustomGeneratedInstruction,
+  IInstructionWithBytesCreatedOnChain,
   ResolvedAccount,
-  Signer,
-  WrappedInstruction,
   accountMetaWithDefault,
-  getAccountMetasAndSigners,
+  getAccountMetasWithSigners,
   getProgramAddress,
 } from '../shared';
 
@@ -140,20 +140,20 @@ export function createEmptyLutInstruction<
 >(
   accounts: {
     address: TAccountAddress extends string
-      ? Base58EncodedAddress<TAccountAddress>
+      ? Address<TAccountAddress>
       : TAccountAddress;
     authority: TAccountAuthority extends string
-      ? Base58EncodedAddress<TAccountAuthority>
+      ? Address<TAccountAuthority>
       : TAccountAuthority;
     payer: TAccountPayer extends string
-      ? Base58EncodedAddress<TAccountPayer>
+      ? Address<TAccountPayer>
       : TAccountPayer;
     systemProgram?: TAccountSystemProgram extends string
-      ? Base58EncodedAddress<TAccountSystemProgram>
+      ? Address<TAccountSystemProgram>
       : TAccountSystemProgram;
   },
   args: CreateEmptyLutInstructionDataArgs,
-  programAddress: Base58EncodedAddress<TProgram> = 'AddressLookupTab1e1111111111111111111111111' as Base58EncodedAddress<TProgram>,
+  programAddress: Address<TProgram> = 'AddressLookupTab1e1111111111111111111111111' as Address<TProgram>,
   remainingAccounts?: TRemainingAccounts
 ) {
   return {
@@ -164,7 +164,7 @@ export function createEmptyLutInstruction<
       accountMetaWithDefault(
         accounts.systemProgram ?? {
           address:
-            '11111111111111111111111111111111' as Base58EncodedAddress<'11111111111111111111111111111111'>,
+            '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>,
           role: AccountRole.READONLY,
         },
         AccountRole.READONLY
@@ -190,10 +190,10 @@ export type CreateEmptyLutInput<
   TAccountPayer extends string,
   TAccountSystemProgram extends string
 > = {
-  address: Base58EncodedAddress<TAccountAddress>;
-  authority?: Signer<TAccountAuthority>;
-  payer?: Signer<TAccountPayer>;
-  systemProgram?: Base58EncodedAddress<TAccountSystemProgram>;
+  address: Address<TAccountAddress>;
+  authority?: TransactionSigner<TAccountAuthority>;
+  payer?: TransactionSigner<TAccountPayer>;
+  systemProgram?: Address<TAccountSystemProgram>;
   recentSlot: CreateEmptyLutInstructionDataArgs['recentSlot'];
   bump: CreateEmptyLutInstructionDataArgs['bump'];
 };
@@ -239,15 +239,15 @@ export async function createEmptyLut<
     TAccountSystemProgram
   >
 ): Promise<
-  WrappedInstruction<
-    CreateEmptyLutInstruction<
-      TProgram,
-      TAccountAddress,
-      TAccountAuthority,
-      TAccountPayer,
-      TAccountSystemProgram
-    >
-  >
+  CreateEmptyLutInstruction<
+    TProgram,
+    TAccountAddress,
+    TAccountAuthority,
+    TAccountPayer,
+    TAccountSystemProgram
+  > &
+    IInstructionWithSigners &
+    IInstructionWithBytesCreatedOnChain
 >;
 export async function createEmptyLut<
   TAccountAddress extends string,
@@ -263,15 +263,15 @@ export async function createEmptyLut<
     TAccountSystemProgram
   >
 ): Promise<
-  WrappedInstruction<
-    CreateEmptyLutInstruction<
-      TProgram,
-      TAccountAddress,
-      TAccountAuthority,
-      TAccountPayer,
-      TAccountSystemProgram
-    >
-  >
+  CreateEmptyLutInstruction<
+    TProgram,
+    TAccountAddress,
+    TAccountAuthority,
+    TAccountPayer,
+    TAccountSystemProgram
+  > &
+    IInstructionWithSigners &
+    IInstructionWithBytesCreatedOnChain
 >;
 export async function createEmptyLut<
   TReturn,
@@ -297,7 +297,12 @@ export async function createEmptyLut<
     TAccountPayer,
     TAccountSystemProgram
   >
-): Promise<TReturn | WrappedInstruction<IInstruction>> {
+): Promise<
+  | TReturn
+  | (IInstruction &
+      IInstructionWithSigners &
+      IInstructionWithBytesCreatedOnChain)
+> {
   // Resolve context and input arguments.
   const context = (rawInput === undefined ? {} : rawContext) as
     | Pick<Context, 'getProgramAddress'>
@@ -314,7 +319,7 @@ export async function createEmptyLut<
 
   // Program address.
   const defaultProgramAddress =
-    'AddressLookupTab1e1111111111111111111111111' as Base58EncodedAddress<'AddressLookupTab1e1111111111111111111111111'>;
+    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
   const programAddress = (
     context.getProgramAddress
       ? await context.getProgramAddress({
@@ -322,7 +327,7 @@ export async function createEmptyLut<
           address: defaultProgramAddress,
         })
       : defaultProgramAddress
-  ) as Base58EncodedAddress<TProgram>;
+  ) as Address<TProgram>;
 
   // Original accounts.
   type AccountMetas = Parameters<
@@ -355,7 +360,7 @@ export async function createEmptyLut<
   }
 
   // Get account metas and signers.
-  const [accountMetas, signers] = getAccountMetasAndSigners(
+  const accountMetas = getAccountMetasWithSigners(
     accounts,
     'programId',
     programAddress
@@ -367,19 +372,18 @@ export async function createEmptyLut<
   // Bytes created on chain.
   const bytesCreatedOnChain = 0;
 
-  // Wrapped instruction.
-  const wrappedInstruction = {
-    instruction: createEmptyLutInstruction(
+  // Instruction.
+  const instruction = {
+    ...createEmptyLutInstruction(
       accountMetas as Record<keyof AccountMetas, IAccountMeta>,
       args as CreateEmptyLutInstructionDataArgs,
       programAddress,
       remainingAccounts
     ),
-    signers,
     bytesCreatedOnChain,
   };
 
   return 'getGeneratedInstruction' in context && context.getGeneratedInstruction
-    ? context.getGeneratedInstruction(wrappedInstruction)
-    : wrappedInstruction;
+    ? context.getGeneratedInstruction(instruction)
+    : instruction;
 }

@@ -6,11 +6,11 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
-import { Base58EncodedAddress } from '@solana/addresses';
+import { Address } from '@solana/addresses';
 import { Context, Program, getProgramAddress } from '../shared';
 
 export const SPL_MEMO_PROGRAM_ADDRESS =
-  'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo' as Base58EncodedAddress<'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'>;
+  'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo' as Address<'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'>;
 
 export type SplMemoProgram =
   Program<'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'>;
@@ -24,6 +24,6 @@ export function createSplMemoProgram(): SplMemoProgram {
 
 export async function getSplMemoProgramAddress(
   context: Pick<Context, 'getProgramAddress'> = {}
-): Promise<Base58EncodedAddress> {
+): Promise<Address> {
   return getProgramAddress(context, 'splMemo', SPL_MEMO_PROGRAM_ADDRESS);
 }

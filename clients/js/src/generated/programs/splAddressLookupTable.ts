@@ -6,11 +6,11 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
-import { Base58EncodedAddress } from '@solana/addresses';
+import { Address } from '@solana/addresses';
 import { Context, Program, getProgramAddress } from '../shared';
 
 export const SPL_ADDRESS_LOOKUP_TABLE_PROGRAM_ADDRESS =
-  'AddressLookupTab1e1111111111111111111111111' as Base58EncodedAddress<'AddressLookupTab1e1111111111111111111111111'>;
+  'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
 
 export type SplAddressLookupTableProgram =
   Program<'AddressLookupTab1e1111111111111111111111111'>;
@@ -24,7 +24,7 @@ export function createSplAddressLookupTableProgram(): SplAddressLookupTableProgr
 
 export async function getSplAddressLookupTableProgramAddress(
   context: Pick<Context, 'getProgramAddress'> = {}
-): Promise<Base58EncodedAddress> {
+): Promise<Address> {
   return getProgramAddress(
     context,
     'splAddressLookupTable',

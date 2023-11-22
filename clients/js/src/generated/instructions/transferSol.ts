@@ -6,7 +6,7 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
-import { Base58EncodedAddress } from '@solana/addresses';
+import { Address } from '@solana/addresses';
 import {
   Codec,
   Decoder,
@@ -33,14 +33,14 @@ import {
   WritableAccount,
   WritableSignerAccount,
 } from '@solana/instructions';
+import { IInstructionWithSigners, TransactionSigner } from '@solana/signers';
 import {
   Context,
   CustomGeneratedInstruction,
+  IInstructionWithBytesCreatedOnChain,
   ResolvedAccount,
-  Signer,
-  WrappedInstruction,
   accountMetaWithDefault,
-  getAccountMetasAndSigners,
+  getAccountMetasWithSigners,
 } from '../shared';
 
 // Output.
@@ -111,14 +111,14 @@ export function transferSolInstruction<
 >(
   accounts: {
     source: TAccountSource extends string
-      ? Base58EncodedAddress<TAccountSource>
+      ? Address<TAccountSource>
       : TAccountSource;
     destination: TAccountDestination extends string
-      ? Base58EncodedAddress<TAccountDestination>
+      ? Address<TAccountDestination>
       : TAccountDestination;
   },
   args: TransferSolInstructionDataArgs,
-  programAddress: Base58EncodedAddress<TProgram> = '11111111111111111111111111111111' as Base58EncodedAddress<TProgram>,
+  programAddress: Address<TProgram> = '11111111111111111111111111111111' as Address<TProgram>,
   remainingAccounts?: TRemainingAccounts
 ) {
   return {
@@ -142,8 +142,8 @@ export type TransferSolInput<
   TAccountSource extends string,
   TAccountDestination extends string
 > = {
-  source: Signer<TAccountSource>;
-  destination: Base58EncodedAddress<TAccountDestination>;
+  source: TransactionSigner<TAccountSource>;
+  destination: Address<TAccountDestination>;
   amount: TransferSolInstructionDataArgs['amount'];
 };
 
@@ -168,9 +168,9 @@ export async function transferSol<
   context: Pick<Context, 'getProgramAddress'>,
   input: TransferSolInput<TAccountSource, TAccountDestination>
 ): Promise<
-  WrappedInstruction<
-    TransferSolInstruction<TProgram, TAccountSource, TAccountDestination>
-  >
+  TransferSolInstruction<TProgram, TAccountSource, TAccountDestination> &
+    IInstructionWithSigners &
+    IInstructionWithBytesCreatedOnChain
 >;
 export async function transferSol<
   TAccountSource extends string,
@@ -179,9 +179,9 @@ export async function transferSol<
 >(
   input: TransferSolInput<TAccountSource, TAccountDestination>
 ): Promise<
-  WrappedInstruction<
-    TransferSolInstruction<TProgram, TAccountSource, TAccountDestination>
-  >
+  TransferSolInstruction<TProgram, TAccountSource, TAccountDestination> &
+    IInstructionWithSigners &
+    IInstructionWithBytesCreatedOnChain
 >;
 export async function transferSol<
   TReturn,
@@ -195,7 +195,12 @@ export async function transferSol<
         CustomGeneratedInstruction<IInstruction, TReturn>)
     | TransferSolInput<TAccountSource, TAccountDestination>,
   rawInput?: TransferSolInput<TAccountSource, TAccountDestination>
-): Promise<TReturn | WrappedInstruction<IInstruction>> {
+): Promise<
+  | TReturn
+  | (IInstruction &
+      IInstructionWithSigners &
+      IInstructionWithBytesCreatedOnChain)
+> {
   // Resolve context and input arguments.
   const context = (rawInput === undefined ? {} : rawContext) as
     | Pick<Context, 'getProgramAddress'>
@@ -207,7 +212,7 @@ export async function transferSol<
 
   // Program address.
   const defaultProgramAddress =
-    '11111111111111111111111111111111' as Base58EncodedAddress<'11111111111111111111111111111111'>;
+    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
   const programAddress = (
     context.getProgramAddress
       ? await context.getProgramAddress({
@@ -215,7 +220,7 @@ export async function transferSol<
           address: defaultProgramAddress,
         })
       : defaultProgramAddress
-  ) as Base58EncodedAddress<TProgram>;
+  ) as Address<TProgram>;
 
   // Original accounts.
   type AccountMetas = Parameters<
@@ -230,7 +235,7 @@ export async function transferSol<
   const args = { ...input };
 
   // Get account metas and signers.
-  const [accountMetas, signers] = getAccountMetasAndSigners(
+  const accountMetas = getAccountMetasWithSigners(
     accounts,
     'programId',
     programAddress
@@ -242,19 +247,18 @@ export async function transferSol<
   // Bytes created on chain.
   const bytesCreatedOnChain = 0;
 
-  // Wrapped instruction.
-  const wrappedInstruction = {
-    instruction: transferSolInstruction(
+  // Instruction.
+  const instruction = {
+    ...transferSolInstruction(
       accountMetas as Record<keyof AccountMetas, IAccountMeta>,
       args as TransferSolInstructionDataArgs,
       programAddress,
       remainingAccounts
     ),
-    signers,
     bytesCreatedOnChain,
   };
 
   return 'getGeneratedInstruction' in context && context.getGeneratedInstruction
-    ? context.getGeneratedInstruction(wrappedInstruction)
-    : wrappedInstruction;
+    ? context.getGeneratedInstruction(instruction)
+    : instruction;
 }

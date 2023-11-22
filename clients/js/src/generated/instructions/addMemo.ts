@@ -6,7 +6,7 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
-import { Base58EncodedAddress } from '@solana/addresses';
+import { Address } from '@solana/addresses';
 import { Codec, Decoder, Encoder, combineCodec } from '@solana/codecs-core';
 import {
   getStructDecoder,
@@ -19,10 +19,11 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
+import { IInstructionWithSigners } from '@solana/signers';
 import {
   Context,
   CustomGeneratedInstruction,
-  WrappedInstruction,
+  IInstructionWithBytesCreatedOnChain,
 } from '../shared';
 
 // Output.
@@ -66,7 +67,7 @@ export function addMemoInstruction<
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
 >(
   args: AddMemoInstructionDataArgs,
-  programAddress: Base58EncodedAddress<TProgram> = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo' as Base58EncodedAddress<TProgram>,
+  programAddress: Address<TProgram> = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo' as Address<TProgram>,
   remainingAccounts?: TRemainingAccounts
 ) {
   return {
@@ -94,12 +95,20 @@ export async function addMemo<
 >(
   context: Pick<Context, 'getProgramAddress'>,
   input: AddMemoInput
-): Promise<WrappedInstruction<AddMemoInstruction<TProgram>>>;
+): Promise<
+  AddMemoInstruction<TProgram> &
+    IInstructionWithSigners &
+    IInstructionWithBytesCreatedOnChain
+>;
 export async function addMemo<
   TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'
 >(
   input: AddMemoInput
-): Promise<WrappedInstruction<AddMemoInstruction<TProgram>>>;
+): Promise<
+  AddMemoInstruction<TProgram> &
+    IInstructionWithSigners &
+    IInstructionWithBytesCreatedOnChain
+>;
 export async function addMemo<
   TReturn,
   TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'
@@ -110,7 +119,12 @@ export async function addMemo<
         CustomGeneratedInstruction<IInstruction, TReturn>)
     | AddMemoInput,
   rawInput?: AddMemoInput
-): Promise<TReturn | WrappedInstruction<IInstruction>> {
+): Promise<
+  | TReturn
+  | (IInstruction &
+      IInstructionWithSigners &
+      IInstructionWithBytesCreatedOnChain)
+> {
   // Resolve context and input arguments.
   const context = (rawInput === undefined ? {} : rawContext) as
     | Pick<Context, 'getProgramAddress'>
@@ -122,7 +136,7 @@ export async function addMemo<
 
   // Program address.
   const defaultProgramAddress =
-    'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo' as Base58EncodedAddress<'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'>;
+    'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo' as Address<'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'>;
   const programAddress = (
     context.getProgramAddress
       ? await context.getProgramAddress({
@@ -130,7 +144,7 @@ export async function addMemo<
           address: defaultProgramAddress,
         })
       : defaultProgramAddress
-  ) as Base58EncodedAddress<TProgram>;
+  ) as Address<TProgram>;
 
   // Original args.
   const args = { ...input };
@@ -141,18 +155,17 @@ export async function addMemo<
   // Bytes created on chain.
   const bytesCreatedOnChain = 0;
 
-  // Wrapped instruction.
-  const wrappedInstruction = {
-    instruction: addMemoInstruction(
+  // Instruction.
+  const instruction = {
+    ...addMemoInstruction(
       args as AddMemoInstructionDataArgs,
       programAddress,
       remainingAccounts
     ),
-    signers: [],
     bytesCreatedOnChain,
   };
 
   return 'getGeneratedInstruction' in context && context.getGeneratedInstruction
-    ? context.getGeneratedInstruction(wrappedInstruction)
-    : wrappedInstruction;
+    ? context.getGeneratedInstruction(instruction)
+    : instruction;
 }

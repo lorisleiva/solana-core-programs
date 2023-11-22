@@ -7,7 +7,7 @@
  */
 
 import {
-  Base58EncodedAddress,
+  Address,
   getAddressDecoder,
   getAddressEncoder,
 } from '@solana/addresses';
@@ -36,14 +36,14 @@ import {
   IInstructionWithData,
   WritableSignerAccount,
 } from '@solana/instructions';
+import { IInstructionWithSigners, TransactionSigner } from '@solana/signers';
 import {
   Context,
   CustomGeneratedInstruction,
+  IInstructionWithBytesCreatedOnChain,
   ResolvedAccount,
-  Signer,
-  WrappedInstruction,
   accountMetaWithDefault,
-  getAccountMetasAndSigners,
+  getAccountMetasWithSigners,
 } from '../shared';
 
 // Output.
@@ -70,13 +70,13 @@ export type CreateAccountInstructionData = {
   discriminator: number;
   lamports: bigint;
   space: bigint;
-  programId: Base58EncodedAddress;
+  programId: Address;
 };
 
 export type CreateAccountInstructionDataArgs = {
   lamports: number | bigint;
   space: number | bigint;
-  programId: Base58EncodedAddress;
+  programId: Address;
 };
 
 export function getCreateAccountInstructionDataEncoder(): Encoder<CreateAccountInstructionDataArgs> {
@@ -85,7 +85,7 @@ export function getCreateAccountInstructionDataEncoder(): Encoder<CreateAccountI
       discriminator: number;
       lamports: number | bigint;
       space: number | bigint;
-      programId: Base58EncodedAddress;
+      programId: Address;
     }>(
       [
         ['discriminator', getU32Encoder()],
@@ -129,14 +129,14 @@ export function createAccountInstruction<
 >(
   accounts: {
     payer: TAccountPayer extends string
-      ? Base58EncodedAddress<TAccountPayer>
+      ? Address<TAccountPayer>
       : TAccountPayer;
     newAccount: TAccountNewAccount extends string
-      ? Base58EncodedAddress<TAccountNewAccount>
+      ? Address<TAccountNewAccount>
       : TAccountNewAccount;
   },
   args: CreateAccountInstructionDataArgs,
-  programAddress: Base58EncodedAddress<TProgram> = '11111111111111111111111111111111' as Base58EncodedAddress<TProgram>,
+  programAddress: Address<TProgram> = '11111111111111111111111111111111' as Address<TProgram>,
   remainingAccounts?: TRemainingAccounts
 ) {
   return {
@@ -160,8 +160,8 @@ export type CreateAccountInput<
   TAccountPayer extends string,
   TAccountNewAccount extends string
 > = {
-  payer?: Signer<TAccountPayer>;
-  newAccount: Signer<TAccountNewAccount>;
+  payer?: TransactionSigner<TAccountPayer>;
+  newAccount: TransactionSigner<TAccountNewAccount>;
   lamports: CreateAccountInstructionDataArgs['lamports'];
   space: CreateAccountInstructionDataArgs['space'];
   programId: CreateAccountInstructionDataArgs['programId'];
@@ -188,9 +188,9 @@ export async function createAccount<
   context: Pick<Context, 'getProgramAddress'>,
   input: CreateAccountInput<TAccountPayer, TAccountNewAccount>
 ): Promise<
-  WrappedInstruction<
-    CreateAccountInstruction<TProgram, TAccountPayer, TAccountNewAccount>
-  >
+  CreateAccountInstruction<TProgram, TAccountPayer, TAccountNewAccount> &
+    IInstructionWithSigners &
+    IInstructionWithBytesCreatedOnChain
 >;
 export async function createAccount<
   TAccountPayer extends string,
@@ -199,9 +199,9 @@ export async function createAccount<
 >(
   input: CreateAccountInput<TAccountPayer, TAccountNewAccount>
 ): Promise<
-  WrappedInstruction<
-    CreateAccountInstruction<TProgram, TAccountPayer, TAccountNewAccount>
-  >
+  CreateAccountInstruction<TProgram, TAccountPayer, TAccountNewAccount> &
+    IInstructionWithSigners &
+    IInstructionWithBytesCreatedOnChain
 >;
 export async function createAccount<
   TReturn,
@@ -215,7 +215,12 @@ export async function createAccount<
         CustomGeneratedInstruction<IInstruction, TReturn>)
     | CreateAccountInput<TAccountPayer, TAccountNewAccount>,
   rawInput?: CreateAccountInput<TAccountPayer, TAccountNewAccount>
-): Promise<TReturn | WrappedInstruction<IInstruction>> {
+): Promise<
+  | TReturn
+  | (IInstruction &
+      IInstructionWithSigners &
+      IInstructionWithBytesCreatedOnChain)
+> {
   // Resolve context and input arguments.
   const context = (rawInput === undefined ? {} : rawContext) as
     | Pick<Context, 'getProgramAddress'>
@@ -227,7 +232,7 @@ export async function createAccount<
 
   // Program address.
   const defaultProgramAddress =
-    '11111111111111111111111111111111' as Base58EncodedAddress<'11111111111111111111111111111111'>;
+    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
   const programAddress = (
     context.getProgramAddress
       ? await context.getProgramAddress({
@@ -235,7 +240,7 @@ export async function createAccount<
           address: defaultProgramAddress,
         })
       : defaultProgramAddress
-  ) as Base58EncodedAddress<TProgram>;
+  ) as Address<TProgram>;
 
   // Original accounts.
   type AccountMetas = Parameters<
@@ -250,7 +255,7 @@ export async function createAccount<
   const args = { ...input };
 
   // Get account metas and signers.
-  const [accountMetas, signers] = getAccountMetasAndSigners(
+  const accountMetas = getAccountMetasWithSigners(
     accounts,
     'programId',
     programAddress
@@ -262,19 +267,18 @@ export async function createAccount<
   // Bytes created on chain.
   const bytesCreatedOnChain = 0;
 
-  // Wrapped instruction.
-  const wrappedInstruction = {
-    instruction: createAccountInstruction(
+  // Instruction.
+  const instruction = {
+    ...createAccountInstruction(
       accountMetas as Record<keyof AccountMetas, IAccountMeta>,
       args as CreateAccountInstructionDataArgs,
       programAddress,
       remainingAccounts
     ),
-    signers,
     bytesCreatedOnChain,
   };
 
   return 'getGeneratedInstruction' in context && context.getGeneratedInstruction
-    ? context.getGeneratedInstruction(wrappedInstruction)
-    : wrappedInstruction;
+    ? context.getGeneratedInstruction(instruction)
+    : instruction;
 }

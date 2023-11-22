@@ -7,7 +7,7 @@
  */
 
 import {
-  Base58EncodedAddress,
+  Address,
   getAddressDecoder,
   getAddressEncoder,
 } from '@solana/addresses';
@@ -41,14 +41,14 @@ import {
   WritableAccount,
   WritableSignerAccount,
 } from '@solana/instructions';
+import { IInstructionWithSigners, TransactionSigner } from '@solana/signers';
 import {
   Context,
   CustomGeneratedInstruction,
+  IInstructionWithBytesCreatedOnChain,
   ResolvedAccount,
-  Signer,
-  WrappedInstruction,
   accountMetaWithDefault,
-  getAccountMetasAndSigners,
+  getAccountMetasWithSigners,
   getProgramAddress,
 } from '../shared';
 
@@ -84,19 +84,14 @@ export type ExtendLutInstruction<
 
 export type ExtendLutInstructionData = {
   discriminator: number;
-  addresses: Array<Base58EncodedAddress>;
+  addresses: Array<Address>;
 };
 
-export type ExtendLutInstructionDataArgs = {
-  addresses: Array<Base58EncodedAddress>;
-};
+export type ExtendLutInstructionDataArgs = { addresses: Array<Address> };
 
 export function getExtendLutInstructionDataEncoder(): Encoder<ExtendLutInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{
-      discriminator: number;
-      addresses: Array<Base58EncodedAddress>;
-    }>(
+    getStructEncoder<{ discriminator: number; addresses: Array<Address> }>(
       [
         ['discriminator', getU32Encoder()],
         [
@@ -145,20 +140,20 @@ export function extendLutInstruction<
 >(
   accounts: {
     address: TAccountAddress extends string
-      ? Base58EncodedAddress<TAccountAddress>
+      ? Address<TAccountAddress>
       : TAccountAddress;
     authority: TAccountAuthority extends string
-      ? Base58EncodedAddress<TAccountAuthority>
+      ? Address<TAccountAuthority>
       : TAccountAuthority;
     payer: TAccountPayer extends string
-      ? Base58EncodedAddress<TAccountPayer>
+      ? Address<TAccountPayer>
       : TAccountPayer;
     systemProgram?: TAccountSystemProgram extends string
-      ? Base58EncodedAddress<TAccountSystemProgram>
+      ? Address<TAccountSystemProgram>
       : TAccountSystemProgram;
   },
   args: ExtendLutInstructionDataArgs,
-  programAddress: Base58EncodedAddress<TProgram> = 'AddressLookupTab1e1111111111111111111111111' as Base58EncodedAddress<TProgram>,
+  programAddress: Address<TProgram> = 'AddressLookupTab1e1111111111111111111111111' as Address<TProgram>,
   remainingAccounts?: TRemainingAccounts
 ) {
   return {
@@ -169,7 +164,7 @@ export function extendLutInstruction<
       accountMetaWithDefault(
         accounts.systemProgram ?? {
           address:
-            '11111111111111111111111111111111' as Base58EncodedAddress<'11111111111111111111111111111111'>,
+            '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>,
           role: AccountRole.READONLY,
         },
         AccountRole.READONLY
@@ -195,10 +190,10 @@ export type ExtendLutInput<
   TAccountPayer extends string,
   TAccountSystemProgram extends string
 > = {
-  address: Base58EncodedAddress<TAccountAddress>;
-  authority?: Signer<TAccountAuthority>;
-  payer?: Signer<TAccountPayer>;
-  systemProgram?: Base58EncodedAddress<TAccountSystemProgram>;
+  address: Address<TAccountAddress>;
+  authority?: TransactionSigner<TAccountAuthority>;
+  payer?: TransactionSigner<TAccountPayer>;
+  systemProgram?: Address<TAccountSystemProgram>;
   addresses: ExtendLutInstructionDataArgs['addresses'];
 };
 
@@ -243,15 +238,15 @@ export async function extendLut<
     TAccountSystemProgram
   >
 ): Promise<
-  WrappedInstruction<
-    ExtendLutInstruction<
-      TProgram,
-      TAccountAddress,
-      TAccountAuthority,
-      TAccountPayer,
-      TAccountSystemProgram
-    >
-  >
+  ExtendLutInstruction<
+    TProgram,
+    TAccountAddress,
+    TAccountAuthority,
+    TAccountPayer,
+    TAccountSystemProgram
+  > &
+    IInstructionWithSigners &
+    IInstructionWithBytesCreatedOnChain
 >;
 export async function extendLut<
   TAccountAddress extends string,
@@ -267,15 +262,15 @@ export async function extendLut<
     TAccountSystemProgram
   >
 ): Promise<
-  WrappedInstruction<
-    ExtendLutInstruction<
-      TProgram,
-      TAccountAddress,
-      TAccountAuthority,
-      TAccountPayer,
-      TAccountSystemProgram
-    >
-  >
+  ExtendLutInstruction<
+    TProgram,
+    TAccountAddress,
+    TAccountAuthority,
+    TAccountPayer,
+    TAccountSystemProgram
+  > &
+    IInstructionWithSigners &
+    IInstructionWithBytesCreatedOnChain
 >;
 export async function extendLut<
   TReturn,
@@ -301,7 +296,12 @@ export async function extendLut<
     TAccountPayer,
     TAccountSystemProgram
   >
-): Promise<TReturn | WrappedInstruction<IInstruction>> {
+): Promise<
+  | TReturn
+  | (IInstruction &
+      IInstructionWithSigners &
+      IInstructionWithBytesCreatedOnChain)
+> {
   // Resolve context and input arguments.
   const context = (rawInput === undefined ? {} : rawContext) as
     | Pick<Context, 'getProgramAddress'>
@@ -318,7 +318,7 @@ export async function extendLut<
 
   // Program address.
   const defaultProgramAddress =
-    'AddressLookupTab1e1111111111111111111111111' as Base58EncodedAddress<'AddressLookupTab1e1111111111111111111111111'>;
+    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
   const programAddress = (
     context.getProgramAddress
       ? await context.getProgramAddress({
@@ -326,7 +326,7 @@ export async function extendLut<
           address: defaultProgramAddress,
         })
       : defaultProgramAddress
-  ) as Base58EncodedAddress<TProgram>;
+  ) as Address<TProgram>;
 
   // Original accounts.
   type AccountMetas = Parameters<
@@ -359,7 +359,7 @@ export async function extendLut<
   }
 
   // Get account metas and signers.
-  const [accountMetas, signers] = getAccountMetasAndSigners(
+  const accountMetas = getAccountMetasWithSigners(
     accounts,
     'programId',
     programAddress
@@ -371,19 +371,18 @@ export async function extendLut<
   // Bytes created on chain.
   const bytesCreatedOnChain = 0;
 
-  // Wrapped instruction.
-  const wrappedInstruction = {
-    instruction: extendLutInstruction(
+  // Instruction.
+  const instruction = {
+    ...extendLutInstruction(
       accountMetas as Record<keyof AccountMetas, IAccountMeta>,
       args as ExtendLutInstructionDataArgs,
       programAddress,
       remainingAccounts
     ),
-    signers,
     bytesCreatedOnChain,
   };
 
   return 'getGeneratedInstruction' in context && context.getGeneratedInstruction
-    ? context.getGeneratedInstruction(wrappedInstruction)
-    : wrappedInstruction;
+    ? context.getGeneratedInstruction(instruction)
+    : instruction;
 }

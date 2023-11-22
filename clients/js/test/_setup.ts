@@ -1,59 +1,24 @@
 /* eslint-disable import/no-extraneous-dependencies */
+import '@solana/webcrypto-ed25519-polyfill';
+
 import { getBase58Encoder, getBase64Encoder } from '@solana/codecs-strings';
-import { GetLatestBlockhashApi } from '@solana/rpc-core/dist/types/rpc-methods/getLatestBlockhash';
-import { Rpc } from '@solana/rpc-transport/dist/types/json-rpc-types';
 import {
-  Base58EncodedAddress,
-  BaseTransaction,
-  IDurableNonceTransaction,
-  IFullySignedTransaction,
-  IInstruction,
-  ITransactionWithBlockhashLifetime,
-  ITransactionWithFeePayer,
-  Transaction,
-  appendTransactionInstruction,
+  Address,
   createDefaultRpcSubscriptionsTransport,
   createDefaultRpcTransport,
-  createDefaultTransactionSender,
   createSolanaRpc,
   createSolanaRpcSubscriptions,
-  createTransaction,
-  generateKeyPair,
-  getAddressFromPublicKey,
-  setTransactionFeePayer,
-  setTransactionLifetimeUsingBlockhash,
-  signTransaction,
 } from '@solana/web3.js';
-import '@solana/webcrypto-ed25519-polyfill';
 import {
-  Commitment,
   Context,
-  CustomGeneratedInstruction,
   FetchEncodedAccountOptions,
   MaybeEncodedAccount,
-  Signer,
-  TransactionSigner,
-  WrappedInstruction,
 } from '../src';
 
-export type ITransactionWithSigners = {
-  signers: Signer[];
-};
-
-export type ITransactionWithBytesCreatedOnChain = {
-  bytesCreatedOnChain: number;
-};
-
-export const createContext = (): Context &
-  CustomGeneratedInstruction<
-    IInstruction,
-    <T extends Transaction>(
-      tx: T
-    ) => T & ITransactionWithSigners & ITransactionWithBytesCreatedOnChain
-  > & {
-    rpc: ReturnType<typeof createSolanaRpc>;
-    rpcSubscriptions: ReturnType<typeof createSolanaRpcSubscriptions>;
-  } => {
+export const createContext = (): Context & {
+  rpc: ReturnType<typeof createSolanaRpc>;
+  rpcSubscriptions: ReturnType<typeof createSolanaRpcSubscriptions>;
+} => {
   const rpc = createSolanaRpc({
     transport: createDefaultRpcTransport({ url: 'http://127.0.0.1:8899' }),
   });
@@ -64,7 +29,7 @@ export const createContext = (): Context &
   });
 
   const fetchEncodedAccount = async <TAddress extends string = string>(
-    address: Base58EncodedAddress<TAddress>,
+    address: Address<TAddress>,
     options?: FetchEncodedAccountOptions
   ): Promise<MaybeEncodedAccount<TAddress>> => {
     const response = await rpc
@@ -83,7 +48,7 @@ export const createContext = (): Context &
   };
 
   const fetchEncodedAccounts = async (
-    addresses: Base58EncodedAddress[],
+    addresses: Address[],
     options?: FetchEncodedAccountOptions
   ): Promise<MaybeEncodedAccount[]> => {
     const response = await rpc
@@ -103,123 +68,10 @@ export const createContext = (): Context &
     });
   };
 
-  const getGeneratedInstruction =
-    (wrappedInstruction: WrappedInstruction<IInstruction>) =>
-    <T extends Transaction>(
-      tx: T
-    ): T & ITransactionWithSigners & ITransactionWithBytesCreatedOnChain =>
-      appendTransactionWrappedInstruction(tx, wrappedInstruction);
-
   return {
     rpc,
     rpcSubscriptions,
     fetchEncodedAccount,
     fetchEncodedAccounts,
-    getGeneratedInstruction,
   };
 };
-
-export type KeypairSigner<TAddress extends string = string> =
-  TransactionSigner<TAddress> & { keypair: CryptoKeyPair };
-
-export const createSignerFromKeypair = async (
-  keypair: CryptoKeyPair
-): Promise<KeypairSigner> => ({
-  keypair,
-  address: await getAddressFromPublicKey(keypair.publicKey),
-  signTransaction: async (transactions) =>
-    Promise.all(
-      transactions.map((transaction) => signTransaction([keypair], transaction))
-    ),
-});
-
-export const generateKeypairSigner = async (): Promise<KeypairSigner> =>
-  createSignerFromKeypair(await generateKeyPair());
-
-type CompilableTransaction = BaseTransaction &
-  ITransactionWithFeePayer &
-  (ITransactionWithBlockhashLifetime | IDurableNonceTransaction);
-
-export async function signTransactionWithSigners<
-  T extends CompilableTransaction & ITransactionWithSigners
->(tx: T): Promise<T & IFullySignedTransaction> {
-  const [signedTx] = await tx.signers.reduce(
-    async (txs, signer) =>
-      'signTransaction' in signer ? signer.signTransaction(await txs) : txs,
-    Promise.resolve([tx])
-  );
-  return signedTx as T & IFullySignedTransaction;
-}
-
-export async function signSendAndConfirmTransactionWithSigners<
-  T extends CompilableTransaction &
-    ITransactionWithSigners &
-    ITransactionWithBlockhashLifetime
->(
-  context: {
-    rpc: ReturnType<typeof createSolanaRpc>;
-    rpcSubscriptions: ReturnType<typeof createSolanaRpcSubscriptions>;
-  },
-  tx: T,
-  options: {
-    commitment: Commitment;
-    abortSignal?: AbortSignal;
-  }
-) {
-  const signedTx = await signTransactionWithSigners(tx);
-  const transactionSender = createDefaultTransactionSender(context);
-  // TODO: use TransactionSenderSigner if any.
-  return transactionSender(signedTx, options);
-}
-
-export function appendTransactionWrappedInstruction<
-  TTransaction extends Transaction,
-  TInstruction extends IInstruction
->(
-  tx: TTransaction,
-  wrappedInstruction: WrappedInstruction<TInstruction>
-): TTransaction &
-  ITransactionWithSigners &
-  ITransactionWithBytesCreatedOnChain {
-  const txWithInstruction = appendTransactionInstruction(
-    wrappedInstruction.instruction,
-    tx
-  ) as TTransaction &
-    Partial<ITransactionWithSigners & ITransactionWithBytesCreatedOnChain>;
-  const txOut = {
-    ...txWithInstruction,
-    signers: [
-      ...(txWithInstruction.signers ?? []),
-      ...wrappedInstruction.signers,
-    ],
-    bytesCreatedOnChain:
-      (txWithInstruction.bytesCreatedOnChain ?? 0) +
-      wrappedInstruction.bytesCreatedOnChain,
-  };
-  Object.freeze(txOut);
-  return txOut;
-}
-
-export function createDefaultTransaction(feePayer: Base58EncodedAddress) {
-  return setTransactionFeePayer(feePayer, createTransaction({ version: 0 }));
-}
-
-export function createDefaultTransactionUsingBlockhash(
-  feePayer: Base58EncodedAddress,
-  blockhashLifetimeConstraint: Parameters<
-    typeof setTransactionLifetimeUsingBlockhash
-  >[0]
-) {
-  return setTransactionLifetimeUsingBlockhash(
-    blockhashLifetimeConstraint,
-    createDefaultTransaction(feePayer)
-  );
-}
-
-export async function createDefaultTransactionUsingLatestBlockhash(
-  rpc: Rpc<GetLatestBlockhashApi>,
-  feePayer: Base58EncodedAddress
-) {
-  const { value: latestBlockhash } = await rpc.getLatestBlockhash().send();
-  return createDefaultTransactionUsingBlockhash(feePayer, latestBlockhash);
-}
