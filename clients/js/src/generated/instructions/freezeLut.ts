@@ -28,7 +28,11 @@ import {
   ReadonlySignerAccount,
   WritableAccount,
 } from '@solana/instructions';
-import { IInstructionWithSigners, TransactionSigner } from '@solana/signers';
+import {
+  IAccountSignerMeta,
+  IInstructionWithSigners,
+  TransactionSigner,
+} from '@solana/signers';
 import {
   Context,
   CustomGeneratedInstruction,
@@ -139,7 +143,12 @@ export async function freezeLut<
 >(
   context: Pick<Context, 'getProgramAddress'> &
     CustomGeneratedInstruction<
-      FreezeLutInstruction<TProgram, TAccountAddress, TAccountAuthority>,
+      FreezeLutInstruction<
+        TProgram,
+        TAccountAddress,
+        ReadonlySignerAccount<TAccountAuthority> &
+          IAccountSignerMeta<TAccountAuthority>
+      >,
       TReturn
     >,
   input: FreezeLutInput<TAccountAddress, TAccountAuthority>
@@ -152,7 +161,12 @@ export async function freezeLut<
   context: Pick<Context, 'getProgramAddress'>,
   input: FreezeLutInput<TAccountAddress, TAccountAuthority>
 ): Promise<
-  FreezeLutInstruction<TProgram, TAccountAddress, TAccountAuthority> &
+  FreezeLutInstruction<
+    TProgram,
+    TAccountAddress,
+    ReadonlySignerAccount<TAccountAuthority> &
+      IAccountSignerMeta<TAccountAuthority>
+  > &
     IInstructionWithSigners &
     IInstructionWithBytesCreatedOnChain
 >;
@@ -163,7 +177,12 @@ export async function freezeLut<
 >(
   input: FreezeLutInput<TAccountAddress, TAccountAuthority>
 ): Promise<
-  FreezeLutInstruction<TProgram, TAccountAddress, TAccountAuthority> &
+  FreezeLutInstruction<
+    TProgram,
+    TAccountAddress,
+    ReadonlySignerAccount<TAccountAuthority> &
+      IAccountSignerMeta<TAccountAuthority>
+  > &
     IInstructionWithSigners &
     IInstructionWithBytesCreatedOnChain
 >;

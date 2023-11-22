@@ -28,7 +28,11 @@ import {
   ReadonlySignerAccount,
   WritableAccount,
 } from '@solana/instructions';
-import { IInstructionWithSigners, TransactionSigner } from '@solana/signers';
+import {
+  IAccountSignerMeta,
+  IInstructionWithSigners,
+  TransactionSigner,
+} from '@solana/signers';
 import {
   Context,
   CustomGeneratedInstruction,
@@ -139,7 +143,12 @@ export async function deactivateLut<
 >(
   context: Pick<Context, 'getProgramAddress'> &
     CustomGeneratedInstruction<
-      DeactivateLutInstruction<TProgram, TAccountAddress, TAccountAuthority>,
+      DeactivateLutInstruction<
+        TProgram,
+        TAccountAddress,
+        ReadonlySignerAccount<TAccountAuthority> &
+          IAccountSignerMeta<TAccountAuthority>
+      >,
       TReturn
     >,
   input: DeactivateLutInput<TAccountAddress, TAccountAuthority>
@@ -152,7 +161,12 @@ export async function deactivateLut<
   context: Pick<Context, 'getProgramAddress'>,
   input: DeactivateLutInput<TAccountAddress, TAccountAuthority>
 ): Promise<
-  DeactivateLutInstruction<TProgram, TAccountAddress, TAccountAuthority> &
+  DeactivateLutInstruction<
+    TProgram,
+    TAccountAddress,
+    ReadonlySignerAccount<TAccountAuthority> &
+      IAccountSignerMeta<TAccountAuthority>
+  > &
     IInstructionWithSigners &
     IInstructionWithBytesCreatedOnChain
 >;
@@ -163,7 +177,12 @@ export async function deactivateLut<
 >(
   input: DeactivateLutInput<TAccountAddress, TAccountAuthority>
 ): Promise<
-  DeactivateLutInstruction<TProgram, TAccountAddress, TAccountAuthority> &
+  DeactivateLutInstruction<
+    TProgram,
+    TAccountAddress,
+    ReadonlySignerAccount<TAccountAuthority> &
+      IAccountSignerMeta<TAccountAuthority>
+  > &
     IInstructionWithSigners &
     IInstructionWithBytesCreatedOnChain
 >;

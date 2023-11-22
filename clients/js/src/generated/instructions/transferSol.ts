@@ -33,7 +33,11 @@ import {
   WritableAccount,
   WritableSignerAccount,
 } from '@solana/instructions';
-import { IInstructionWithSigners, TransactionSigner } from '@solana/signers';
+import {
+  IAccountSignerMeta,
+  IInstructionWithSigners,
+  TransactionSigner,
+} from '@solana/signers';
 import {
   Context,
   CustomGeneratedInstruction,
@@ -155,7 +159,12 @@ export async function transferSol<
 >(
   context: Pick<Context, 'getProgramAddress'> &
     CustomGeneratedInstruction<
-      TransferSolInstruction<TProgram, TAccountSource, TAccountDestination>,
+      TransferSolInstruction<
+        TProgram,
+        WritableSignerAccount<TAccountSource> &
+          IAccountSignerMeta<TAccountSource>,
+        TAccountDestination
+      >,
       TReturn
     >,
   input: TransferSolInput<TAccountSource, TAccountDestination>
@@ -168,7 +177,11 @@ export async function transferSol<
   context: Pick<Context, 'getProgramAddress'>,
   input: TransferSolInput<TAccountSource, TAccountDestination>
 ): Promise<
-  TransferSolInstruction<TProgram, TAccountSource, TAccountDestination> &
+  TransferSolInstruction<
+    TProgram,
+    WritableSignerAccount<TAccountSource> & IAccountSignerMeta<TAccountSource>,
+    TAccountDestination
+  > &
     IInstructionWithSigners &
     IInstructionWithBytesCreatedOnChain
 >;
@@ -179,7 +192,11 @@ export async function transferSol<
 >(
   input: TransferSolInput<TAccountSource, TAccountDestination>
 ): Promise<
-  TransferSolInstruction<TProgram, TAccountSource, TAccountDestination> &
+  TransferSolInstruction<
+    TProgram,
+    WritableSignerAccount<TAccountSource> & IAccountSignerMeta<TAccountSource>,
+    TAccountDestination
+  > &
     IInstructionWithSigners &
     IInstructionWithBytesCreatedOnChain
 >;

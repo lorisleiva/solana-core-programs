@@ -37,7 +37,11 @@ import {
   WritableAccount,
   WritableSignerAccount,
 } from '@solana/instructions';
-import { IInstructionWithSigners, TransactionSigner } from '@solana/signers';
+import {
+  IAccountSignerMeta,
+  IInstructionWithSigners,
+  TransactionSigner,
+} from '@solana/signers';
 import {
   Context,
   CustomGeneratedInstruction,
@@ -211,8 +215,10 @@ export async function createEmptyLut<
       CreateEmptyLutInstruction<
         TProgram,
         TAccountAddress,
-        TAccountAuthority,
-        TAccountPayer,
+        ReadonlySignerAccount<TAccountAuthority> &
+          IAccountSignerMeta<TAccountAuthority>,
+        WritableSignerAccount<TAccountPayer> &
+          IAccountSignerMeta<TAccountPayer>,
         TAccountSystemProgram
       >,
       TReturn
@@ -242,8 +248,9 @@ export async function createEmptyLut<
   CreateEmptyLutInstruction<
     TProgram,
     TAccountAddress,
-    TAccountAuthority,
-    TAccountPayer,
+    ReadonlySignerAccount<TAccountAuthority> &
+      IAccountSignerMeta<TAccountAuthority>,
+    WritableSignerAccount<TAccountPayer> & IAccountSignerMeta<TAccountPayer>,
     TAccountSystemProgram
   > &
     IInstructionWithSigners &
@@ -266,8 +273,9 @@ export async function createEmptyLut<
   CreateEmptyLutInstruction<
     TProgram,
     TAccountAddress,
-    TAccountAuthority,
-    TAccountPayer,
+    ReadonlySignerAccount<TAccountAuthority> &
+      IAccountSignerMeta<TAccountAuthority>,
+    WritableSignerAccount<TAccountPayer> & IAccountSignerMeta<TAccountPayer>,
     TAccountSystemProgram
   > &
     IInstructionWithSigners &

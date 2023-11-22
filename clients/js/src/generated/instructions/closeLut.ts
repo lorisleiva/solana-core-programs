@@ -28,7 +28,11 @@ import {
   ReadonlySignerAccount,
   WritableAccount,
 } from '@solana/instructions';
-import { IInstructionWithSigners, TransactionSigner } from '@solana/signers';
+import {
+  IAccountSignerMeta,
+  IInstructionWithSigners,
+  TransactionSigner,
+} from '@solana/signers';
 import {
   Context,
   CustomGeneratedInstruction,
@@ -155,7 +159,8 @@ export async function closeLut<
       CloseLutInstruction<
         TProgram,
         TAccountAddress,
-        TAccountAuthority,
+        ReadonlySignerAccount<TAccountAuthority> &
+          IAccountSignerMeta<TAccountAuthority>,
         TAccountRecipient
       >,
       TReturn
@@ -174,7 +179,8 @@ export async function closeLut<
   CloseLutInstruction<
     TProgram,
     TAccountAddress,
-    TAccountAuthority,
+    ReadonlySignerAccount<TAccountAuthority> &
+      IAccountSignerMeta<TAccountAuthority>,
     TAccountRecipient
   > &
     IInstructionWithSigners &
@@ -191,7 +197,8 @@ export async function closeLut<
   CloseLutInstruction<
     TProgram,
     TAccountAddress,
-    TAccountAuthority,
+    ReadonlySignerAccount<TAccountAuthority> &
+      IAccountSignerMeta<TAccountAuthority>,
     TAccountRecipient
   > &
     IInstructionWithSigners &

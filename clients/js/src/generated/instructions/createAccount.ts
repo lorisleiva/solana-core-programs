@@ -36,7 +36,11 @@ import {
   IInstructionWithData,
   WritableSignerAccount,
 } from '@solana/instructions';
-import { IInstructionWithSigners, TransactionSigner } from '@solana/signers';
+import {
+  IAccountSignerMeta,
+  IInstructionWithSigners,
+  TransactionSigner,
+} from '@solana/signers';
 import {
   Context,
   CustomGeneratedInstruction,
@@ -175,7 +179,13 @@ export async function createAccount<
 >(
   context: Pick<Context, 'getProgramAddress'> &
     CustomGeneratedInstruction<
-      CreateAccountInstruction<TProgram, TAccountPayer, TAccountNewAccount>,
+      CreateAccountInstruction<
+        TProgram,
+        WritableSignerAccount<TAccountPayer> &
+          IAccountSignerMeta<TAccountPayer>,
+        WritableSignerAccount<TAccountNewAccount> &
+          IAccountSignerMeta<TAccountNewAccount>
+      >,
       TReturn
     >,
   input: CreateAccountInput<TAccountPayer, TAccountNewAccount>
@@ -188,7 +198,12 @@ export async function createAccount<
   context: Pick<Context, 'getProgramAddress'>,
   input: CreateAccountInput<TAccountPayer, TAccountNewAccount>
 ): Promise<
-  CreateAccountInstruction<TProgram, TAccountPayer, TAccountNewAccount> &
+  CreateAccountInstruction<
+    TProgram,
+    WritableSignerAccount<TAccountPayer> & IAccountSignerMeta<TAccountPayer>,
+    WritableSignerAccount<TAccountNewAccount> &
+      IAccountSignerMeta<TAccountNewAccount>
+  > &
     IInstructionWithSigners &
     IInstructionWithBytesCreatedOnChain
 >;
@@ -199,7 +214,12 @@ export async function createAccount<
 >(
   input: CreateAccountInput<TAccountPayer, TAccountNewAccount>
 ): Promise<
-  CreateAccountInstruction<TProgram, TAccountPayer, TAccountNewAccount> &
+  CreateAccountInstruction<
+    TProgram,
+    WritableSignerAccount<TAccountPayer> & IAccountSignerMeta<TAccountPayer>,
+    WritableSignerAccount<TAccountNewAccount> &
+      IAccountSignerMeta<TAccountNewAccount>
+  > &
     IInstructionWithSigners &
     IInstructionWithBytesCreatedOnChain
 >;
