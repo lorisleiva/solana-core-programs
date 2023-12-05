@@ -28,15 +28,9 @@ import {
   ReadonlySignerAccount,
   WritableAccount,
 } from '@solana/instructions';
-import {
-  IAccountSignerMeta,
-  IInstructionWithSigners,
-  TransactionSigner,
-} from '@solana/signers';
+import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import {
   Context,
-  CustomGeneratedInstruction,
-  IInstructionWithBytesCreatedOnChain,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
@@ -66,25 +60,48 @@ export type CloseLutInstruction<
     ]
   >;
 
+// Output.
+export type CloseLutInstructionWithSigners<
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
+  TAccountAddress extends string | IAccountMeta<string> = string,
+  TAccountAuthority extends string | IAccountMeta<string> = string,
+  TAccountRecipient extends string | IAccountMeta<string> = string,
+  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+> = IInstruction<TProgram> &
+  IInstructionWithData<Uint8Array> &
+  IInstructionWithAccounts<
+    [
+      TAccountAddress extends string
+        ? WritableAccount<TAccountAddress>
+        : TAccountAddress,
+      TAccountAuthority extends string
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            IAccountSignerMeta<TAccountAuthority>
+        : TAccountAuthority,
+      TAccountRecipient extends string
+        ? WritableAccount<TAccountRecipient>
+        : TAccountRecipient,
+      ...TRemainingAccounts
+    ]
+  >;
+
 export type CloseLutInstructionData = { discriminator: number };
 
 export type CloseLutInstructionDataArgs = {};
 
-export function getCloseLutInstructionDataEncoder(): Encoder<CloseLutInstructionDataArgs> {
+export function getCloseLutInstructionDataEncoder() {
   return mapEncoder(
-    getStructEncoder<{ discriminator: number }>(
-      [['discriminator', getU32Encoder()]],
-      { description: 'CloseLutInstructionData' }
-    ),
+    getStructEncoder<{ discriminator: number }>([
+      ['discriminator', getU32Encoder()],
+    ]),
     (value) => ({ ...value, discriminator: 4 })
-  ) as Encoder<CloseLutInstructionDataArgs>;
+  ) satisfies Encoder<CloseLutInstructionDataArgs>;
 }
 
-export function getCloseLutInstructionDataDecoder(): Decoder<CloseLutInstructionData> {
-  return getStructDecoder<CloseLutInstructionData>(
-    [['discriminator', getU32Decoder()]],
-    { description: 'CloseLutInstructionData' }
-  ) as Decoder<CloseLutInstructionData>;
+export function getCloseLutInstructionDataDecoder() {
+  return getStructDecoder<CloseLutInstructionData>([
+    ['discriminator', getU32Decoder()],
+  ]) satisfies Decoder<CloseLutInstructionData>;
 }
 
 export function getCloseLutInstructionDataCodec(): Codec<
@@ -97,7 +114,163 @@ export function getCloseLutInstructionDataCodec(): Codec<
   );
 }
 
-export function closeLutInstruction<
+export type CloseLutInput<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TAccountRecipient extends string
+> = {
+  address: Address<TAccountAddress>;
+  authority?: Address<TAccountAuthority>;
+  recipient: Address<TAccountRecipient>;
+};
+
+export type CloseLutInputWithSigners<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TAccountRecipient extends string
+> = {
+  address: Address<TAccountAddress>;
+  authority?: TransactionSigner<TAccountAuthority>;
+  recipient: Address<TAccountRecipient>;
+};
+
+export function getCloseLutInstruction<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TAccountRecipient extends string,
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  context: Pick<Context, 'getProgramAddress'>,
+  input: CloseLutInputWithSigners<
+    TAccountAddress,
+    TAccountAuthority,
+    TAccountRecipient
+  >
+): CloseLutInstructionWithSigners<
+  TProgram,
+  TAccountAddress,
+  TAccountAuthority,
+  TAccountRecipient
+>;
+export function getCloseLutInstruction<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TAccountRecipient extends string,
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  context: Pick<Context, 'getProgramAddress'>,
+  input: CloseLutInput<TAccountAddress, TAccountAuthority, TAccountRecipient>
+): CloseLutInstruction<
+  TProgram,
+  TAccountAddress,
+  TAccountAuthority,
+  TAccountRecipient
+>;
+export function getCloseLutInstruction<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TAccountRecipient extends string,
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  input: CloseLutInputWithSigners<
+    TAccountAddress,
+    TAccountAuthority,
+    TAccountRecipient
+  >
+): CloseLutInstructionWithSigners<
+  TProgram,
+  TAccountAddress,
+  TAccountAuthority,
+  TAccountRecipient
+>;
+export function getCloseLutInstruction<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TAccountRecipient extends string,
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  input: CloseLutInput<TAccountAddress, TAccountAuthority, TAccountRecipient>
+): CloseLutInstruction<
+  TProgram,
+  TAccountAddress,
+  TAccountAuthority,
+  TAccountRecipient
+>;
+export function getCloseLutInstruction<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TAccountRecipient extends string,
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  rawContext:
+    | Pick<Context, 'getProgramAddress'>
+    | CloseLutInput<TAccountAddress, TAccountAuthority, TAccountRecipient>,
+  rawInput?: CloseLutInput<
+    TAccountAddress,
+    TAccountAuthority,
+    TAccountRecipient
+  >
+): IInstruction {
+  // Resolve context and input arguments.
+  const context = (rawInput === undefined ? {} : rawContext) as Pick<
+    Context,
+    'getProgramAddress'
+  >;
+  const input = (
+    rawInput === undefined ? rawContext : rawInput
+  ) as CloseLutInput<TAccountAddress, TAccountAuthority, TAccountRecipient>;
+
+  // Program address.
+  const defaultProgramAddress =
+    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
+  const programAddress = (
+    context.getProgramAddress
+      ? context.getProgramAddress({
+          name: 'splAddressLookupTable',
+          address: defaultProgramAddress,
+        })
+      : defaultProgramAddress
+  ) as Address<TProgram>;
+
+  // Original accounts.
+  type AccountMetas = Parameters<
+    typeof getCloseLutInstructionRaw<
+      TProgram,
+      TAccountAddress,
+      TAccountAuthority,
+      TAccountRecipient
+    >
+  >[0];
+  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+    address: { value: input.address ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: false },
+    recipient: { value: input.recipient ?? null, isWritable: true },
+  };
+
+  // Get account metas and signers.
+  const accountMetas = getAccountMetasWithSigners(
+    accounts,
+    'programId',
+    programAddress
+  );
+
+  // Remaining accounts.
+  const remainingAccounts: IAccountMeta[] = [];
+
+  // Bytes created on chain.
+  const bytesCreatedOnChain = 0;
+
+  return Object.freeze({
+    ...getCloseLutInstructionRaw(
+      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
+      programAddress,
+      remainingAccounts
+    ),
+    bytesCreatedOnChain,
+  });
+}
+
+export function getCloseLutInstructionRaw<
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
   TAccountAddress extends string | IAccountMeta<string> = string,
   TAccountAuthority extends string | IAccountMeta<string> = string,
@@ -134,159 +307,4 @@ export function closeLutInstruction<
     TAccountRecipient,
     TRemainingAccounts
   >;
-}
-
-// Input.
-export type CloseLutInput<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountRecipient extends string
-> = {
-  address: Address<TAccountAddress>;
-  authority?: TransactionSigner<TAccountAuthority>;
-  recipient: Address<TAccountRecipient>;
-};
-
-export async function closeLut<
-  TReturn,
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountRecipient extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'> &
-    CustomGeneratedInstruction<
-      CloseLutInstruction<
-        TProgram,
-        TAccountAddress,
-        ReadonlySignerAccount<TAccountAuthority> &
-          IAccountSignerMeta<TAccountAuthority>,
-        TAccountRecipient
-      >,
-      TReturn
-    >,
-  input: CloseLutInput<TAccountAddress, TAccountAuthority, TAccountRecipient>
-): Promise<TReturn>;
-export async function closeLut<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountRecipient extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: CloseLutInput<TAccountAddress, TAccountAuthority, TAccountRecipient>
-): Promise<
-  CloseLutInstruction<
-    TProgram,
-    TAccountAddress,
-    ReadonlySignerAccount<TAccountAuthority> &
-      IAccountSignerMeta<TAccountAuthority>,
-    TAccountRecipient
-  > &
-    IInstructionWithSigners &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function closeLut<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountRecipient extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
-  input: CloseLutInput<TAccountAddress, TAccountAuthority, TAccountRecipient>
-): Promise<
-  CloseLutInstruction<
-    TProgram,
-    TAccountAddress,
-    ReadonlySignerAccount<TAccountAuthority> &
-      IAccountSignerMeta<TAccountAuthority>,
-    TAccountRecipient
-  > &
-    IInstructionWithSigners &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function closeLut<
-  TReturn,
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountRecipient extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | (Pick<Context, 'getProgramAddress'> &
-        CustomGeneratedInstruction<IInstruction, TReturn>)
-    | CloseLutInput<TAccountAddress, TAccountAuthority, TAccountRecipient>,
-  rawInput?: CloseLutInput<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountRecipient
-  >
-): Promise<
-  | TReturn
-  | (IInstruction &
-      IInstructionWithSigners &
-      IInstructionWithBytesCreatedOnChain)
-> {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as
-    | Pick<Context, 'getProgramAddress'>
-    | (Pick<Context, 'getProgramAddress'> &
-        CustomGeneratedInstruction<IInstruction, TReturn>);
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as CloseLutInput<TAccountAddress, TAccountAuthority, TAccountRecipient>;
-
-  // Program address.
-  const defaultProgramAddress =
-    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
-  const programAddress = (
-    context.getProgramAddress
-      ? await context.getProgramAddress({
-          name: 'splAddressLookupTable',
-          address: defaultProgramAddress,
-        })
-      : defaultProgramAddress
-  ) as Address<TProgram>;
-
-  // Original accounts.
-  type AccountMetas = Parameters<
-    typeof closeLutInstruction<
-      TProgram,
-      TAccountAddress,
-      TAccountAuthority,
-      TAccountRecipient
-    >
-  >[0];
-  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
-    address: { value: input.address ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
-    recipient: { value: input.recipient ?? null, isWritable: true },
-  };
-
-  // Get account metas and signers.
-  const accountMetas = getAccountMetasWithSigners(
-    accounts,
-    'programId',
-    programAddress
-  );
-
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
-
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
-
-  // Instruction.
-  const instruction = {
-    ...closeLutInstruction(
-      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  };
-
-  return 'getGeneratedInstruction' in context && context.getGeneratedInstruction
-    ? context.getGeneratedInstruction(instruction)
-    : instruction;
 }

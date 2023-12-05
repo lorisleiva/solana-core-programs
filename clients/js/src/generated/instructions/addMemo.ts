@@ -19,15 +19,18 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
-import { IInstructionWithSigners } from '@solana/signers';
-import {
-  Context,
-  CustomGeneratedInstruction,
-  IInstructionWithBytesCreatedOnChain,
-} from '../shared';
+import { Context } from '../shared';
 
 // Output.
 export type AddMemoInstruction<
+  TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo',
+  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+> = IInstruction<TProgram> &
+  IInstructionWithData<Uint8Array> &
+  IInstructionWithAccounts<TRemainingAccounts>;
+
+// Output.
+export type AddMemoInstructionWithSigners<
   TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo',
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
 > = IInstruction<TProgram> &
@@ -38,18 +41,16 @@ export type AddMemoInstructionData = { memo: string };
 
 export type AddMemoInstructionDataArgs = AddMemoInstructionData;
 
-export function getAddMemoInstructionDataEncoder(): Encoder<AddMemoInstructionDataArgs> {
-  return getStructEncoder<AddMemoInstructionDataArgs>(
-    [['memo', getStringEncoder()]],
-    { description: 'AddMemoInstructionData' }
-  ) as Encoder<AddMemoInstructionDataArgs>;
+export function getAddMemoInstructionDataEncoder() {
+  return getStructEncoder<AddMemoInstructionDataArgs>([
+    ['memo', getStringEncoder()],
+  ]) satisfies Encoder<AddMemoInstructionDataArgs>;
 }
 
-export function getAddMemoInstructionDataDecoder(): Decoder<AddMemoInstructionData> {
-  return getStructDecoder<AddMemoInstructionData>(
-    [['memo', getStringDecoder()]],
-    { description: 'AddMemoInstructionData' }
-  ) as Decoder<AddMemoInstructionData>;
+export function getAddMemoInstructionDataDecoder() {
+  return getStructDecoder<AddMemoInstructionData>([
+    ['memo', getStringDecoder()],
+  ]) satisfies Decoder<AddMemoInstructionData>;
 }
 
 export function getAddMemoInstructionDataCodec(): Codec<
@@ -62,74 +63,43 @@ export function getAddMemoInstructionDataCodec(): Codec<
   );
 }
 
-export function addMemoInstruction<
-  TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
->(
-  args: AddMemoInstructionDataArgs,
-  programAddress: Address<TProgram> = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: remainingAccounts ?? [],
-    data: getAddMemoInstructionDataEncoder().encode(args),
-    programAddress,
-  } as AddMemoInstruction<TProgram, TRemainingAccounts>;
-}
-
-// Input.
 export type AddMemoInput = {
   memo: AddMemoInstructionDataArgs['memo'];
 };
 
-export async function addMemo<
-  TReturn,
+export type AddMemoInputWithSigners = {
+  memo: AddMemoInstructionDataArgs['memo'];
+};
+
+export function getAddMemoInstruction<
   TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'
 >(
-  context: Pick<Context, 'getProgramAddress'> &
-    CustomGeneratedInstruction<AddMemoInstruction<TProgram>, TReturn>,
-  input: AddMemoInput
-): Promise<TReturn>;
-export async function addMemo<
+  context: Pick<Context, 'getProgramAddress'>,
+  input: AddMemoInputWithSigners
+): AddMemoInstructionWithSigners<TProgram>;
+export function getAddMemoInstruction<
   TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'
 >(
   context: Pick<Context, 'getProgramAddress'>,
   input: AddMemoInput
-): Promise<
-  AddMemoInstruction<TProgram> &
-    IInstructionWithSigners &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function addMemo<
+): AddMemoInstruction<TProgram>;
+export function getAddMemoInstruction<
+  TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'
+>(input: AddMemoInputWithSigners): AddMemoInstructionWithSigners<TProgram>;
+export function getAddMemoInstruction<
+  TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'
+>(input: AddMemoInput): AddMemoInstruction<TProgram>;
+export function getAddMemoInstruction<
   TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'
 >(
-  input: AddMemoInput
-): Promise<
-  AddMemoInstruction<TProgram> &
-    IInstructionWithSigners &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function addMemo<
-  TReturn,
-  TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'
->(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | (Pick<Context, 'getProgramAddress'> &
-        CustomGeneratedInstruction<IInstruction, TReturn>)
-    | AddMemoInput,
+  rawContext: Pick<Context, 'getProgramAddress'> | AddMemoInput,
   rawInput?: AddMemoInput
-): Promise<
-  | TReturn
-  | (IInstruction &
-      IInstructionWithSigners &
-      IInstructionWithBytesCreatedOnChain)
-> {
+): IInstruction {
   // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as
-    | Pick<Context, 'getProgramAddress'>
-    | (Pick<Context, 'getProgramAddress'> &
-        CustomGeneratedInstruction<IInstruction, TReturn>);
+  const context = (rawInput === undefined ? {} : rawContext) as Pick<
+    Context,
+    'getProgramAddress'
+  >;
   const input = (
     rawInput === undefined ? rawContext : rawInput
   ) as AddMemoInput;
@@ -139,7 +109,7 @@ export async function addMemo<
     'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo' as Address<'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'>;
   const programAddress = (
     context.getProgramAddress
-      ? await context.getProgramAddress({
+      ? context.getProgramAddress({
           name: 'splMemo',
           address: defaultProgramAddress,
         })
@@ -155,17 +125,27 @@ export async function addMemo<
   // Bytes created on chain.
   const bytesCreatedOnChain = 0;
 
-  // Instruction.
-  const instruction = {
-    ...addMemoInstruction(
+  return Object.freeze({
+    ...getAddMemoInstructionRaw(
       args as AddMemoInstructionDataArgs,
       programAddress,
       remainingAccounts
     ),
     bytesCreatedOnChain,
-  };
+  });
+}
 
-  return 'getGeneratedInstruction' in context && context.getGeneratedInstruction
-    ? context.getGeneratedInstruction(instruction)
-    : instruction;
+export function getAddMemoInstructionRaw<
+  TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo',
+  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+>(
+  args: AddMemoInstructionDataArgs,
+  programAddress: Address<TProgram> = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo' as Address<TProgram>,
+  remainingAccounts?: TRemainingAccounts
+) {
+  return {
+    accounts: remainingAccounts ?? [],
+    data: getAddMemoInstructionDataEncoder().encode(args),
+    programAddress,
+  } as AddMemoInstruction<TProgram, TRemainingAccounts>;
 }

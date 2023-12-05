@@ -30,15 +30,18 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
-import { IInstructionWithSigners } from '@solana/signers';
-import {
-  Context,
-  CustomGeneratedInstruction,
-  IInstructionWithBytesCreatedOnChain,
-} from '../shared';
+import { Context } from '../shared';
 
 // Output.
 export type SetComputeUnitPriceInstruction<
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
+  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+> = IInstruction<TProgram> &
+  IInstructionWithData<Uint8Array> &
+  IInstructionWithAccounts<TRemainingAccounts>;
+
+// Output.
+export type SetComputeUnitPriceInstructionWithSigners<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
 > = IInstruction<TProgram> &
@@ -56,31 +59,25 @@ export type SetComputeUnitPriceInstructionDataArgs = {
   microLamports: number | bigint;
 };
 
-export function getSetComputeUnitPriceInstructionDataEncoder(): Encoder<SetComputeUnitPriceInstructionDataArgs> {
+export function getSetComputeUnitPriceInstructionDataEncoder() {
   return mapEncoder(
     getStructEncoder<{
       discriminator: number;
       /** Transaction compute unit price used for prioritization fees. */
       microLamports: number | bigint;
-    }>(
-      [
-        ['discriminator', getU8Encoder()],
-        ['microLamports', getU64Encoder()],
-      ],
-      { description: 'SetComputeUnitPriceInstructionData' }
-    ),
+    }>([
+      ['discriminator', getU8Encoder()],
+      ['microLamports', getU64Encoder()],
+    ]),
     (value) => ({ ...value, discriminator: 3 })
-  ) as Encoder<SetComputeUnitPriceInstructionDataArgs>;
+  ) satisfies Encoder<SetComputeUnitPriceInstructionDataArgs>;
 }
 
-export function getSetComputeUnitPriceInstructionDataDecoder(): Decoder<SetComputeUnitPriceInstructionData> {
-  return getStructDecoder<SetComputeUnitPriceInstructionData>(
-    [
-      ['discriminator', getU8Decoder()],
-      ['microLamports', getU64Decoder()],
-    ],
-    { description: 'SetComputeUnitPriceInstructionData' }
-  ) as Decoder<SetComputeUnitPriceInstructionData>;
+export function getSetComputeUnitPriceInstructionDataDecoder() {
+  return getStructDecoder<SetComputeUnitPriceInstructionData>([
+    ['discriminator', getU8Decoder()],
+    ['microLamports', getU64Decoder()],
+  ]) satisfies Decoder<SetComputeUnitPriceInstructionData>;
 }
 
 export function getSetComputeUnitPriceInstructionDataCodec(): Codec<
@@ -93,77 +90,45 @@ export function getSetComputeUnitPriceInstructionDataCodec(): Codec<
   );
 }
 
-export function setComputeUnitPriceInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
->(
-  args: SetComputeUnitPriceInstructionDataArgs,
-  programAddress: Address<TProgram> = 'ComputeBudget111111111111111111111111111111' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: remainingAccounts ?? [],
-    data: getSetComputeUnitPriceInstructionDataEncoder().encode(args),
-    programAddress,
-  } as SetComputeUnitPriceInstruction<TProgram, TRemainingAccounts>;
-}
-
-// Input.
 export type SetComputeUnitPriceInput = {
   microLamports: SetComputeUnitPriceInstructionDataArgs['microLamports'];
 };
 
-export async function setComputeUnitPrice<
-  TReturn,
+export type SetComputeUnitPriceInputWithSigners = {
+  microLamports: SetComputeUnitPriceInstructionDataArgs['microLamports'];
+};
+
+export function getSetComputeUnitPriceInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'> &
-    CustomGeneratedInstruction<
-      SetComputeUnitPriceInstruction<TProgram>,
-      TReturn
-    >,
-  input: SetComputeUnitPriceInput
-): Promise<TReturn>;
-export async function setComputeUnitPrice<
+  context: Pick<Context, 'getProgramAddress'>,
+  input: SetComputeUnitPriceInputWithSigners
+): SetComputeUnitPriceInstructionWithSigners<TProgram>;
+export function getSetComputeUnitPriceInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
 >(
   context: Pick<Context, 'getProgramAddress'>,
   input: SetComputeUnitPriceInput
-): Promise<
-  SetComputeUnitPriceInstruction<TProgram> &
-    IInstructionWithSigners &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function setComputeUnitPrice<
+): SetComputeUnitPriceInstruction<TProgram>;
+export function getSetComputeUnitPriceInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
 >(
-  input: SetComputeUnitPriceInput
-): Promise<
-  SetComputeUnitPriceInstruction<TProgram> &
-    IInstructionWithSigners &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function setComputeUnitPrice<
-  TReturn,
+  input: SetComputeUnitPriceInputWithSigners
+): SetComputeUnitPriceInstructionWithSigners<TProgram>;
+export function getSetComputeUnitPriceInstruction<
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+>(input: SetComputeUnitPriceInput): SetComputeUnitPriceInstruction<TProgram>;
+export function getSetComputeUnitPriceInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
 >(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | (Pick<Context, 'getProgramAddress'> &
-        CustomGeneratedInstruction<IInstruction, TReturn>)
-    | SetComputeUnitPriceInput,
+  rawContext: Pick<Context, 'getProgramAddress'> | SetComputeUnitPriceInput,
   rawInput?: SetComputeUnitPriceInput
-): Promise<
-  | TReturn
-  | (IInstruction &
-      IInstructionWithSigners &
-      IInstructionWithBytesCreatedOnChain)
-> {
+): IInstruction {
   // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as
-    | Pick<Context, 'getProgramAddress'>
-    | (Pick<Context, 'getProgramAddress'> &
-        CustomGeneratedInstruction<IInstruction, TReturn>);
+  const context = (rawInput === undefined ? {} : rawContext) as Pick<
+    Context,
+    'getProgramAddress'
+  >;
   const input = (
     rawInput === undefined ? rawContext : rawInput
   ) as SetComputeUnitPriceInput;
@@ -173,7 +138,7 @@ export async function setComputeUnitPrice<
     'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
   const programAddress = (
     context.getProgramAddress
-      ? await context.getProgramAddress({
+      ? context.getProgramAddress({
           name: 'splComputeBudget',
           address: defaultProgramAddress,
         })
@@ -189,17 +154,27 @@ export async function setComputeUnitPrice<
   // Bytes created on chain.
   const bytesCreatedOnChain = 0;
 
-  // Instruction.
-  const instruction = {
-    ...setComputeUnitPriceInstruction(
+  return Object.freeze({
+    ...getSetComputeUnitPriceInstructionRaw(
       args as SetComputeUnitPriceInstructionDataArgs,
       programAddress,
       remainingAccounts
     ),
     bytesCreatedOnChain,
-  };
+  });
+}
 
-  return 'getGeneratedInstruction' in context && context.getGeneratedInstruction
-    ? context.getGeneratedInstruction(instruction)
-    : instruction;
+export function getSetComputeUnitPriceInstructionRaw<
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
+  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+>(
+  args: SetComputeUnitPriceInstructionDataArgs,
+  programAddress: Address<TProgram> = 'ComputeBudget111111111111111111111111111111' as Address<TProgram>,
+  remainingAccounts?: TRemainingAccounts
+) {
+  return {
+    accounts: remainingAccounts ?? [],
+    data: getSetComputeUnitPriceInstructionDataEncoder().encode(args),
+    programAddress,
+  } as SetComputeUnitPriceInstruction<TProgram, TRemainingAccounts>;
 }

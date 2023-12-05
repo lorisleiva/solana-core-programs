@@ -36,15 +36,9 @@ import {
   IInstructionWithData,
   WritableSignerAccount,
 } from '@solana/instructions';
-import {
-  IAccountSignerMeta,
-  IInstructionWithSigners,
-  TransactionSigner,
-} from '@solana/signers';
+import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import {
   Context,
-  CustomGeneratedInstruction,
-  IInstructionWithBytesCreatedOnChain,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
@@ -70,6 +64,28 @@ export type CreateAccountInstruction<
     ]
   >;
 
+// Output.
+export type CreateAccountInstructionWithSigners<
+  TProgram extends string = '11111111111111111111111111111111',
+  TAccountPayer extends string | IAccountMeta<string> = string,
+  TAccountNewAccount extends string | IAccountMeta<string> = string,
+  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+> = IInstruction<TProgram> &
+  IInstructionWithData<Uint8Array> &
+  IInstructionWithAccounts<
+    [
+      TAccountPayer extends string
+        ? WritableSignerAccount<TAccountPayer> &
+            IAccountSignerMeta<TAccountPayer>
+        : TAccountPayer,
+      TAccountNewAccount extends string
+        ? WritableSignerAccount<TAccountNewAccount> &
+            IAccountSignerMeta<TAccountNewAccount>
+        : TAccountNewAccount,
+      ...TRemainingAccounts
+    ]
+  >;
+
 export type CreateAccountInstructionData = {
   discriminator: number;
   lamports: bigint;
@@ -83,36 +99,30 @@ export type CreateAccountInstructionDataArgs = {
   programId: Address;
 };
 
-export function getCreateAccountInstructionDataEncoder(): Encoder<CreateAccountInstructionDataArgs> {
+export function getCreateAccountInstructionDataEncoder() {
   return mapEncoder(
     getStructEncoder<{
       discriminator: number;
       lamports: number | bigint;
       space: number | bigint;
       programId: Address;
-    }>(
-      [
-        ['discriminator', getU32Encoder()],
-        ['lamports', getU64Encoder()],
-        ['space', getU64Encoder()],
-        ['programId', getAddressEncoder()],
-      ],
-      { description: 'CreateAccountInstructionData' }
-    ),
+    }>([
+      ['discriminator', getU32Encoder()],
+      ['lamports', getU64Encoder()],
+      ['space', getU64Encoder()],
+      ['programId', getAddressEncoder()],
+    ]),
     (value) => ({ ...value, discriminator: 0 })
-  ) as Encoder<CreateAccountInstructionDataArgs>;
+  ) satisfies Encoder<CreateAccountInstructionDataArgs>;
 }
 
-export function getCreateAccountInstructionDataDecoder(): Decoder<CreateAccountInstructionData> {
-  return getStructDecoder<CreateAccountInstructionData>(
-    [
-      ['discriminator', getU32Decoder()],
-      ['lamports', getU64Decoder()],
-      ['space', getU64Decoder()],
-      ['programId', getAddressDecoder()],
-    ],
-    { description: 'CreateAccountInstructionData' }
-  ) as Decoder<CreateAccountInstructionData>;
+export function getCreateAccountInstructionDataDecoder() {
+  return getStructDecoder<CreateAccountInstructionData>([
+    ['discriminator', getU32Decoder()],
+    ['lamports', getU64Decoder()],
+    ['space', getU64Decoder()],
+    ['programId', getAddressDecoder()],
+  ]) satisfies Decoder<CreateAccountInstructionData>;
 }
 
 export function getCreateAccountInstructionDataCodec(): Codec<
@@ -125,7 +135,138 @@ export function getCreateAccountInstructionDataCodec(): Codec<
   );
 }
 
-export function createAccountInstruction<
+export type CreateAccountInput<
+  TAccountPayer extends string,
+  TAccountNewAccount extends string
+> = {
+  payer?: Address<TAccountPayer>;
+  newAccount: Address<TAccountNewAccount>;
+  lamports: CreateAccountInstructionDataArgs['lamports'];
+  space: CreateAccountInstructionDataArgs['space'];
+  programId: CreateAccountInstructionDataArgs['programId'];
+};
+
+export type CreateAccountInputWithSigners<
+  TAccountPayer extends string,
+  TAccountNewAccount extends string
+> = {
+  payer?: TransactionSigner<TAccountPayer>;
+  newAccount: TransactionSigner<TAccountNewAccount>;
+  lamports: CreateAccountInstructionDataArgs['lamports'];
+  space: CreateAccountInstructionDataArgs['space'];
+  programId: CreateAccountInstructionDataArgs['programId'];
+};
+
+export function getCreateAccountInstruction<
+  TAccountPayer extends string,
+  TAccountNewAccount extends string,
+  TProgram extends string = '11111111111111111111111111111111'
+>(
+  context: Pick<Context, 'getProgramAddress'>,
+  input: CreateAccountInputWithSigners<TAccountPayer, TAccountNewAccount>
+): CreateAccountInstructionWithSigners<
+  TProgram,
+  TAccountPayer,
+  TAccountNewAccount
+>;
+export function getCreateAccountInstruction<
+  TAccountPayer extends string,
+  TAccountNewAccount extends string,
+  TProgram extends string = '11111111111111111111111111111111'
+>(
+  context: Pick<Context, 'getProgramAddress'>,
+  input: CreateAccountInput<TAccountPayer, TAccountNewAccount>
+): CreateAccountInstruction<TProgram, TAccountPayer, TAccountNewAccount>;
+export function getCreateAccountInstruction<
+  TAccountPayer extends string,
+  TAccountNewAccount extends string,
+  TProgram extends string = '11111111111111111111111111111111'
+>(
+  input: CreateAccountInputWithSigners<TAccountPayer, TAccountNewAccount>
+): CreateAccountInstructionWithSigners<
+  TProgram,
+  TAccountPayer,
+  TAccountNewAccount
+>;
+export function getCreateAccountInstruction<
+  TAccountPayer extends string,
+  TAccountNewAccount extends string,
+  TProgram extends string = '11111111111111111111111111111111'
+>(
+  input: CreateAccountInput<TAccountPayer, TAccountNewAccount>
+): CreateAccountInstruction<TProgram, TAccountPayer, TAccountNewAccount>;
+export function getCreateAccountInstruction<
+  TAccountPayer extends string,
+  TAccountNewAccount extends string,
+  TProgram extends string = '11111111111111111111111111111111'
+>(
+  rawContext:
+    | Pick<Context, 'getProgramAddress'>
+    | CreateAccountInput<TAccountPayer, TAccountNewAccount>,
+  rawInput?: CreateAccountInput<TAccountPayer, TAccountNewAccount>
+): IInstruction {
+  // Resolve context and input arguments.
+  const context = (rawInput === undefined ? {} : rawContext) as Pick<
+    Context,
+    'getProgramAddress'
+  >;
+  const input = (
+    rawInput === undefined ? rawContext : rawInput
+  ) as CreateAccountInput<TAccountPayer, TAccountNewAccount>;
+
+  // Program address.
+  const defaultProgramAddress =
+    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+  const programAddress = (
+    context.getProgramAddress
+      ? context.getProgramAddress({
+          name: 'splSystem',
+          address: defaultProgramAddress,
+        })
+      : defaultProgramAddress
+  ) as Address<TProgram>;
+
+  // Original accounts.
+  type AccountMetas = Parameters<
+    typeof getCreateAccountInstructionRaw<
+      TProgram,
+      TAccountPayer,
+      TAccountNewAccount
+    >
+  >[0];
+  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+    payer: { value: input.payer ?? null, isWritable: true },
+    newAccount: { value: input.newAccount ?? null, isWritable: true },
+  };
+
+  // Original args.
+  const args = { ...input };
+
+  // Get account metas and signers.
+  const accountMetas = getAccountMetasWithSigners(
+    accounts,
+    'programId',
+    programAddress
+  );
+
+  // Remaining accounts.
+  const remainingAccounts: IAccountMeta[] = [];
+
+  // Bytes created on chain.
+  const bytesCreatedOnChain = 0;
+
+  return Object.freeze({
+    ...getCreateAccountInstructionRaw(
+      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
+      args as CreateAccountInstructionDataArgs,
+      programAddress,
+      remainingAccounts
+    ),
+    bytesCreatedOnChain,
+  });
+}
+
+export function getCreateAccountInstructionRaw<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountPayer extends string | IAccountMeta<string> = string,
   TAccountNewAccount extends string | IAccountMeta<string> = string,
@@ -157,148 +298,4 @@ export function createAccountInstruction<
     TAccountNewAccount,
     TRemainingAccounts
   >;
-}
-
-// Input.
-export type CreateAccountInput<
-  TAccountPayer extends string,
-  TAccountNewAccount extends string
-> = {
-  payer?: TransactionSigner<TAccountPayer>;
-  newAccount: TransactionSigner<TAccountNewAccount>;
-  lamports: CreateAccountInstructionDataArgs['lamports'];
-  space: CreateAccountInstructionDataArgs['space'];
-  programId: CreateAccountInstructionDataArgs['programId'];
-};
-
-export async function createAccount<
-  TReturn,
-  TAccountPayer extends string,
-  TAccountNewAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'> &
-    CustomGeneratedInstruction<
-      CreateAccountInstruction<
-        TProgram,
-        WritableSignerAccount<TAccountPayer> &
-          IAccountSignerMeta<TAccountPayer>,
-        WritableSignerAccount<TAccountNewAccount> &
-          IAccountSignerMeta<TAccountNewAccount>
-      >,
-      TReturn
-    >,
-  input: CreateAccountInput<TAccountPayer, TAccountNewAccount>
-): Promise<TReturn>;
-export async function createAccount<
-  TAccountPayer extends string,
-  TAccountNewAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: CreateAccountInput<TAccountPayer, TAccountNewAccount>
-): Promise<
-  CreateAccountInstruction<
-    TProgram,
-    WritableSignerAccount<TAccountPayer> & IAccountSignerMeta<TAccountPayer>,
-    WritableSignerAccount<TAccountNewAccount> &
-      IAccountSignerMeta<TAccountNewAccount>
-  > &
-    IInstructionWithSigners &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function createAccount<
-  TAccountPayer extends string,
-  TAccountNewAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
-  input: CreateAccountInput<TAccountPayer, TAccountNewAccount>
-): Promise<
-  CreateAccountInstruction<
-    TProgram,
-    WritableSignerAccount<TAccountPayer> & IAccountSignerMeta<TAccountPayer>,
-    WritableSignerAccount<TAccountNewAccount> &
-      IAccountSignerMeta<TAccountNewAccount>
-  > &
-    IInstructionWithSigners &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function createAccount<
-  TReturn,
-  TAccountPayer extends string,
-  TAccountNewAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | (Pick<Context, 'getProgramAddress'> &
-        CustomGeneratedInstruction<IInstruction, TReturn>)
-    | CreateAccountInput<TAccountPayer, TAccountNewAccount>,
-  rawInput?: CreateAccountInput<TAccountPayer, TAccountNewAccount>
-): Promise<
-  | TReturn
-  | (IInstruction &
-      IInstructionWithSigners &
-      IInstructionWithBytesCreatedOnChain)
-> {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as
-    | Pick<Context, 'getProgramAddress'>
-    | (Pick<Context, 'getProgramAddress'> &
-        CustomGeneratedInstruction<IInstruction, TReturn>);
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as CreateAccountInput<TAccountPayer, TAccountNewAccount>;
-
-  // Program address.
-  const defaultProgramAddress =
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
-  const programAddress = (
-    context.getProgramAddress
-      ? await context.getProgramAddress({
-          name: 'splSystem',
-          address: defaultProgramAddress,
-        })
-      : defaultProgramAddress
-  ) as Address<TProgram>;
-
-  // Original accounts.
-  type AccountMetas = Parameters<
-    typeof createAccountInstruction<TProgram, TAccountPayer, TAccountNewAccount>
-  >[0];
-  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
-    payer: { value: input.payer ?? null, isWritable: true },
-    newAccount: { value: input.newAccount ?? null, isWritable: true },
-  };
-
-  // Original args.
-  const args = { ...input };
-
-  // Get account metas and signers.
-  const accountMetas = getAccountMetasWithSigners(
-    accounts,
-    'programId',
-    programAddress
-  );
-
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
-
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
-
-  // Instruction.
-  const instruction = {
-    ...createAccountInstruction(
-      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-      args as CreateAccountInstructionDataArgs,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  };
-
-  return 'getGeneratedInstruction' in context && context.getGeneratedInstruction
-    ? context.getGeneratedInstruction(instruction)
-    : instruction;
 }

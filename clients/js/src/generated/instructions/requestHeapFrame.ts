@@ -30,15 +30,18 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
-import { IInstructionWithSigners } from '@solana/signers';
-import {
-  Context,
-  CustomGeneratedInstruction,
-  IInstructionWithBytesCreatedOnChain,
-} from '../shared';
+import { Context } from '../shared';
 
 // Output.
 export type RequestHeapFrameInstruction<
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
+  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+> = IInstruction<TProgram> &
+  IInstructionWithData<Uint8Array> &
+  IInstructionWithAccounts<TRemainingAccounts>;
+
+// Output.
+export type RequestHeapFrameInstructionWithSigners<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
 > = IInstruction<TProgram> &
@@ -62,7 +65,7 @@ export type RequestHeapFrameInstructionDataArgs = {
   bytes: number;
 };
 
-export function getRequestHeapFrameInstructionDataEncoder(): Encoder<RequestHeapFrameInstructionDataArgs> {
+export function getRequestHeapFrameInstructionDataEncoder() {
   return mapEncoder(
     getStructEncoder<{
       discriminator: number;
@@ -71,25 +74,19 @@ export function getRequestHeapFrameInstructionDataEncoder(): Encoder<RequestHeap
        * Must be multiple of 1024. Applies to each program, including CPIs.
        */
       bytes: number;
-    }>(
-      [
-        ['discriminator', getU8Encoder()],
-        ['bytes', getU32Encoder()],
-      ],
-      { description: 'RequestHeapFrameInstructionData' }
-    ),
+    }>([
+      ['discriminator', getU8Encoder()],
+      ['bytes', getU32Encoder()],
+    ]),
     (value) => ({ ...value, discriminator: 1 })
-  ) as Encoder<RequestHeapFrameInstructionDataArgs>;
+  ) satisfies Encoder<RequestHeapFrameInstructionDataArgs>;
 }
 
-export function getRequestHeapFrameInstructionDataDecoder(): Decoder<RequestHeapFrameInstructionData> {
-  return getStructDecoder<RequestHeapFrameInstructionData>(
-    [
-      ['discriminator', getU8Decoder()],
-      ['bytes', getU32Decoder()],
-    ],
-    { description: 'RequestHeapFrameInstructionData' }
-  ) as Decoder<RequestHeapFrameInstructionData>;
+export function getRequestHeapFrameInstructionDataDecoder() {
+  return getStructDecoder<RequestHeapFrameInstructionData>([
+    ['discriminator', getU8Decoder()],
+    ['bytes', getU32Decoder()],
+  ]) satisfies Decoder<RequestHeapFrameInstructionData>;
 }
 
 export function getRequestHeapFrameInstructionDataCodec(): Codec<
@@ -102,74 +99,45 @@ export function getRequestHeapFrameInstructionDataCodec(): Codec<
   );
 }
 
-export function requestHeapFrameInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
->(
-  args: RequestHeapFrameInstructionDataArgs,
-  programAddress: Address<TProgram> = 'ComputeBudget111111111111111111111111111111' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: remainingAccounts ?? [],
-    data: getRequestHeapFrameInstructionDataEncoder().encode(args),
-    programAddress,
-  } as RequestHeapFrameInstruction<TProgram, TRemainingAccounts>;
-}
-
-// Input.
 export type RequestHeapFrameInput = {
   bytes: RequestHeapFrameInstructionDataArgs['bytes'];
 };
 
-export async function requestHeapFrame<
-  TReturn,
+export type RequestHeapFrameInputWithSigners = {
+  bytes: RequestHeapFrameInstructionDataArgs['bytes'];
+};
+
+export function getRequestHeapFrameInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'> &
-    CustomGeneratedInstruction<RequestHeapFrameInstruction<TProgram>, TReturn>,
-  input: RequestHeapFrameInput
-): Promise<TReturn>;
-export async function requestHeapFrame<
+  context: Pick<Context, 'getProgramAddress'>,
+  input: RequestHeapFrameInputWithSigners
+): RequestHeapFrameInstructionWithSigners<TProgram>;
+export function getRequestHeapFrameInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
 >(
   context: Pick<Context, 'getProgramAddress'>,
   input: RequestHeapFrameInput
-): Promise<
-  RequestHeapFrameInstruction<TProgram> &
-    IInstructionWithSigners &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function requestHeapFrame<
+): RequestHeapFrameInstruction<TProgram>;
+export function getRequestHeapFrameInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
 >(
-  input: RequestHeapFrameInput
-): Promise<
-  RequestHeapFrameInstruction<TProgram> &
-    IInstructionWithSigners &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function requestHeapFrame<
-  TReturn,
+  input: RequestHeapFrameInputWithSigners
+): RequestHeapFrameInstructionWithSigners<TProgram>;
+export function getRequestHeapFrameInstruction<
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+>(input: RequestHeapFrameInput): RequestHeapFrameInstruction<TProgram>;
+export function getRequestHeapFrameInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
 >(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | (Pick<Context, 'getProgramAddress'> &
-        CustomGeneratedInstruction<IInstruction, TReturn>)
-    | RequestHeapFrameInput,
+  rawContext: Pick<Context, 'getProgramAddress'> | RequestHeapFrameInput,
   rawInput?: RequestHeapFrameInput
-): Promise<
-  | TReturn
-  | (IInstruction &
-      IInstructionWithSigners &
-      IInstructionWithBytesCreatedOnChain)
-> {
+): IInstruction {
   // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as
-    | Pick<Context, 'getProgramAddress'>
-    | (Pick<Context, 'getProgramAddress'> &
-        CustomGeneratedInstruction<IInstruction, TReturn>);
+  const context = (rawInput === undefined ? {} : rawContext) as Pick<
+    Context,
+    'getProgramAddress'
+  >;
   const input = (
     rawInput === undefined ? rawContext : rawInput
   ) as RequestHeapFrameInput;
@@ -179,7 +147,7 @@ export async function requestHeapFrame<
     'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
   const programAddress = (
     context.getProgramAddress
-      ? await context.getProgramAddress({
+      ? context.getProgramAddress({
           name: 'splComputeBudget',
           address: defaultProgramAddress,
         })
@@ -195,17 +163,27 @@ export async function requestHeapFrame<
   // Bytes created on chain.
   const bytesCreatedOnChain = 0;
 
-  // Instruction.
-  const instruction = {
-    ...requestHeapFrameInstruction(
+  return Object.freeze({
+    ...getRequestHeapFrameInstructionRaw(
       args as RequestHeapFrameInstructionDataArgs,
       programAddress,
       remainingAccounts
     ),
     bytesCreatedOnChain,
-  };
+  });
+}
 
-  return 'getGeneratedInstruction' in context && context.getGeneratedInstruction
-    ? context.getGeneratedInstruction(instruction)
-    : instruction;
+export function getRequestHeapFrameInstructionRaw<
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
+  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+>(
+  args: RequestHeapFrameInstructionDataArgs,
+  programAddress: Address<TProgram> = 'ComputeBudget111111111111111111111111111111' as Address<TProgram>,
+  remainingAccounts?: TRemainingAccounts
+) {
+  return {
+    accounts: remainingAccounts ?? [],
+    data: getRequestHeapFrameInstructionDataEncoder().encode(args),
+    programAddress,
+  } as RequestHeapFrameInstruction<TProgram, TRemainingAccounts>;
 }

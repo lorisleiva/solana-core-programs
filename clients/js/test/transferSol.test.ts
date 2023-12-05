@@ -1,6 +1,10 @@
 import { pipe } from '@solana/functional';
 import { lamports } from '@solana/rpc-types';
 import {
+  generateKeyPairSigner,
+  signTransactionWithSigners,
+} from '@solana/signers';
+import {
   appendTransactionInstruction,
   createDefaultAirdropRequester,
   createDefaultTransactionSender,
@@ -10,10 +14,10 @@ import {
 } from '@solana/web3.js';
 import test from 'ava';
 import {
-  generateKeyPairSigner,
-  signTransactionWithSigners,
-} from '@solana/signers';
-import { addMemo, setComputeUnitLimit, transferSol } from '../src';
+  getAddMemoInstruction,
+  getSetComputeUnitLimitInstruction,
+  getTransferSolInstruction,
+} from '../src';
 import { createClient } from './_setup';
 
 test('it can transfer SOL from one account to another', async (t) => {
@@ -33,20 +37,26 @@ test('it can transfer SOL from one account to another', async (t) => {
   const destination = (await generateKeyPairSigner()).address;
 
   // When the source account transfers 1 SOL to the destination account.
-  const [{ value: latestBlockhash }, ...instructions] = await Promise.all([
-    await client.rpc.getLatestBlockhash().send(),
-    await setComputeUnitLimit({ units: 600_000 }),
-    await transferSol({ source, destination, amount: 1_000_000_000 }),
-    await addMemo({ memo: "I'm transferring some SOL!" }),
-  ]);
+  const { value: latestBlockhash } = await client.rpc
+    .getLatestBlockhash()
+    .send();
+  const setComputeUnitLimit = getSetComputeUnitLimitInstruction({
+    units: 600_000,
+  });
+  const transferSol = getTransferSolInstruction({
+    source,
+    destination,
+    amount: 1_000_000_000,
+  });
+  const addMemo = getAddMemoInstruction({ memo: "I'm transferring some SOL!" });
 
   const transaction = pipe(
     createTransaction({ version: 0 }),
     (tx) => setTransactionFeePayer(source.address, tx),
     (tx) => setTransactionLifetimeUsingBlockhash(latestBlockhash, tx),
-    (tx) => appendTransactionInstruction(instructions[0], tx),
-    (tx) => appendTransactionInstruction(instructions[1], tx),
-    (tx) => appendTransactionInstruction(instructions[2], tx)
+    (tx) => appendTransactionInstruction(setComputeUnitLimit, tx),
+    (tx) => appendTransactionInstruction(transferSol, tx),
+    (tx) => appendTransactionInstruction(addMemo, tx)
   );
 
   const signedTransaction = await signTransactionWithSigners(transaction);

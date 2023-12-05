@@ -77,7 +77,7 @@ export type AddressLookupTableAccountDataArgs = {
   addresses: Array<Address>;
 };
 
-export function getAddressLookupTableAccountDataEncoder(): Encoder<AddressLookupTableAccountDataArgs> {
+export function getAddressLookupTableAccountDataEncoder() {
   return mapEncoder(
     getStructEncoder<{
       discriminator: number;
@@ -87,41 +87,32 @@ export function getAddressLookupTableAccountDataEncoder(): Encoder<AddressLookup
       authority: OptionOrNullable<Address>;
       padding: number;
       addresses: Array<Address>;
-    }>(
-      [
-        ['discriminator', getU32Encoder()],
-        ['deactivationSlot', getU64Encoder()],
-        ['lastExtendedSlot', getU64Encoder()],
-        ['lastExtendedStartIndex', getU8Encoder()],
-        ['authority', getOptionEncoder(getAddressEncoder(), { fixed: true })],
-        ['padding', getU16Encoder()],
-        [
-          'addresses',
-          getArrayEncoder(getAddressEncoder(), { size: 'remainder' }),
-        ],
-      ],
-      { description: 'AddressLookupTableAccountData' }
-    ),
-    (value) => ({ ...value, discriminator: 1 })
-  ) as Encoder<AddressLookupTableAccountDataArgs>;
-}
-
-export function getAddressLookupTableAccountDataDecoder(): Decoder<AddressLookupTableAccountData> {
-  return getStructDecoder<AddressLookupTableAccountData>(
-    [
-      ['discriminator', getU32Decoder()],
-      ['deactivationSlot', getU64Decoder()],
-      ['lastExtendedSlot', getU64Decoder()],
-      ['lastExtendedStartIndex', getU8Decoder()],
-      ['authority', getOptionDecoder(getAddressDecoder(), { fixed: true })],
-      ['padding', getU16Decoder()],
+    }>([
+      ['discriminator', getU32Encoder()],
+      ['deactivationSlot', getU64Encoder()],
+      ['lastExtendedSlot', getU64Encoder()],
+      ['lastExtendedStartIndex', getU8Encoder()],
+      ['authority', getOptionEncoder(getAddressEncoder(), { fixed: true })],
+      ['padding', getU16Encoder()],
       [
         'addresses',
-        getArrayDecoder(getAddressDecoder(), { size: 'remainder' }),
+        getArrayEncoder(getAddressEncoder(), { size: 'remainder' }),
       ],
-    ],
-    { description: 'AddressLookupTableAccountData' }
-  ) as Decoder<AddressLookupTableAccountData>;
+    ]),
+    (value) => ({ ...value, discriminator: 1 })
+  ) satisfies Encoder<AddressLookupTableAccountDataArgs>;
+}
+
+export function getAddressLookupTableAccountDataDecoder() {
+  return getStructDecoder<AddressLookupTableAccountData>([
+    ['discriminator', getU32Decoder()],
+    ['deactivationSlot', getU64Decoder()],
+    ['lastExtendedSlot', getU64Decoder()],
+    ['lastExtendedStartIndex', getU8Decoder()],
+    ['authority', getOptionDecoder(getAddressDecoder(), { fixed: true })],
+    ['padding', getU16Decoder()],
+    ['addresses', getArrayDecoder(getAddressDecoder(), { size: 'remainder' })],
+  ]) satisfies Decoder<AddressLookupTableAccountData>;
 }
 
 export function getAddressLookupTableAccountDataCodec(): Codec<

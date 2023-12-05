@@ -30,15 +30,18 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
-import { IInstructionWithSigners } from '@solana/signers';
-import {
-  Context,
-  CustomGeneratedInstruction,
-  IInstructionWithBytesCreatedOnChain,
-} from '../shared';
+import { Context } from '../shared';
 
 // Output.
 export type SetComputeUnitLimitInstruction<
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
+  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+> = IInstruction<TProgram> &
+  IInstructionWithData<Uint8Array> &
+  IInstructionWithAccounts<TRemainingAccounts>;
+
+// Output.
+export type SetComputeUnitLimitInstructionWithSigners<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
 > = IInstruction<TProgram> &
@@ -56,31 +59,25 @@ export type SetComputeUnitLimitInstructionDataArgs = {
   units: number;
 };
 
-export function getSetComputeUnitLimitInstructionDataEncoder(): Encoder<SetComputeUnitLimitInstructionDataArgs> {
+export function getSetComputeUnitLimitInstructionDataEncoder() {
   return mapEncoder(
     getStructEncoder<{
       discriminator: number;
       /** Transaction-wide compute unit limit. */
       units: number;
-    }>(
-      [
-        ['discriminator', getU8Encoder()],
-        ['units', getU32Encoder()],
-      ],
-      { description: 'SetComputeUnitLimitInstructionData' }
-    ),
+    }>([
+      ['discriminator', getU8Encoder()],
+      ['units', getU32Encoder()],
+    ]),
     (value) => ({ ...value, discriminator: 2 })
-  ) as Encoder<SetComputeUnitLimitInstructionDataArgs>;
+  ) satisfies Encoder<SetComputeUnitLimitInstructionDataArgs>;
 }
 
-export function getSetComputeUnitLimitInstructionDataDecoder(): Decoder<SetComputeUnitLimitInstructionData> {
-  return getStructDecoder<SetComputeUnitLimitInstructionData>(
-    [
-      ['discriminator', getU8Decoder()],
-      ['units', getU32Decoder()],
-    ],
-    { description: 'SetComputeUnitLimitInstructionData' }
-  ) as Decoder<SetComputeUnitLimitInstructionData>;
+export function getSetComputeUnitLimitInstructionDataDecoder() {
+  return getStructDecoder<SetComputeUnitLimitInstructionData>([
+    ['discriminator', getU8Decoder()],
+    ['units', getU32Decoder()],
+  ]) satisfies Decoder<SetComputeUnitLimitInstructionData>;
 }
 
 export function getSetComputeUnitLimitInstructionDataCodec(): Codec<
@@ -93,77 +90,45 @@ export function getSetComputeUnitLimitInstructionDataCodec(): Codec<
   );
 }
 
-export function setComputeUnitLimitInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
->(
-  args: SetComputeUnitLimitInstructionDataArgs,
-  programAddress: Address<TProgram> = 'ComputeBudget111111111111111111111111111111' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: remainingAccounts ?? [],
-    data: getSetComputeUnitLimitInstructionDataEncoder().encode(args),
-    programAddress,
-  } as SetComputeUnitLimitInstruction<TProgram, TRemainingAccounts>;
-}
-
-// Input.
 export type SetComputeUnitLimitInput = {
   units: SetComputeUnitLimitInstructionDataArgs['units'];
 };
 
-export async function setComputeUnitLimit<
-  TReturn,
+export type SetComputeUnitLimitInputWithSigners = {
+  units: SetComputeUnitLimitInstructionDataArgs['units'];
+};
+
+export function getSetComputeUnitLimitInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'> &
-    CustomGeneratedInstruction<
-      SetComputeUnitLimitInstruction<TProgram>,
-      TReturn
-    >,
-  input: SetComputeUnitLimitInput
-): Promise<TReturn>;
-export async function setComputeUnitLimit<
+  context: Pick<Context, 'getProgramAddress'>,
+  input: SetComputeUnitLimitInputWithSigners
+): SetComputeUnitLimitInstructionWithSigners<TProgram>;
+export function getSetComputeUnitLimitInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
 >(
   context: Pick<Context, 'getProgramAddress'>,
   input: SetComputeUnitLimitInput
-): Promise<
-  SetComputeUnitLimitInstruction<TProgram> &
-    IInstructionWithSigners &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function setComputeUnitLimit<
+): SetComputeUnitLimitInstruction<TProgram>;
+export function getSetComputeUnitLimitInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
 >(
-  input: SetComputeUnitLimitInput
-): Promise<
-  SetComputeUnitLimitInstruction<TProgram> &
-    IInstructionWithSigners &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function setComputeUnitLimit<
-  TReturn,
+  input: SetComputeUnitLimitInputWithSigners
+): SetComputeUnitLimitInstructionWithSigners<TProgram>;
+export function getSetComputeUnitLimitInstruction<
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+>(input: SetComputeUnitLimitInput): SetComputeUnitLimitInstruction<TProgram>;
+export function getSetComputeUnitLimitInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
 >(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | (Pick<Context, 'getProgramAddress'> &
-        CustomGeneratedInstruction<IInstruction, TReturn>)
-    | SetComputeUnitLimitInput,
+  rawContext: Pick<Context, 'getProgramAddress'> | SetComputeUnitLimitInput,
   rawInput?: SetComputeUnitLimitInput
-): Promise<
-  | TReturn
-  | (IInstruction &
-      IInstructionWithSigners &
-      IInstructionWithBytesCreatedOnChain)
-> {
+): IInstruction {
   // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as
-    | Pick<Context, 'getProgramAddress'>
-    | (Pick<Context, 'getProgramAddress'> &
-        CustomGeneratedInstruction<IInstruction, TReturn>);
+  const context = (rawInput === undefined ? {} : rawContext) as Pick<
+    Context,
+    'getProgramAddress'
+  >;
   const input = (
     rawInput === undefined ? rawContext : rawInput
   ) as SetComputeUnitLimitInput;
@@ -173,7 +138,7 @@ export async function setComputeUnitLimit<
     'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
   const programAddress = (
     context.getProgramAddress
-      ? await context.getProgramAddress({
+      ? context.getProgramAddress({
           name: 'splComputeBudget',
           address: defaultProgramAddress,
         })
@@ -189,17 +154,27 @@ export async function setComputeUnitLimit<
   // Bytes created on chain.
   const bytesCreatedOnChain = 0;
 
-  // Instruction.
-  const instruction = {
-    ...setComputeUnitLimitInstruction(
+  return Object.freeze({
+    ...getSetComputeUnitLimitInstructionRaw(
       args as SetComputeUnitLimitInstructionDataArgs,
       programAddress,
       remainingAccounts
     ),
     bytesCreatedOnChain,
-  };
+  });
+}
 
-  return 'getGeneratedInstruction' in context && context.getGeneratedInstruction
-    ? context.getGeneratedInstruction(instruction)
-    : instruction;
+export function getSetComputeUnitLimitInstructionRaw<
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
+  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+>(
+  args: SetComputeUnitLimitInstructionDataArgs,
+  programAddress: Address<TProgram> = 'ComputeBudget111111111111111111111111111111' as Address<TProgram>,
+  remainingAccounts?: TRemainingAccounts
+) {
+  return {
+    accounts: remainingAccounts ?? [],
+    data: getSetComputeUnitLimitInstructionDataEncoder().encode(args),
+    programAddress,
+  } as SetComputeUnitLimitInstruction<TProgram, TRemainingAccounts>;
 }

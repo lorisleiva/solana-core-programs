@@ -30,15 +30,18 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
-import { IInstructionWithSigners } from '@solana/signers';
-import {
-  Context,
-  CustomGeneratedInstruction,
-  IInstructionWithBytesCreatedOnChain,
-} from '../shared';
+import { Context } from '../shared';
 
 // Output.
 export type RequestUnitsInstruction<
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
+  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+> = IInstruction<TProgram> &
+  IInstructionWithData<Uint8Array> &
+  IInstructionWithAccounts<TRemainingAccounts>;
+
+// Output.
+export type RequestUnitsInstructionWithSigners<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
 > = IInstruction<TProgram> &
@@ -60,7 +63,7 @@ export type RequestUnitsInstructionDataArgs = {
   additionalFee: number;
 };
 
-export function getRequestUnitsInstructionDataEncoder(): Encoder<RequestUnitsInstructionDataArgs> {
+export function getRequestUnitsInstructionDataEncoder() {
   return mapEncoder(
     getStructEncoder<{
       discriminator: number;
@@ -68,27 +71,21 @@ export function getRequestUnitsInstructionDataEncoder(): Encoder<RequestUnitsIns
       units: number;
       /** Prioritization fee lamports. */
       additionalFee: number;
-    }>(
-      [
-        ['discriminator', getU8Encoder()],
-        ['units', getU32Encoder()],
-        ['additionalFee', getU32Encoder()],
-      ],
-      { description: 'RequestUnitsInstructionData' }
-    ),
+    }>([
+      ['discriminator', getU8Encoder()],
+      ['units', getU32Encoder()],
+      ['additionalFee', getU32Encoder()],
+    ]),
     (value) => ({ ...value, discriminator: 0 })
-  ) as Encoder<RequestUnitsInstructionDataArgs>;
+  ) satisfies Encoder<RequestUnitsInstructionDataArgs>;
 }
 
-export function getRequestUnitsInstructionDataDecoder(): Decoder<RequestUnitsInstructionData> {
-  return getStructDecoder<RequestUnitsInstructionData>(
-    [
-      ['discriminator', getU8Decoder()],
-      ['units', getU32Decoder()],
-      ['additionalFee', getU32Decoder()],
-    ],
-    { description: 'RequestUnitsInstructionData' }
-  ) as Decoder<RequestUnitsInstructionData>;
+export function getRequestUnitsInstructionDataDecoder() {
+  return getStructDecoder<RequestUnitsInstructionData>([
+    ['discriminator', getU8Decoder()],
+    ['units', getU32Decoder()],
+    ['additionalFee', getU32Decoder()],
+  ]) satisfies Decoder<RequestUnitsInstructionData>;
 }
 
 export function getRequestUnitsInstructionDataCodec(): Codec<
@@ -101,75 +98,47 @@ export function getRequestUnitsInstructionDataCodec(): Codec<
   );
 }
 
-export function requestUnitsInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
->(
-  args: RequestUnitsInstructionDataArgs,
-  programAddress: Address<TProgram> = 'ComputeBudget111111111111111111111111111111' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: remainingAccounts ?? [],
-    data: getRequestUnitsInstructionDataEncoder().encode(args),
-    programAddress,
-  } as RequestUnitsInstruction<TProgram, TRemainingAccounts>;
-}
-
-// Input.
 export type RequestUnitsInput = {
   units: RequestUnitsInstructionDataArgs['units'];
   additionalFee: RequestUnitsInstructionDataArgs['additionalFee'];
 };
 
-export async function requestUnits<
-  TReturn,
+export type RequestUnitsInputWithSigners = {
+  units: RequestUnitsInstructionDataArgs['units'];
+  additionalFee: RequestUnitsInstructionDataArgs['additionalFee'];
+};
+
+export function getRequestUnitsInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'> &
-    CustomGeneratedInstruction<RequestUnitsInstruction<TProgram>, TReturn>,
-  input: RequestUnitsInput
-): Promise<TReturn>;
-export async function requestUnits<
+  context: Pick<Context, 'getProgramAddress'>,
+  input: RequestUnitsInputWithSigners
+): RequestUnitsInstructionWithSigners<TProgram>;
+export function getRequestUnitsInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
 >(
   context: Pick<Context, 'getProgramAddress'>,
   input: RequestUnitsInput
-): Promise<
-  RequestUnitsInstruction<TProgram> &
-    IInstructionWithSigners &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function requestUnits<
+): RequestUnitsInstruction<TProgram>;
+export function getRequestUnitsInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
 >(
-  input: RequestUnitsInput
-): Promise<
-  RequestUnitsInstruction<TProgram> &
-    IInstructionWithSigners &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function requestUnits<
-  TReturn,
+  input: RequestUnitsInputWithSigners
+): RequestUnitsInstructionWithSigners<TProgram>;
+export function getRequestUnitsInstruction<
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+>(input: RequestUnitsInput): RequestUnitsInstruction<TProgram>;
+export function getRequestUnitsInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
 >(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | (Pick<Context, 'getProgramAddress'> &
-        CustomGeneratedInstruction<IInstruction, TReturn>)
-    | RequestUnitsInput,
+  rawContext: Pick<Context, 'getProgramAddress'> | RequestUnitsInput,
   rawInput?: RequestUnitsInput
-): Promise<
-  | TReturn
-  | (IInstruction &
-      IInstructionWithSigners &
-      IInstructionWithBytesCreatedOnChain)
-> {
+): IInstruction {
   // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as
-    | Pick<Context, 'getProgramAddress'>
-    | (Pick<Context, 'getProgramAddress'> &
-        CustomGeneratedInstruction<IInstruction, TReturn>);
+  const context = (rawInput === undefined ? {} : rawContext) as Pick<
+    Context,
+    'getProgramAddress'
+  >;
   const input = (
     rawInput === undefined ? rawContext : rawInput
   ) as RequestUnitsInput;
@@ -179,7 +148,7 @@ export async function requestUnits<
     'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
   const programAddress = (
     context.getProgramAddress
-      ? await context.getProgramAddress({
+      ? context.getProgramAddress({
           name: 'splComputeBudget',
           address: defaultProgramAddress,
         })
@@ -195,17 +164,27 @@ export async function requestUnits<
   // Bytes created on chain.
   const bytesCreatedOnChain = 0;
 
-  // Instruction.
-  const instruction = {
-    ...requestUnitsInstruction(
+  return Object.freeze({
+    ...getRequestUnitsInstructionRaw(
       args as RequestUnitsInstructionDataArgs,
       programAddress,
       remainingAccounts
     ),
     bytesCreatedOnChain,
-  };
+  });
+}
 
-  return 'getGeneratedInstruction' in context && context.getGeneratedInstruction
-    ? context.getGeneratedInstruction(instruction)
-    : instruction;
+export function getRequestUnitsInstructionRaw<
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
+  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+>(
+  args: RequestUnitsInstructionDataArgs,
+  programAddress: Address<TProgram> = 'ComputeBudget111111111111111111111111111111' as Address<TProgram>,
+  remainingAccounts?: TRemainingAccounts
+) {
+  return {
+    accounts: remainingAccounts ?? [],
+    data: getRequestUnitsInstructionDataEncoder().encode(args),
+    programAddress,
+  } as RequestUnitsInstruction<TProgram, TRemainingAccounts>;
 }

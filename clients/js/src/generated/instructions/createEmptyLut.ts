@@ -37,15 +37,9 @@ import {
   WritableAccount,
   WritableSignerAccount,
 } from '@solana/instructions';
-import {
-  IAccountSignerMeta,
-  IInstructionWithSigners,
-  TransactionSigner,
-} from '@solana/signers';
+import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import {
   Context,
-  CustomGeneratedInstruction,
-  IInstructionWithBytesCreatedOnChain,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
@@ -82,6 +76,38 @@ export type CreateEmptyLutInstruction<
     ]
   >;
 
+// Output.
+export type CreateEmptyLutInstructionWithSigners<
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
+  TAccountAddress extends string | IAccountMeta<string> = string,
+  TAccountAuthority extends string | IAccountMeta<string> = string,
+  TAccountPayer extends string | IAccountMeta<string> = string,
+  TAccountSystemProgram extends
+    | string
+    | IAccountMeta<string> = '11111111111111111111111111111111',
+  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+> = IInstruction<TProgram> &
+  IInstructionWithData<Uint8Array> &
+  IInstructionWithAccounts<
+    [
+      TAccountAddress extends string
+        ? WritableAccount<TAccountAddress>
+        : TAccountAddress,
+      TAccountAuthority extends string
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            IAccountSignerMeta<TAccountAuthority>
+        : TAccountAuthority,
+      TAccountPayer extends string
+        ? WritableSignerAccount<TAccountPayer> &
+            IAccountSignerMeta<TAccountPayer>
+        : TAccountPayer,
+      TAccountSystemProgram extends string
+        ? ReadonlyAccount<TAccountSystemProgram>
+        : TAccountSystemProgram,
+      ...TRemainingAccounts
+    ]
+  >;
+
 export type CreateEmptyLutInstructionData = {
   discriminator: number;
   recentSlot: bigint;
@@ -93,33 +119,27 @@ export type CreateEmptyLutInstructionDataArgs = {
   bump: number;
 };
 
-export function getCreateEmptyLutInstructionDataEncoder(): Encoder<CreateEmptyLutInstructionDataArgs> {
+export function getCreateEmptyLutInstructionDataEncoder() {
   return mapEncoder(
     getStructEncoder<{
       discriminator: number;
       recentSlot: number | bigint;
       bump: number;
-    }>(
-      [
-        ['discriminator', getU32Encoder()],
-        ['recentSlot', getU64Encoder()],
-        ['bump', getU8Encoder()],
-      ],
-      { description: 'CreateEmptyLutInstructionData' }
-    ),
+    }>([
+      ['discriminator', getU32Encoder()],
+      ['recentSlot', getU64Encoder()],
+      ['bump', getU8Encoder()],
+    ]),
     (value) => ({ ...value, discriminator: 0 })
-  ) as Encoder<CreateEmptyLutInstructionDataArgs>;
+  ) satisfies Encoder<CreateEmptyLutInstructionDataArgs>;
 }
 
-export function getCreateEmptyLutInstructionDataDecoder(): Decoder<CreateEmptyLutInstructionData> {
-  return getStructDecoder<CreateEmptyLutInstructionData>(
-    [
-      ['discriminator', getU32Decoder()],
-      ['recentSlot', getU64Decoder()],
-      ['bump', getU8Decoder()],
-    ],
-    { description: 'CreateEmptyLutInstructionData' }
-  ) as Decoder<CreateEmptyLutInstructionData>;
+export function getCreateEmptyLutInstructionDataDecoder() {
+  return getStructDecoder<CreateEmptyLutInstructionData>([
+    ['discriminator', getU32Decoder()],
+    ['recentSlot', getU64Decoder()],
+    ['bump', getU8Decoder()],
+  ]) satisfies Decoder<CreateEmptyLutInstructionData>;
 }
 
 export function getCreateEmptyLutInstructionDataCodec(): Codec<
@@ -132,7 +152,219 @@ export function getCreateEmptyLutInstructionDataCodec(): Codec<
   );
 }
 
-export function createEmptyLutInstruction<
+export type CreateEmptyLutInput<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TAccountPayer extends string,
+  TAccountSystemProgram extends string
+> = {
+  address: Address<TAccountAddress>;
+  authority?: Address<TAccountAuthority>;
+  payer?: Address<TAccountPayer>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  recentSlot: CreateEmptyLutInstructionDataArgs['recentSlot'];
+  bump: CreateEmptyLutInstructionDataArgs['bump'];
+};
+
+export type CreateEmptyLutInputWithSigners<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TAccountPayer extends string,
+  TAccountSystemProgram extends string
+> = {
+  address: Address<TAccountAddress>;
+  authority?: TransactionSigner<TAccountAuthority>;
+  payer?: TransactionSigner<TAccountPayer>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  recentSlot: CreateEmptyLutInstructionDataArgs['recentSlot'];
+  bump: CreateEmptyLutInstructionDataArgs['bump'];
+};
+
+export function getCreateEmptyLutInstruction<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TAccountPayer extends string,
+  TAccountSystemProgram extends string,
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  context: Pick<Context, 'getProgramAddress'>,
+  input: CreateEmptyLutInputWithSigners<
+    TAccountAddress,
+    TAccountAuthority,
+    TAccountPayer,
+    TAccountSystemProgram
+  >
+): CreateEmptyLutInstructionWithSigners<
+  TProgram,
+  TAccountAddress,
+  TAccountAuthority,
+  TAccountPayer,
+  TAccountSystemProgram
+>;
+export function getCreateEmptyLutInstruction<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TAccountPayer extends string,
+  TAccountSystemProgram extends string,
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  context: Pick<Context, 'getProgramAddress'>,
+  input: CreateEmptyLutInput<
+    TAccountAddress,
+    TAccountAuthority,
+    TAccountPayer,
+    TAccountSystemProgram
+  >
+): CreateEmptyLutInstruction<
+  TProgram,
+  TAccountAddress,
+  TAccountAuthority,
+  TAccountPayer,
+  TAccountSystemProgram
+>;
+export function getCreateEmptyLutInstruction<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TAccountPayer extends string,
+  TAccountSystemProgram extends string,
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  input: CreateEmptyLutInputWithSigners<
+    TAccountAddress,
+    TAccountAuthority,
+    TAccountPayer,
+    TAccountSystemProgram
+  >
+): CreateEmptyLutInstructionWithSigners<
+  TProgram,
+  TAccountAddress,
+  TAccountAuthority,
+  TAccountPayer,
+  TAccountSystemProgram
+>;
+export function getCreateEmptyLutInstruction<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TAccountPayer extends string,
+  TAccountSystemProgram extends string,
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  input: CreateEmptyLutInput<
+    TAccountAddress,
+    TAccountAuthority,
+    TAccountPayer,
+    TAccountSystemProgram
+  >
+): CreateEmptyLutInstruction<
+  TProgram,
+  TAccountAddress,
+  TAccountAuthority,
+  TAccountPayer,
+  TAccountSystemProgram
+>;
+export function getCreateEmptyLutInstruction<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TAccountPayer extends string,
+  TAccountSystemProgram extends string,
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  rawContext:
+    | Pick<Context, 'getProgramAddress'>
+    | CreateEmptyLutInput<
+        TAccountAddress,
+        TAccountAuthority,
+        TAccountPayer,
+        TAccountSystemProgram
+      >,
+  rawInput?: CreateEmptyLutInput<
+    TAccountAddress,
+    TAccountAuthority,
+    TAccountPayer,
+    TAccountSystemProgram
+  >
+): IInstruction {
+  // Resolve context and input arguments.
+  const context = (rawInput === undefined ? {} : rawContext) as Pick<
+    Context,
+    'getProgramAddress'
+  >;
+  const input = (
+    rawInput === undefined ? rawContext : rawInput
+  ) as CreateEmptyLutInput<
+    TAccountAddress,
+    TAccountAuthority,
+    TAccountPayer,
+    TAccountSystemProgram
+  >;
+
+  // Program address.
+  const defaultProgramAddress =
+    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
+  const programAddress = (
+    context.getProgramAddress
+      ? context.getProgramAddress({
+          name: 'splAddressLookupTable',
+          address: defaultProgramAddress,
+        })
+      : defaultProgramAddress
+  ) as Address<TProgram>;
+
+  // Original accounts.
+  type AccountMetas = Parameters<
+    typeof getCreateEmptyLutInstructionRaw<
+      TProgram,
+      TAccountAddress,
+      TAccountAuthority,
+      TAccountPayer,
+      TAccountSystemProgram
+    >
+  >[0];
+  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+    address: { value: input.address ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isWritable: true },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value = getProgramAddress(
+      context,
+      'splSystem',
+      '11111111111111111111111111111111'
+    );
+    accounts.systemProgram.isWritable = false;
+  }
+
+  // Get account metas and signers.
+  const accountMetas = getAccountMetasWithSigners(
+    accounts,
+    'programId',
+    programAddress
+  );
+
+  // Remaining accounts.
+  const remainingAccounts: IAccountMeta[] = [];
+
+  // Bytes created on chain.
+  const bytesCreatedOnChain = 0;
+
+  return Object.freeze({
+    ...getCreateEmptyLutInstructionRaw(
+      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
+      args as CreateEmptyLutInstructionDataArgs,
+      programAddress,
+      remainingAccounts
+    ),
+    bytesCreatedOnChain,
+  });
+}
+
+export function getCreateEmptyLutInstructionRaw<
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
   TAccountAddress extends string | IAccountMeta<string> = string,
   TAccountAuthority extends string | IAccountMeta<string> = string,
@@ -185,213 +417,4 @@ export function createEmptyLutInstruction<
     TAccountSystemProgram,
     TRemainingAccounts
   >;
-}
-
-// Input.
-export type CreateEmptyLutInput<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string
-> = {
-  address: Address<TAccountAddress>;
-  authority?: TransactionSigner<TAccountAuthority>;
-  payer?: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  recentSlot: CreateEmptyLutInstructionDataArgs['recentSlot'];
-  bump: CreateEmptyLutInstructionDataArgs['bump'];
-};
-
-export async function createEmptyLut<
-  TReturn,
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'> &
-    CustomGeneratedInstruction<
-      CreateEmptyLutInstruction<
-        TProgram,
-        TAccountAddress,
-        ReadonlySignerAccount<TAccountAuthority> &
-          IAccountSignerMeta<TAccountAuthority>,
-        WritableSignerAccount<TAccountPayer> &
-          IAccountSignerMeta<TAccountPayer>,
-        TAccountSystemProgram
-      >,
-      TReturn
-    >,
-  input: CreateEmptyLutInput<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
-  >
-): Promise<TReturn>;
-export async function createEmptyLut<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: CreateEmptyLutInput<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
-  >
-): Promise<
-  CreateEmptyLutInstruction<
-    TProgram,
-    TAccountAddress,
-    ReadonlySignerAccount<TAccountAuthority> &
-      IAccountSignerMeta<TAccountAuthority>,
-    WritableSignerAccount<TAccountPayer> & IAccountSignerMeta<TAccountPayer>,
-    TAccountSystemProgram
-  > &
-    IInstructionWithSigners &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function createEmptyLut<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
-  input: CreateEmptyLutInput<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
-  >
-): Promise<
-  CreateEmptyLutInstruction<
-    TProgram,
-    TAccountAddress,
-    ReadonlySignerAccount<TAccountAuthority> &
-      IAccountSignerMeta<TAccountAuthority>,
-    WritableSignerAccount<TAccountPayer> & IAccountSignerMeta<TAccountPayer>,
-    TAccountSystemProgram
-  > &
-    IInstructionWithSigners &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function createEmptyLut<
-  TReturn,
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | (Pick<Context, 'getProgramAddress'> &
-        CustomGeneratedInstruction<IInstruction, TReturn>)
-    | CreateEmptyLutInput<
-        TAccountAddress,
-        TAccountAuthority,
-        TAccountPayer,
-        TAccountSystemProgram
-      >,
-  rawInput?: CreateEmptyLutInput<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
-  >
-): Promise<
-  | TReturn
-  | (IInstruction &
-      IInstructionWithSigners &
-      IInstructionWithBytesCreatedOnChain)
-> {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as
-    | Pick<Context, 'getProgramAddress'>
-    | (Pick<Context, 'getProgramAddress'> &
-        CustomGeneratedInstruction<IInstruction, TReturn>);
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as CreateEmptyLutInput<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
-  >;
-
-  // Program address.
-  const defaultProgramAddress =
-    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
-  const programAddress = (
-    context.getProgramAddress
-      ? await context.getProgramAddress({
-          name: 'splAddressLookupTable',
-          address: defaultProgramAddress,
-        })
-      : defaultProgramAddress
-  ) as Address<TProgram>;
-
-  // Original accounts.
-  type AccountMetas = Parameters<
-    typeof createEmptyLutInstruction<
-      TProgram,
-      TAccountAddress,
-      TAccountAuthority,
-      TAccountPayer,
-      TAccountSystemProgram
-    >
-  >[0];
-  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
-    address: { value: input.address ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-  };
-
-  // Original args.
-  const args = { ...input };
-
-  // Resolve default values.
-  if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value = await getProgramAddress(
-      context,
-      'splSystem',
-      '11111111111111111111111111111111'
-    );
-    accounts.systemProgram.isWritable = false;
-  }
-
-  // Get account metas and signers.
-  const accountMetas = getAccountMetasWithSigners(
-    accounts,
-    'programId',
-    programAddress
-  );
-
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
-
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
-
-  // Instruction.
-  const instruction = {
-    ...createEmptyLutInstruction(
-      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-      args as CreateEmptyLutInstructionDataArgs,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  };
-
-  return 'getGeneratedInstruction' in context && context.getGeneratedInstruction
-    ? context.getGeneratedInstruction(instruction)
-    : instruction;
 }

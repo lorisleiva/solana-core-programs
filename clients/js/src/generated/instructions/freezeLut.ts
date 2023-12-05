@@ -28,15 +28,9 @@ import {
   ReadonlySignerAccount,
   WritableAccount,
 } from '@solana/instructions';
-import {
-  IAccountSignerMeta,
-  IInstructionWithSigners,
-  TransactionSigner,
-} from '@solana/signers';
+import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import {
   Context,
-  CustomGeneratedInstruction,
-  IInstructionWithBytesCreatedOnChain,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
@@ -62,25 +56,44 @@ export type FreezeLutInstruction<
     ]
   >;
 
+// Output.
+export type FreezeLutInstructionWithSigners<
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
+  TAccountAddress extends string | IAccountMeta<string> = string,
+  TAccountAuthority extends string | IAccountMeta<string> = string,
+  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+> = IInstruction<TProgram> &
+  IInstructionWithData<Uint8Array> &
+  IInstructionWithAccounts<
+    [
+      TAccountAddress extends string
+        ? WritableAccount<TAccountAddress>
+        : TAccountAddress,
+      TAccountAuthority extends string
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            IAccountSignerMeta<TAccountAuthority>
+        : TAccountAuthority,
+      ...TRemainingAccounts
+    ]
+  >;
+
 export type FreezeLutInstructionData = { discriminator: number };
 
 export type FreezeLutInstructionDataArgs = {};
 
-export function getFreezeLutInstructionDataEncoder(): Encoder<FreezeLutInstructionDataArgs> {
+export function getFreezeLutInstructionDataEncoder() {
   return mapEncoder(
-    getStructEncoder<{ discriminator: number }>(
-      [['discriminator', getU32Encoder()]],
-      { description: 'FreezeLutInstructionData' }
-    ),
+    getStructEncoder<{ discriminator: number }>([
+      ['discriminator', getU32Encoder()],
+    ]),
     (value) => ({ ...value, discriminator: 1 })
-  ) as Encoder<FreezeLutInstructionDataArgs>;
+  ) satisfies Encoder<FreezeLutInstructionDataArgs>;
 }
 
-export function getFreezeLutInstructionDataDecoder(): Decoder<FreezeLutInstructionData> {
-  return getStructDecoder<FreezeLutInstructionData>(
-    [['discriminator', getU32Decoder()]],
-    { description: 'FreezeLutInstructionData' }
-  ) as Decoder<FreezeLutInstructionData>;
+export function getFreezeLutInstructionDataDecoder() {
+  return getStructDecoder<FreezeLutInstructionData>([
+    ['discriminator', getU32Decoder()],
+  ]) satisfies Decoder<FreezeLutInstructionData>;
 }
 
 export function getFreezeLutInstructionDataCodec(): Codec<
@@ -93,7 +106,128 @@ export function getFreezeLutInstructionDataCodec(): Codec<
   );
 }
 
-export function freezeLutInstruction<
+export type FreezeLutInput<
+  TAccountAddress extends string,
+  TAccountAuthority extends string
+> = {
+  address: Address<TAccountAddress>;
+  authority?: Address<TAccountAuthority>;
+};
+
+export type FreezeLutInputWithSigners<
+  TAccountAddress extends string,
+  TAccountAuthority extends string
+> = {
+  address: Address<TAccountAddress>;
+  authority?: TransactionSigner<TAccountAuthority>;
+};
+
+export function getFreezeLutInstruction<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  context: Pick<Context, 'getProgramAddress'>,
+  input: FreezeLutInputWithSigners<TAccountAddress, TAccountAuthority>
+): FreezeLutInstructionWithSigners<
+  TProgram,
+  TAccountAddress,
+  TAccountAuthority
+>;
+export function getFreezeLutInstruction<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  context: Pick<Context, 'getProgramAddress'>,
+  input: FreezeLutInput<TAccountAddress, TAccountAuthority>
+): FreezeLutInstruction<TProgram, TAccountAddress, TAccountAuthority>;
+export function getFreezeLutInstruction<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  input: FreezeLutInputWithSigners<TAccountAddress, TAccountAuthority>
+): FreezeLutInstructionWithSigners<
+  TProgram,
+  TAccountAddress,
+  TAccountAuthority
+>;
+export function getFreezeLutInstruction<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  input: FreezeLutInput<TAccountAddress, TAccountAuthority>
+): FreezeLutInstruction<TProgram, TAccountAddress, TAccountAuthority>;
+export function getFreezeLutInstruction<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  rawContext:
+    | Pick<Context, 'getProgramAddress'>
+    | FreezeLutInput<TAccountAddress, TAccountAuthority>,
+  rawInput?: FreezeLutInput<TAccountAddress, TAccountAuthority>
+): IInstruction {
+  // Resolve context and input arguments.
+  const context = (rawInput === undefined ? {} : rawContext) as Pick<
+    Context,
+    'getProgramAddress'
+  >;
+  const input = (
+    rawInput === undefined ? rawContext : rawInput
+  ) as FreezeLutInput<TAccountAddress, TAccountAuthority>;
+
+  // Program address.
+  const defaultProgramAddress =
+    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
+  const programAddress = (
+    context.getProgramAddress
+      ? context.getProgramAddress({
+          name: 'splAddressLookupTable',
+          address: defaultProgramAddress,
+        })
+      : defaultProgramAddress
+  ) as Address<TProgram>;
+
+  // Original accounts.
+  type AccountMetas = Parameters<
+    typeof getFreezeLutInstructionRaw<
+      TProgram,
+      TAccountAddress,
+      TAccountAuthority
+    >
+  >[0];
+  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+    address: { value: input.address ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: false },
+  };
+
+  // Get account metas and signers.
+  const accountMetas = getAccountMetasWithSigners(
+    accounts,
+    'programId',
+    programAddress
+  );
+
+  // Remaining accounts.
+  const remainingAccounts: IAccountMeta[] = [];
+
+  // Bytes created on chain.
+  const bytesCreatedOnChain = 0;
+
+  return Object.freeze({
+    ...getFreezeLutInstructionRaw(
+      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
+      programAddress,
+      remainingAccounts
+    ),
+    bytesCreatedOnChain,
+  });
+}
+
+export function getFreezeLutInstructionRaw<
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
   TAccountAddress extends string | IAccountMeta<string> = string,
   TAccountAuthority extends string | IAccountMeta<string> = string,
@@ -124,140 +258,4 @@ export function freezeLutInstruction<
     TAccountAuthority,
     TRemainingAccounts
   >;
-}
-
-// Input.
-export type FreezeLutInput<
-  TAccountAddress extends string,
-  TAccountAuthority extends string
-> = {
-  address: Address<TAccountAddress>;
-  authority?: TransactionSigner<TAccountAuthority>;
-};
-
-export async function freezeLut<
-  TReturn,
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'> &
-    CustomGeneratedInstruction<
-      FreezeLutInstruction<
-        TProgram,
-        TAccountAddress,
-        ReadonlySignerAccount<TAccountAuthority> &
-          IAccountSignerMeta<TAccountAuthority>
-      >,
-      TReturn
-    >,
-  input: FreezeLutInput<TAccountAddress, TAccountAuthority>
-): Promise<TReturn>;
-export async function freezeLut<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: FreezeLutInput<TAccountAddress, TAccountAuthority>
-): Promise<
-  FreezeLutInstruction<
-    TProgram,
-    TAccountAddress,
-    ReadonlySignerAccount<TAccountAuthority> &
-      IAccountSignerMeta<TAccountAuthority>
-  > &
-    IInstructionWithSigners &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function freezeLut<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
-  input: FreezeLutInput<TAccountAddress, TAccountAuthority>
-): Promise<
-  FreezeLutInstruction<
-    TProgram,
-    TAccountAddress,
-    ReadonlySignerAccount<TAccountAuthority> &
-      IAccountSignerMeta<TAccountAuthority>
-  > &
-    IInstructionWithSigners &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function freezeLut<
-  TReturn,
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | (Pick<Context, 'getProgramAddress'> &
-        CustomGeneratedInstruction<IInstruction, TReturn>)
-    | FreezeLutInput<TAccountAddress, TAccountAuthority>,
-  rawInput?: FreezeLutInput<TAccountAddress, TAccountAuthority>
-): Promise<
-  | TReturn
-  | (IInstruction &
-      IInstructionWithSigners &
-      IInstructionWithBytesCreatedOnChain)
-> {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as
-    | Pick<Context, 'getProgramAddress'>
-    | (Pick<Context, 'getProgramAddress'> &
-        CustomGeneratedInstruction<IInstruction, TReturn>);
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as FreezeLutInput<TAccountAddress, TAccountAuthority>;
-
-  // Program address.
-  const defaultProgramAddress =
-    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
-  const programAddress = (
-    context.getProgramAddress
-      ? await context.getProgramAddress({
-          name: 'splAddressLookupTable',
-          address: defaultProgramAddress,
-        })
-      : defaultProgramAddress
-  ) as Address<TProgram>;
-
-  // Original accounts.
-  type AccountMetas = Parameters<
-    typeof freezeLutInstruction<TProgram, TAccountAddress, TAccountAuthority>
-  >[0];
-  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
-    address: { value: input.address ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
-  };
-
-  // Get account metas and signers.
-  const accountMetas = getAccountMetasWithSigners(
-    accounts,
-    'programId',
-    programAddress
-  );
-
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
-
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
-
-  // Instruction.
-  const instruction = {
-    ...freezeLutInstruction(
-      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  };
-
-  return 'getGeneratedInstruction' in context && context.getGeneratedInstruction
-    ? context.getGeneratedInstruction(instruction)
-    : instruction;
 }
