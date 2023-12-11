@@ -66,11 +66,10 @@ const prettier = require(path.join(clientDir, "js", ".prettierrc.json"));
 kinobi.accept(new k.RenderJavaScriptExperimentalVisitor(jsDir, { prettier }));
 
 // Render Rust.
-// const crateDir = path.join(clientDir, "rust");
-// const rustDir = path.join(clientDir, "rust", "src", "generated");
-// kinobi.accept(
-//   new k.RenderRustVisitor(rustDir, {
-//     formatCode: true,
-//     crateFolder: crateDir,
-//   })
-// );
+const crateDir = path.join(clientDir, "rust");
+kinobi.accept(
+  new k.RenderRustVisitor(path.join(crateDir, "src", "generated"), {
+    formatCode: true,
+    crateFolder: crateDir,
+  })
+);
