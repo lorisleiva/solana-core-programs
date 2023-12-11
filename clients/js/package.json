@@ -25,6 +25,7 @@
   "author": "Metaplex Maintainers <contact@metaplex.com>",
   "license": "Apache-2.0",
   "dependencies": {
+    "@solana/accounts": "2.0.0-experimental.9741939",
     "@solana/addresses": "2.0.0-experimental.9741939",
     "@solana/codecs-core": "2.0.0-experimental.9741939",
     "@solana/codecs-data-structures": "2.0.0-experimental.9741939",

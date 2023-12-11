@@ -7,6 +7,14 @@
  */
 
 import {
+  Account,
+  EncodedAccount,
+  FetchAccountConfig,
+  FetchAccountsConfig,
+  assertAccountExists,
+  decodeAccount,
+} from '@solana/accounts';
+import {
   Address,
   ProgramDerivedAddress,
   getAddressDecoder,
@@ -42,13 +50,7 @@ import {
   getOptionEncoder,
 } from '@solana/options';
 import {
-  Account,
   Context,
-  EncodedAccount,
-  FetchEncodedAccountOptions,
-  FetchEncodedAccountsOptions,
-  assertAccountExists,
-  decodeAccount,
   getProgramAddress,
   getProgramDerivedAddress,
 } from '../shared';
@@ -137,7 +139,7 @@ export function decodeAddressLookupTable<TAddress extends string = string>(
 export async function fetchAddressLookupTable<TAddress extends string = string>(
   context: Pick<Context, 'fetchEncodedAccount'>,
   address: Address<TAddress>,
-  options?: FetchEncodedAccountOptions
+  options?: FetchAccountConfig
 ): Promise<AddressLookupTable<TAddress>> {
   const maybeAccount = await context.fetchEncodedAccount(address, options);
   assertAccountExists(maybeAccount);
@@ -149,7 +151,7 @@ export async function safeFetchAddressLookupTable<
 >(
   context: Pick<Context, 'fetchEncodedAccount'>,
   address: Address<TAddress>,
-  options?: FetchEncodedAccountOptions
+  options?: FetchAccountConfig
 ): Promise<AddressLookupTable<TAddress> | null> {
   const maybeAccount = await context.fetchEncodedAccount(address, options);
   return maybeAccount.exists ? decodeAddressLookupTable(maybeAccount) : null;
@@ -158,7 +160,7 @@ export async function safeFetchAddressLookupTable<
 export async function fetchAllAddressLookupTable(
   context: Pick<Context, 'fetchEncodedAccounts'>,
   addresses: Array<Address>,
-  options?: FetchEncodedAccountsOptions
+  options?: FetchAccountsConfig
 ): Promise<AddressLookupTable[]> {
   const maybeAccounts = await context.fetchEncodedAccounts(addresses, options);
   return maybeAccounts.map((maybeAccount) => {
@@ -170,7 +172,7 @@ export async function fetchAllAddressLookupTable(
 export async function safeFetchAllAddressLookupTable(
   context: Pick<Context, 'fetchEncodedAccounts'>,
   addresses: Array<Address>,
-  options?: FetchEncodedAccountsOptions
+  options?: FetchAccountsConfig
 ): Promise<AddressLookupTable[]> {
   const maybeAccounts = await context.fetchEncodedAccounts(addresses, options);
   return maybeAccounts
@@ -206,7 +208,7 @@ export async function fetchAddressLookupTableFromSeeds(
     'fetchEncodedAccount' | 'getProgramAddress' | 'getProgramDerivedAddress'
   >,
   seeds: Parameters<typeof findAddressLookupTablePda>[1],
-  options?: FetchEncodedAccountOptions
+  options?: FetchAccountConfig
 ): Promise<AddressLookupTable> {
   const [address] = await findAddressLookupTablePda(context, seeds);
   return fetchAddressLookupTable(context, address, options);
@@ -218,7 +220,7 @@ export async function safeFetchAddressLookupTableFromSeeds(
     'fetchEncodedAccount' | 'getProgramAddress' | 'getProgramDerivedAddress'
   >,
   seeds: Parameters<typeof findAddressLookupTablePda>[1],
-  options?: FetchEncodedAccountOptions
+  options?: FetchAccountConfig
 ): Promise<AddressLookupTable | null> {
   const [address] = await findAddressLookupTablePda(context, seeds);
   return safeFetchAddressLookupTable(context, address, options);

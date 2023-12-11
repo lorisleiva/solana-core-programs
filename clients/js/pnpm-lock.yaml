@@ -1,6 +1,9 @@
 lockfileVersion: '6.0'
 
 dependencies:
+  '@solana/accounts':
+    specifier: 2.0.0-experimental.9741939
+    version: 2.0.0-experimental.9741939(fastestsmallesttextencoderdecoder@1.0.22)(ws@8.14.2)
   '@solana/addresses':
     specifier: 2.0.0-experimental.9741939
     version: 2.0.0-experimental.9741939(fastestsmallesttextencoderdecoder@1.0.22)
@@ -1801,6 +1804,20 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
+  /@solana/accounts@2.0.0-experimental.9741939(fastestsmallesttextencoderdecoder@1.0.22)(ws@8.14.2):
+    resolution: {integrity: sha512-9i5Ur0/l8GXr4LQQW+ZTmBd2fpWzDcnqbOJ9tuVJsUIgHjD9+JJlOnn95wUpkGgbwDFBCvr1C89t+uXVU6y4lg==}
+    dependencies:
+      '@solana/addresses': 2.0.0-experimental.9741939(fastestsmallesttextencoderdecoder@1.0.22)
+      '@solana/codecs-core': 2.0.0-experimental.9741939
+      '@solana/codecs-strings': 2.0.0-experimental.9741939(fastestsmallesttextencoderdecoder@1.0.22)
+      '@solana/rpc-core': 2.0.0-experimental.9741939
+      '@solana/rpc-transport': 2.0.0-experimental.9741939(ws@8.14.2)
+      '@solana/rpc-types': 2.0.0-experimental.9741939
+    transitivePeerDependencies:
+      - fastestsmallesttextencoderdecoder
+      - ws
+    dev: false
+
   /@solana/addresses@2.0.0-experimental.9741939(fastestsmallesttextencoderdecoder@1.0.22):
     resolution: {integrity: sha512-5yGih/laPMZe97b8vFuknLHBNqW495L79CrsLPVz6F1F0FVq/Af1GbG9IB+CqYofNJJV5Z0x79E3BfaRV0HmUw==}
     dependencies:
@@ -1860,7 +1877,6 @@ packages:
 
   /@solana/rpc-core@2.0.0-experimental.9741939:
     resolution: {integrity: sha512-LsrAkyIJ9jODWEGi0wRy1wCpjCFBUxEmnAQ4lwoRB8kxviQJ5DkUk8tje/7ZS6pPZbO71w48utk+zi8TIQzAQg==}
-    dev: true
 
   /@solana/rpc-transport@2.0.0-experimental.9741939(ws@8.14.2):
     resolution: {integrity: sha512-w3PeLlo1kMdsW9p1SgV7lZtYd39uSb2X/fkqThsDnq29pUqU5HeRr09bfx/76xsiApvR1usGBrGA2iVHHO79Ow==}
@@ -1868,11 +1884,9 @@ packages:
       ws: ^8.14.0
     dependencies:
       ws: 8.14.2
-    dev: true
 
   /@solana/rpc-types@2.0.0-experimental.9741939:
     resolution: {integrity: sha512-iyf0R03lheGear1Lu9ibX6jzSd67hTWptcfSakdKRvZ0q8NRocMM7upEvbddPsAhnF16pc0T9OpiDDSMHnayPQ==}
-    dev: true
 
   /@solana/signers@2.0.0-experimental.9741939(fastestsmallesttextencoderdecoder@1.0.22):
     resolution: {integrity: sha512-dSSLfKR9dcFJe8GTuPmCd4x/nDsAAFZq9vYLd02FkOSX6b/OwCe2AHe8gunneKrY3Y+qf9wBe0XE+wWb/KTQ/A==}
@@ -7806,7 +7820,6 @@ packages:
         optional: true
       utf-8-validate:
         optional: true
-    dev: true
 
   /xdm@2.1.0:
     resolution: {integrity: sha512-3LxxbxKcRogYY7cQSMy1tUuU1zKNK9YPqMT7/S0r7Cz2QpyF8O9yFySGD7caOZt+LWUOQioOIX+6ZzCoBCpcAA==}
