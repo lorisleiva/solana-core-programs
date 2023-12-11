@@ -28,12 +28,15 @@ import {
   getU64Decoder,
   getU64Encoder,
 } from '@solana/codecs-numbers';
+import { getStringDecoder, getStringEncoder } from '@solana/codecs-strings';
 import {
   AccountRole,
   IAccountMeta,
   IInstruction,
   IInstructionWithAccounts,
   IInstructionWithData,
+  ReadonlySignerAccount,
+  WritableAccount,
   WritableSignerAccount,
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
@@ -45,10 +48,11 @@ import {
 } from '../shared';
 
 // Output.
-export type CreateAccountInstruction<
+export type CreateAccountWithSeedInstruction<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountPayer extends string | IAccountMeta<string> = string,
   TAccountNewAccount extends string | IAccountMeta<string> = string,
+  TAccountBaseAccount extends string | IAccountMeta<string> = string,
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
@@ -58,17 +62,21 @@ export type CreateAccountInstruction<
         ? WritableSignerAccount<TAccountPayer>
         : TAccountPayer,
       TAccountNewAccount extends string
-        ? WritableSignerAccount<TAccountNewAccount>
+        ? WritableAccount<TAccountNewAccount>
         : TAccountNewAccount,
+      TAccountBaseAccount extends string
+        ? ReadonlySignerAccount<TAccountBaseAccount>
+        : TAccountBaseAccount,
       ...TRemainingAccounts
     ]
   >;
 
 // Output.
-export type CreateAccountInstructionWithSigners<
+export type CreateAccountWithSeedInstructionWithSigners<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountPayer extends string | IAccountMeta<string> = string,
   TAccountNewAccount extends string | IAccountMeta<string> = string,
+  TAccountBaseAccount extends string | IAccountMeta<string> = string,
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
@@ -79,131 +87,193 @@ export type CreateAccountInstructionWithSigners<
             IAccountSignerMeta<TAccountPayer>
         : TAccountPayer,
       TAccountNewAccount extends string
-        ? WritableSignerAccount<TAccountNewAccount> &
-            IAccountSignerMeta<TAccountNewAccount>
+        ? WritableAccount<TAccountNewAccount>
         : TAccountNewAccount,
+      TAccountBaseAccount extends string
+        ? ReadonlySignerAccount<TAccountBaseAccount> &
+            IAccountSignerMeta<TAccountBaseAccount>
+        : TAccountBaseAccount,
       ...TRemainingAccounts
     ]
   >;
 
-export type CreateAccountInstructionData = {
+export type CreateAccountWithSeedInstructionData = {
   discriminator: number;
-  lamports: bigint;
+  base: Address;
+  seed: string;
+  amount: bigint;
   space: bigint;
   programAddress: Address;
 };
 
-export type CreateAccountInstructionDataArgs = {
-  lamports: number | bigint;
+export type CreateAccountWithSeedInstructionDataArgs = {
+  base: Address;
+  seed: string;
+  amount: number | bigint;
   space: number | bigint;
   programAddress: Address;
 };
 
-export function getCreateAccountInstructionDataEncoder() {
+export function getCreateAccountWithSeedInstructionDataEncoder() {
   return mapEncoder(
     getStructEncoder<{
       discriminator: number;
-      lamports: number | bigint;
+      base: Address;
+      seed: string;
+      amount: number | bigint;
       space: number | bigint;
       programAddress: Address;
     }>([
       ['discriminator', getU32Encoder()],
-      ['lamports', getU64Encoder()],
+      ['base', getAddressEncoder()],
+      ['seed', getStringEncoder()],
+      ['amount', getU64Encoder()],
       ['space', getU64Encoder()],
       ['programAddress', getAddressEncoder()],
     ]),
-    (value) => ({ ...value, discriminator: 0 })
-  ) satisfies Encoder<CreateAccountInstructionDataArgs>;
+    (value) => ({ ...value, discriminator: 3 })
+  ) satisfies Encoder<CreateAccountWithSeedInstructionDataArgs>;
 }
 
-export function getCreateAccountInstructionDataDecoder() {
-  return getStructDecoder<CreateAccountInstructionData>([
+export function getCreateAccountWithSeedInstructionDataDecoder() {
+  return getStructDecoder<CreateAccountWithSeedInstructionData>([
     ['discriminator', getU32Decoder()],
-    ['lamports', getU64Decoder()],
+    ['base', getAddressDecoder()],
+    ['seed', getStringDecoder()],
+    ['amount', getU64Decoder()],
     ['space', getU64Decoder()],
     ['programAddress', getAddressDecoder()],
-  ]) satisfies Decoder<CreateAccountInstructionData>;
+  ]) satisfies Decoder<CreateAccountWithSeedInstructionData>;
 }
 
-export function getCreateAccountInstructionDataCodec(): Codec<
-  CreateAccountInstructionDataArgs,
-  CreateAccountInstructionData
+export function getCreateAccountWithSeedInstructionDataCodec(): Codec<
+  CreateAccountWithSeedInstructionDataArgs,
+  CreateAccountWithSeedInstructionData
 > {
   return combineCodec(
-    getCreateAccountInstructionDataEncoder(),
-    getCreateAccountInstructionDataDecoder()
+    getCreateAccountWithSeedInstructionDataEncoder(),
+    getCreateAccountWithSeedInstructionDataDecoder()
   );
 }
 
-export type CreateAccountInput<
+export type CreateAccountWithSeedInput<
   TAccountPayer extends string,
-  TAccountNewAccount extends string
+  TAccountNewAccount extends string,
+  TAccountBaseAccount extends string
 > = {
   payer?: Address<TAccountPayer>;
   newAccount: Address<TAccountNewAccount>;
-  lamports: CreateAccountInstructionDataArgs['lamports'];
-  space: CreateAccountInstructionDataArgs['space'];
-  programAddress: CreateAccountInstructionDataArgs['programAddress'];
+  baseAccount: Address<TAccountBaseAccount>;
+  base: CreateAccountWithSeedInstructionDataArgs['base'];
+  seed: CreateAccountWithSeedInstructionDataArgs['seed'];
+  amount: CreateAccountWithSeedInstructionDataArgs['amount'];
+  space: CreateAccountWithSeedInstructionDataArgs['space'];
+  programAddress: CreateAccountWithSeedInstructionDataArgs['programAddress'];
 };
 
-export type CreateAccountInputWithSigners<
+export type CreateAccountWithSeedInputWithSigners<
   TAccountPayer extends string,
-  TAccountNewAccount extends string
+  TAccountNewAccount extends string,
+  TAccountBaseAccount extends string
 > = {
   payer?: TransactionSigner<TAccountPayer>;
-  newAccount: TransactionSigner<TAccountNewAccount>;
-  lamports: CreateAccountInstructionDataArgs['lamports'];
-  space: CreateAccountInstructionDataArgs['space'];
-  programAddress: CreateAccountInstructionDataArgs['programAddress'];
+  newAccount: Address<TAccountNewAccount>;
+  baseAccount: TransactionSigner<TAccountBaseAccount>;
+  base: CreateAccountWithSeedInstructionDataArgs['base'];
+  seed: CreateAccountWithSeedInstructionDataArgs['seed'];
+  amount: CreateAccountWithSeedInstructionDataArgs['amount'];
+  space: CreateAccountWithSeedInstructionDataArgs['space'];
+  programAddress: CreateAccountWithSeedInstructionDataArgs['programAddress'];
 };
 
-export function getCreateAccountInstruction<
+export function getCreateAccountWithSeedInstruction<
   TAccountPayer extends string,
   TAccountNewAccount extends string,
+  TAccountBaseAccount extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
   context: Pick<Context, 'getProgramAddress'>,
-  input: CreateAccountInputWithSigners<TAccountPayer, TAccountNewAccount>
-): CreateAccountInstructionWithSigners<
+  input: CreateAccountWithSeedInputWithSigners<
+    TAccountPayer,
+    TAccountNewAccount,
+    TAccountBaseAccount
+  >
+): CreateAccountWithSeedInstructionWithSigners<
   TProgram,
   TAccountPayer,
-  TAccountNewAccount
+  TAccountNewAccount,
+  TAccountBaseAccount
 >;
-export function getCreateAccountInstruction<
+export function getCreateAccountWithSeedInstruction<
   TAccountPayer extends string,
   TAccountNewAccount extends string,
+  TAccountBaseAccount extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
   context: Pick<Context, 'getProgramAddress'>,
-  input: CreateAccountInput<TAccountPayer, TAccountNewAccount>
-): CreateAccountInstruction<TProgram, TAccountPayer, TAccountNewAccount>;
-export function getCreateAccountInstruction<
-  TAccountPayer extends string,
-  TAccountNewAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
-  input: CreateAccountInputWithSigners<TAccountPayer, TAccountNewAccount>
-): CreateAccountInstructionWithSigners<
+  input: CreateAccountWithSeedInput<
+    TAccountPayer,
+    TAccountNewAccount,
+    TAccountBaseAccount
+  >
+): CreateAccountWithSeedInstruction<
   TProgram,
   TAccountPayer,
-  TAccountNewAccount
+  TAccountNewAccount,
+  TAccountBaseAccount
 >;
-export function getCreateAccountInstruction<
+export function getCreateAccountWithSeedInstruction<
   TAccountPayer extends string,
   TAccountNewAccount extends string,
+  TAccountBaseAccount extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
-  input: CreateAccountInput<TAccountPayer, TAccountNewAccount>
-): CreateAccountInstruction<TProgram, TAccountPayer, TAccountNewAccount>;
-export function getCreateAccountInstruction<
+  input: CreateAccountWithSeedInputWithSigners<
+    TAccountPayer,
+    TAccountNewAccount,
+    TAccountBaseAccount
+  >
+): CreateAccountWithSeedInstructionWithSigners<
+  TProgram,
+  TAccountPayer,
+  TAccountNewAccount,
+  TAccountBaseAccount
+>;
+export function getCreateAccountWithSeedInstruction<
   TAccountPayer extends string,
   TAccountNewAccount extends string,
+  TAccountBaseAccount extends string,
+  TProgram extends string = '11111111111111111111111111111111'
+>(
+  input: CreateAccountWithSeedInput<
+    TAccountPayer,
+    TAccountNewAccount,
+    TAccountBaseAccount
+  >
+): CreateAccountWithSeedInstruction<
+  TProgram,
+  TAccountPayer,
+  TAccountNewAccount,
+  TAccountBaseAccount
+>;
+export function getCreateAccountWithSeedInstruction<
+  TAccountPayer extends string,
+  TAccountNewAccount extends string,
+  TAccountBaseAccount extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
   rawContext:
     | Pick<Context, 'getProgramAddress'>
-    | CreateAccountInput<TAccountPayer, TAccountNewAccount>,
-  rawInput?: CreateAccountInput<TAccountPayer, TAccountNewAccount>
+    | CreateAccountWithSeedInput<
+        TAccountPayer,
+        TAccountNewAccount,
+        TAccountBaseAccount
+      >,
+  rawInput?: CreateAccountWithSeedInput<
+    TAccountPayer,
+    TAccountNewAccount,
+    TAccountBaseAccount
+  >
 ): IInstruction {
   // Resolve context and input arguments.
   const context = (rawInput === undefined ? {} : rawContext) as Pick<
@@ -212,7 +282,11 @@ export function getCreateAccountInstruction<
   >;
   const input = (
     rawInput === undefined ? rawContext : rawInput
-  ) as CreateAccountInput<TAccountPayer, TAccountNewAccount>;
+  ) as CreateAccountWithSeedInput<
+    TAccountPayer,
+    TAccountNewAccount,
+    TAccountBaseAccount
+  >;
 
   // Program address.
   const defaultProgramAddress =
@@ -228,15 +302,17 @@ export function getCreateAccountInstruction<
 
   // Original accounts.
   type AccountMetas = Parameters<
-    typeof getCreateAccountInstructionRaw<
+    typeof getCreateAccountWithSeedInstructionRaw<
       TProgram,
       TAccountPayer,
-      TAccountNewAccount
+      TAccountNewAccount,
+      TAccountBaseAccount
     >
   >[0];
   const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
     payer: { value: input.payer ?? null, isWritable: true },
     newAccount: { value: input.newAccount ?? null, isWritable: true },
+    baseAccount: { value: input.baseAccount ?? null, isWritable: false },
   };
 
   // Original args.
@@ -256,9 +332,9 @@ export function getCreateAccountInstruction<
   const bytesCreatedOnChain = 0;
 
   return Object.freeze({
-    ...getCreateAccountInstructionRaw(
+    ...getCreateAccountWithSeedInstructionRaw(
       accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-      args as CreateAccountInstructionDataArgs,
+      args as CreateAccountWithSeedInstructionDataArgs,
       programAddress,
       remainingAccounts
     ),
@@ -266,10 +342,11 @@ export function getCreateAccountInstruction<
   });
 }
 
-export function getCreateAccountInstructionRaw<
+export function getCreateAccountWithSeedInstructionRaw<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountPayer extends string | IAccountMeta<string> = string,
   TAccountNewAccount extends string | IAccountMeta<string> = string,
+  TAccountBaseAccount extends string | IAccountMeta<string> = string,
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
 >(
   accounts: {
@@ -279,23 +356,28 @@ export function getCreateAccountInstructionRaw<
     newAccount: TAccountNewAccount extends string
       ? Address<TAccountNewAccount>
       : TAccountNewAccount;
+    baseAccount: TAccountBaseAccount extends string
+      ? Address<TAccountBaseAccount>
+      : TAccountBaseAccount;
   },
-  args: CreateAccountInstructionDataArgs,
+  args: CreateAccountWithSeedInstructionDataArgs,
   programAddress: Address<TProgram> = '11111111111111111111111111111111' as Address<TProgram>,
   remainingAccounts?: TRemainingAccounts
 ) {
   return {
     accounts: [
       accountMetaWithDefault(accounts.payer, AccountRole.WRITABLE_SIGNER),
-      accountMetaWithDefault(accounts.newAccount, AccountRole.WRITABLE_SIGNER),
+      accountMetaWithDefault(accounts.newAccount, AccountRole.WRITABLE),
+      accountMetaWithDefault(accounts.baseAccount, AccountRole.READONLY_SIGNER),
       ...(remainingAccounts ?? []),
     ],
-    data: getCreateAccountInstructionDataEncoder().encode(args),
+    data: getCreateAccountWithSeedInstructionDataEncoder().encode(args),
     programAddress,
-  } as CreateAccountInstruction<
+  } as CreateAccountWithSeedInstruction<
     TProgram,
     TAccountPayer,
     TAccountNewAccount,
+    TAccountBaseAccount,
     TRemainingAccounts
   >;
 }

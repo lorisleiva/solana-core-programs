@@ -39,6 +39,16 @@ kinobi.update(
 // Update instructions.
 kinobi.update(
   new k.UpdateInstructionsVisitor({
+    initializeNonceAccount: {
+      args: {
+        nonceAccountArg: { defaultsTo: k.accountDefault("nonceAccount") },
+      },
+    },
+    authorizeNonceAccount: {
+      args: {
+        nonceAccountArg: { defaultsTo: k.accountDefault("nonceAccount") },
+      },
+    },
     //
   })
 );

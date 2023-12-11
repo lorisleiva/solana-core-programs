@@ -7,14 +7,25 @@
  */
 
 export * from './addMemo';
+export * from './advanceNonceAccount';
+export * from './allocate';
+export * from './allocateWithSeed';
+export * from './assign';
+export * from './assignWithSeed';
+export * from './authorizeNonceAccount';
 export * from './closeLut';
 export * from './createAccount';
+export * from './createAccountWithSeed';
 export * from './createEmptyLut';
 export * from './deactivateLut';
 export * from './extendLut';
 export * from './freezeLut';
+export * from './initializeNonceAccount';
 export * from './requestHeapFrame';
 export * from './requestUnits';
 export * from './setComputeUnitLimit';
 export * from './setComputeUnitPrice';
 export * from './transferSol';
+export * from './transferSolWithSeed';
+export * from './upgradeNonceAccount';
+export * from './withdrawNonceAccount';
