@@ -20,6 +20,16 @@ kinobi.update(
   })
 );
 
+// Temporarily remove program errors.
+kinobi.update(
+  new k.TransformNodesVisitor([
+    {
+      selector: { kind: "programNode" },
+      transformer: (programNode) => ({ ...programNode, errors: [] }),
+    },
+  ])
+);
+
 // Update accounts.
 kinobi.update(
   new k.UpdateAccountsVisitor({

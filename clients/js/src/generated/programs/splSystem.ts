@@ -7,31 +7,17 @@
  */
 
 import { Address } from '@solana/addresses';
-import {
-  SplSystemProgramError,
-  SplSystemProgramErrorCode,
-  getSplSystemProgramErrorFromCode,
-} from '../errors';
-import {
-  Context,
-  Program,
-  ProgramWithErrors,
-  getProgramAddress,
-} from '../shared';
+import { Context, Program, getProgramAddress } from '../shared';
 
 export const SPL_SYSTEM_PROGRAM_ADDRESS =
   '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
 
-export type SplSystemProgram = Program<'11111111111111111111111111111111'> &
-  ProgramWithErrors<SplSystemProgramErrorCode, SplSystemProgramError>;
+export type SplSystemProgram = Program<'11111111111111111111111111111111'>;
 
 export function createSplSystemProgram(): SplSystemProgram {
   return {
     name: 'splSystem',
     address: SPL_SYSTEM_PROGRAM_ADDRESS,
-    getErrorFromCode(code: SplSystemProgramErrorCode, cause?: Error) {
-      return getSplSystemProgramErrorFromCode(code, cause);
-    },
   };
 }
 
