@@ -50,7 +50,6 @@ import {
   getProgramAddress,
 } from '../shared';
 
-// Output.
 export type ExtendLutInstruction<
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
   TAccountAddress extends string | IAccountMeta<string> = string,
@@ -80,7 +79,6 @@ export type ExtendLutInstruction<
     ]
   >;
 
-// Output.
 export type ExtendLutInstructionWithSigners<
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
   TAccountAddress extends string | IAccountMeta<string> = string,

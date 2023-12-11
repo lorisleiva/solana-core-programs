@@ -41,7 +41,6 @@ import {
   getAccountMetasWithSigners,
 } from '../shared';
 
-// Output.
 export type AssignWithSeedInstruction<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountAccount extends string | IAccountMeta<string> = string,
@@ -61,7 +60,6 @@ export type AssignWithSeedInstruction<
     ]
   >;
 
-// Output.
 export type AssignWithSeedInstructionWithSigners<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountAccount extends string | IAccountMeta<string> = string,

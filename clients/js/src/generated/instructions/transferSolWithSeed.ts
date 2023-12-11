@@ -46,7 +46,6 @@ import {
   getAccountMetasWithSigners,
 } from '../shared';
 
-// Output.
 export type TransferSolWithSeedInstruction<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountSource extends string | IAccountMeta<string> = string,
@@ -70,7 +69,6 @@ export type TransferSolWithSeedInstruction<
     ]
   >;
 
-// Output.
 export type TransferSolWithSeedInstructionWithSigners<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountSource extends string | IAccountMeta<string> = string,

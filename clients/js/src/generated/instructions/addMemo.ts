@@ -21,7 +21,6 @@ import {
 } from '@solana/instructions';
 import { Context } from '../shared';
 
-// Output.
 export type AddMemoInstruction<
   TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo',
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
@@ -29,7 +28,6 @@ export type AddMemoInstruction<
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<TRemainingAccounts>;
 
-// Output.
 export type AddMemoInstructionWithSigners<
   TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo',
   TRemainingAccounts extends Array<IAccountMeta<string>> = []

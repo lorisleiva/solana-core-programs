@@ -46,7 +46,6 @@ import {
   getProgramAddress,
 } from '../shared';
 
-// Output.
 export type CreateEmptyLutInstruction<
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
   TAccountAddress extends string | IAccountMeta<string> = string,
@@ -76,7 +75,6 @@ export type CreateEmptyLutInstruction<
     ]
   >;
 
-// Output.
 export type CreateEmptyLutInstructionWithSigners<
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
   TAccountAddress extends string | IAccountMeta<string> = string,

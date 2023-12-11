@@ -40,7 +40,6 @@ import {
   getAccountMetasWithSigners,
 } from '../shared';
 
-// Output.
 export type InitializeNonceAccountInstruction<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountNonceAccount extends string | IAccountMeta<string> = string,
@@ -68,7 +67,6 @@ export type InitializeNonceAccountInstruction<
     ]
   >;
 
-// Output.
 export type InitializeNonceAccountInstructionWithSigners<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountNonceAccount extends string | IAccountMeta<string> = string,

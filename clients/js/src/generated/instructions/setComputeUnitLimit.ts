@@ -32,7 +32,6 @@ import {
 } from '@solana/instructions';
 import { Context } from '../shared';
 
-// Output.
 export type SetComputeUnitLimitInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
@@ -40,7 +39,6 @@ export type SetComputeUnitLimitInstruction<
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<TRemainingAccounts>;
 
-// Output.
 export type SetComputeUnitLimitInstructionWithSigners<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
   TRemainingAccounts extends Array<IAccountMeta<string>> = []

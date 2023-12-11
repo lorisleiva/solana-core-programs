@@ -36,7 +36,6 @@ import {
   getAccountMetasWithSigners,
 } from '../shared';
 
-// Output.
 export type DeactivateLutInstruction<
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
   TAccountAddress extends string | IAccountMeta<string> = string,
@@ -56,7 +55,6 @@ export type DeactivateLutInstruction<
     ]
   >;
 
-// Output.
 export type DeactivateLutInstructionWithSigners<
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
   TAccountAddress extends string | IAccountMeta<string> = string,
