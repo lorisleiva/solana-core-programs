@@ -329,6 +329,9 @@ export function getExtendLookupTableInstruction<
   // Original args.
   const args = { ...input };
 
+  // Resolver scope.
+  const resolverScope = { context, programAddress, accounts, args };
+
   // Resolve default values.
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value = getProgramAddress(
@@ -338,23 +341,17 @@ export function getExtendLookupTableInstruction<
     );
     accounts.systemProgram.isWritable = false;
   }
+  // Remaining accounts.
+  const remainingAccounts: IAccountMeta[] = [];
+
+  // Bytes created on chain.
+  const bytesCreatedOnChain = resolveExtendLookupTableBytes(resolverScope);
 
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(
     accounts,
     'programId',
     programAddress
-  );
-
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
-
-  // Bytes created on chain.
-  const bytesCreatedOnChain = await resolveExtendLookupTableBytes(
-    context,
-    resolvedAccounts,
-    resolvedArgs,
-    programId
   );
 
   return Object.freeze({

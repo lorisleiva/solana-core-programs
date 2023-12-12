@@ -202,18 +202,18 @@ export function getFreezeLookupTableInstruction<
     authority: { value: input.authority ?? null, isWritable: false },
   };
 
+  // Remaining accounts.
+  const remainingAccounts: IAccountMeta[] = [];
+
+  // Bytes created on chain.
+  const bytesCreatedOnChain = 0;
+
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(
     accounts,
     'programId',
     programAddress
   );
-
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
-
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
 
   return Object.freeze({
     ...getFreezeLookupTableInstructionRaw(

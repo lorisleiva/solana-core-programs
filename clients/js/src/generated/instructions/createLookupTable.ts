@@ -359,6 +359,11 @@ export async function getCreateLookupTableInstructionAsync<
   if (!args.bump) {
     args.bump = expectProgramDerivedAddress(accounts.address.value)[1];
   }
+  // Remaining accounts.
+  const remainingAccounts: IAccountMeta[] = [];
+
+  // Bytes created on chain.
+  const bytesCreatedOnChain = 56 + BASE_ACCOUNT_SIZE;
 
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(
@@ -366,12 +371,6 @@ export async function getCreateLookupTableInstructionAsync<
     'programId',
     programAddress
   );
-
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
-
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 56 + BASE_ACCOUNT_SIZE;
 
   return Object.freeze({
     ...getCreateLookupTableInstructionRaw(
@@ -574,6 +573,11 @@ export function getCreateLookupTableInstruction<
   if (!args.bump) {
     args.bump = expectProgramDerivedAddress(accounts.address.value)[1];
   }
+  // Remaining accounts.
+  const remainingAccounts: IAccountMeta[] = [];
+
+  // Bytes created on chain.
+  const bytesCreatedOnChain = 56 + BASE_ACCOUNT_SIZE;
 
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(
@@ -581,12 +585,6 @@ export function getCreateLookupTableInstruction<
     'programId',
     programAddress
   );
-
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
-
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 56 + BASE_ACCOUNT_SIZE;
 
   return Object.freeze({
     ...getCreateLookupTableInstructionRaw(

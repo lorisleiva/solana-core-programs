@@ -241,18 +241,18 @@ export function getCreateAccountInstruction<
   // Original args.
   const args = { ...input };
 
+  // Remaining accounts.
+  const remainingAccounts: IAccountMeta[] = [];
+
+  // Bytes created on chain.
+  const bytesCreatedOnChain = Number(args.space) + BASE_ACCOUNT_SIZE;
+
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(
     accounts,
     'programId',
     programAddress
   );
-
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
-
-  // Bytes created on chain.
-  const bytesCreatedOnChain = Number(args.space) + BASE_ACCOUNT_SIZE;
 
   return Object.freeze({
     ...getCreateAccountInstructionRaw(
