@@ -75,7 +75,6 @@ export type AddressLookupTableAccountDataArgs = {
   lastExtendedSlot: number | bigint;
   lastExtendedSlotStartIndex: number;
   authority: OptionOrNullable<Address>;
-  padding: number;
   addresses: Array<Address>;
 };
 
@@ -101,7 +100,7 @@ export function getAddressLookupTableAccountDataEncoder() {
         getArrayEncoder(getAddressEncoder(), { size: 'remainder' }),
       ],
     ]),
-    (value) => ({ ...value, discriminator: 1 })
+    (value) => ({ ...value, discriminator: 1, padding: 0 })
   ) satisfies Encoder<AddressLookupTableAccountDataArgs>;
 }
 

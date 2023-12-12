@@ -42,6 +42,7 @@ import {
   WritableSignerAccount,
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
+import { resolveExtendLookupTableBytes } from '../../hooked';
 import {
   Context,
   ResolvedAccount,
@@ -185,7 +186,7 @@ export function getExtendLookupTableInstruction<
   TAccountSystemProgram extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'>,
+  context: Pick<Context, 'getProgramAddress' | 'getProgramDerivedAddress'>,
   input: ExtendLookupTableInputWithSigners<
     TAccountAddress,
     TAccountAuthority,
@@ -206,7 +207,7 @@ export function getExtendLookupTableInstruction<
   TAccountSystemProgram extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'>,
+  context: Pick<Context, 'getProgramAddress' | 'getProgramDerivedAddress'>,
   input: ExtendLookupTableInput<
     TAccountAddress,
     TAccountAuthority,
@@ -268,7 +269,7 @@ export function getExtendLookupTableInstruction<
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
   rawContext:
-    | Pick<Context, 'getProgramAddress'>
+    | Pick<Context, 'getProgramAddress' | 'getProgramDerivedAddress'>
     | ExtendLookupTableInput<
         TAccountAddress,
         TAccountAuthority,
@@ -285,7 +286,7 @@ export function getExtendLookupTableInstruction<
   // Resolve context and input arguments.
   const context = (rawInput === undefined ? {} : rawContext) as Pick<
     Context,
-    'getProgramAddress'
+    'getProgramAddress' | 'getProgramDerivedAddress'
   >;
   const input = (
     rawInput === undefined ? rawContext : rawInput
@@ -349,7 +350,12 @@ export function getExtendLookupTableInstruction<
   const remainingAccounts: IAccountMeta[] = [];
 
   // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
+  const bytesCreatedOnChain = await resolveExtendLookupTableBytes(
+    context,
+    resolvedAccounts,
+    resolvedArgs,
+    programId
+  );
 
   return Object.freeze({
     ...getExtendLookupTableInstructionRaw(

@@ -39,12 +39,29 @@ kinobi.update(
 // Update instructions.
 kinobi.update(
   new k.UpdateInstructionsVisitor({
-    initializeNonceAccount: {
+    authorizeNonceAccount: {
       args: {
         nonceAccountArg: { defaultsTo: k.accountDefault("nonceAccount") },
       },
     },
-    authorizeNonceAccount: {
+    createAccount: {
+      bytesCreatedOnChain: k.bytesFromArg("space"),
+    },
+    createLookupTable: {
+      bytesCreatedOnChain: k.bytesFromNumber(56),
+      accounts: {
+        address: { defaultsTo: k.pdaDefault("addressLookupTable") },
+      },
+      args: {
+        bump: { defaultsTo: k.accountBumpDefault("address") },
+      },
+    },
+    extendLookupTable: {
+      bytesCreatedOnChain: k.resolverDefault("resolveExtendLookupTableBytes", [
+        k.dependsOnArg("addresses"),
+      ]),
+    },
+    initializeNonceAccount: {
       args: {
         nonceAccountArg: { defaultsTo: k.accountDefault("nonceAccount") },
       },
@@ -57,6 +74,15 @@ kinobi.update(
 kinobi.update(
   new k.SetAccountDiscriminatorFromFieldVisitor({
     addressLookupTable: { field: "discriminator", value: k.vScalar(1) },
+  })
+);
+
+// Set default values for structs.
+kinobi.update(
+  new k.SetStructDefaultValuesVisitor({
+    addressLookupTable: {
+      padding: { ...k.vScalar(0), strategy: "omitted" },
+    },
   })
 );
 

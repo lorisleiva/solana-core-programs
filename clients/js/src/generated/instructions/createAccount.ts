@@ -6,6 +6,7 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
+import { BASE_ACCOUNT_SIZE } from '@solana/accounts';
 import {
   Address,
   getAddressDecoder,
@@ -251,7 +252,7 @@ export function getCreateAccountInstruction<
   const remainingAccounts: IAccountMeta[] = [];
 
   // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
+  const bytesCreatedOnChain = Number(args.space) + BASE_ACCOUNT_SIZE;
 
   return Object.freeze({
     ...getCreateAccountInstructionRaw(
