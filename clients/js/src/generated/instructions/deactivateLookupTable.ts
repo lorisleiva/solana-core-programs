@@ -36,7 +36,7 @@ import {
   getAccountMetasWithSigners,
 } from '../shared';
 
-export type DeactivateLutInstruction<
+export type DeactivateLookupTableInstruction<
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
   TAccountAddress extends string | IAccountMeta<string> = string,
   TAccountAuthority extends string | IAccountMeta<string> = string,
@@ -55,7 +55,7 @@ export type DeactivateLutInstruction<
     ]
   >;
 
-export type DeactivateLutInstructionWithSigners<
+export type DeactivateLookupTableInstructionWithSigners<
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
   TAccountAddress extends string | IAccountMeta<string> = string,
   TAccountAuthority extends string | IAccountMeta<string> = string,
@@ -75,36 +75,36 @@ export type DeactivateLutInstructionWithSigners<
     ]
   >;
 
-export type DeactivateLutInstructionData = { discriminator: number };
+export type DeactivateLookupTableInstructionData = { discriminator: number };
 
-export type DeactivateLutInstructionDataArgs = {};
+export type DeactivateLookupTableInstructionDataArgs = {};
 
-export function getDeactivateLutInstructionDataEncoder() {
+export function getDeactivateLookupTableInstructionDataEncoder() {
   return mapEncoder(
     getStructEncoder<{ discriminator: number }>([
       ['discriminator', getU32Encoder()],
     ]),
     (value) => ({ ...value, discriminator: 3 })
-  ) satisfies Encoder<DeactivateLutInstructionDataArgs>;
+  ) satisfies Encoder<DeactivateLookupTableInstructionDataArgs>;
 }
 
-export function getDeactivateLutInstructionDataDecoder() {
-  return getStructDecoder<DeactivateLutInstructionData>([
+export function getDeactivateLookupTableInstructionDataDecoder() {
+  return getStructDecoder<DeactivateLookupTableInstructionData>([
     ['discriminator', getU32Decoder()],
-  ]) satisfies Decoder<DeactivateLutInstructionData>;
+  ]) satisfies Decoder<DeactivateLookupTableInstructionData>;
 }
 
-export function getDeactivateLutInstructionDataCodec(): Codec<
-  DeactivateLutInstructionDataArgs,
-  DeactivateLutInstructionData
+export function getDeactivateLookupTableInstructionDataCodec(): Codec<
+  DeactivateLookupTableInstructionDataArgs,
+  DeactivateLookupTableInstructionData
 > {
   return combineCodec(
-    getDeactivateLutInstructionDataEncoder(),
-    getDeactivateLutInstructionDataDecoder()
+    getDeactivateLookupTableInstructionDataEncoder(),
+    getDeactivateLookupTableInstructionDataDecoder()
   );
 }
 
-export type DeactivateLutInput<
+export type DeactivateLookupTableInput<
   TAccountAddress extends string,
   TAccountAuthority extends string
 > = {
@@ -112,7 +112,7 @@ export type DeactivateLutInput<
   authority?: Address<TAccountAuthority>;
 };
 
-export type DeactivateLutInputWithSigners<
+export type DeactivateLookupTableInputWithSigners<
   TAccountAddress extends string,
   TAccountAuthority extends string
 > = {
@@ -120,53 +120,67 @@ export type DeactivateLutInputWithSigners<
   authority?: TransactionSigner<TAccountAuthority>;
 };
 
-export function getDeactivateLutInstruction<
+export function getDeactivateLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
   context: Pick<Context, 'getProgramAddress'>,
-  input: DeactivateLutInputWithSigners<TAccountAddress, TAccountAuthority>
-): DeactivateLutInstructionWithSigners<
+  input: DeactivateLookupTableInputWithSigners<
+    TAccountAddress,
+    TAccountAuthority
+  >
+): DeactivateLookupTableInstructionWithSigners<
   TProgram,
   TAccountAddress,
   TAccountAuthority
 >;
-export function getDeactivateLutInstruction<
+export function getDeactivateLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
   context: Pick<Context, 'getProgramAddress'>,
-  input: DeactivateLutInput<TAccountAddress, TAccountAuthority>
-): DeactivateLutInstruction<TProgram, TAccountAddress, TAccountAuthority>;
-export function getDeactivateLutInstruction<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
-  input: DeactivateLutInputWithSigners<TAccountAddress, TAccountAuthority>
-): DeactivateLutInstructionWithSigners<
+  input: DeactivateLookupTableInput<TAccountAddress, TAccountAuthority>
+): DeactivateLookupTableInstruction<
   TProgram,
   TAccountAddress,
   TAccountAuthority
 >;
-export function getDeactivateLutInstruction<
+export function getDeactivateLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
-  input: DeactivateLutInput<TAccountAddress, TAccountAuthority>
-): DeactivateLutInstruction<TProgram, TAccountAddress, TAccountAuthority>;
-export function getDeactivateLutInstruction<
+  input: DeactivateLookupTableInputWithSigners<
+    TAccountAddress,
+    TAccountAuthority
+  >
+): DeactivateLookupTableInstructionWithSigners<
+  TProgram,
+  TAccountAddress,
+  TAccountAuthority
+>;
+export function getDeactivateLookupTableInstruction<
+  TAccountAddress extends string,
+  TAccountAuthority extends string,
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  input: DeactivateLookupTableInput<TAccountAddress, TAccountAuthority>
+): DeactivateLookupTableInstruction<
+  TProgram,
+  TAccountAddress,
+  TAccountAuthority
+>;
+export function getDeactivateLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
   rawContext:
     | Pick<Context, 'getProgramAddress'>
-    | DeactivateLutInput<TAccountAddress, TAccountAuthority>,
-  rawInput?: DeactivateLutInput<TAccountAddress, TAccountAuthority>
+    | DeactivateLookupTableInput<TAccountAddress, TAccountAuthority>,
+  rawInput?: DeactivateLookupTableInput<TAccountAddress, TAccountAuthority>
 ): IInstruction {
   // Resolve context and input arguments.
   const context = (rawInput === undefined ? {} : rawContext) as Pick<
@@ -175,7 +189,7 @@ export function getDeactivateLutInstruction<
   >;
   const input = (
     rawInput === undefined ? rawContext : rawInput
-  ) as DeactivateLutInput<TAccountAddress, TAccountAuthority>;
+  ) as DeactivateLookupTableInput<TAccountAddress, TAccountAuthority>;
 
   // Program address.
   const defaultProgramAddress =
@@ -191,7 +205,7 @@ export function getDeactivateLutInstruction<
 
   // Original accounts.
   type AccountMetas = Parameters<
-    typeof getDeactivateLutInstructionRaw<
+    typeof getDeactivateLookupTableInstructionRaw<
       TProgram,
       TAccountAddress,
       TAccountAuthority
@@ -216,7 +230,7 @@ export function getDeactivateLutInstruction<
   const bytesCreatedOnChain = 0;
 
   return Object.freeze({
-    ...getDeactivateLutInstructionRaw(
+    ...getDeactivateLookupTableInstructionRaw(
       accountMetas as Record<keyof AccountMetas, IAccountMeta>,
       programAddress,
       remainingAccounts
@@ -225,7 +239,7 @@ export function getDeactivateLutInstruction<
   });
 }
 
-export function getDeactivateLutInstructionRaw<
+export function getDeactivateLookupTableInstructionRaw<
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
   TAccountAddress extends string | IAccountMeta<string> = string,
   TAccountAuthority extends string | IAccountMeta<string> = string,
@@ -248,9 +262,9 @@ export function getDeactivateLutInstructionRaw<
       accountMetaWithDefault(accounts.authority, AccountRole.READONLY_SIGNER),
       ...(remainingAccounts ?? []),
     ],
-    data: getDeactivateLutInstructionDataEncoder().encode({}),
+    data: getDeactivateLookupTableInstructionDataEncoder().encode({}),
     programAddress,
-  } as DeactivateLutInstruction<
+  } as DeactivateLookupTableInstruction<
     TProgram,
     TAccountAddress,
     TAccountAuthority,

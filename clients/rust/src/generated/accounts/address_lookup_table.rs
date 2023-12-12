@@ -16,7 +16,7 @@ pub struct AddressLookupTable {
     pub discriminator: u32,
     pub deactivation_slot: u64,
     pub last_extended_slot: u64,
-    pub last_extended_start_index: u8,
+    pub last_extended_slot_start_index: u8,
     pub authority: Option<Pubkey>,
     pub padding: u16,
     pub addresses: RemainderVec<Pubkey>,

@@ -64,7 +64,7 @@ export type AddressLookupTableAccountData = {
   discriminator: number;
   deactivationSlot: bigint;
   lastExtendedSlot: bigint;
-  lastExtendedStartIndex: number;
+  lastExtendedSlotStartIndex: number;
   authority: Option<Address>;
   padding: number;
   addresses: Array<Address>;
@@ -73,7 +73,7 @@ export type AddressLookupTableAccountData = {
 export type AddressLookupTableAccountDataArgs = {
   deactivationSlot: number | bigint;
   lastExtendedSlot: number | bigint;
-  lastExtendedStartIndex: number;
+  lastExtendedSlotStartIndex: number;
   authority: OptionOrNullable<Address>;
   padding: number;
   addresses: Array<Address>;
@@ -85,7 +85,7 @@ export function getAddressLookupTableAccountDataEncoder() {
       discriminator: number;
       deactivationSlot: number | bigint;
       lastExtendedSlot: number | bigint;
-      lastExtendedStartIndex: number;
+      lastExtendedSlotStartIndex: number;
       authority: OptionOrNullable<Address>;
       padding: number;
       addresses: Array<Address>;
@@ -93,7 +93,7 @@ export function getAddressLookupTableAccountDataEncoder() {
       ['discriminator', getU32Encoder()],
       ['deactivationSlot', getU64Encoder()],
       ['lastExtendedSlot', getU64Encoder()],
-      ['lastExtendedStartIndex', getU8Encoder()],
+      ['lastExtendedSlotStartIndex', getU8Encoder()],
       ['authority', getOptionEncoder(getAddressEncoder(), { fixed: true })],
       ['padding', getU16Encoder()],
       [
@@ -110,7 +110,7 @@ export function getAddressLookupTableAccountDataDecoder() {
     ['discriminator', getU32Decoder()],
     ['deactivationSlot', getU64Decoder()],
     ['lastExtendedSlot', getU64Decoder()],
-    ['lastExtendedStartIndex', getU8Decoder()],
+    ['lastExtendedSlotStartIndex', getU8Decoder()],
     ['authority', getOptionDecoder(getAddressDecoder(), { fixed: true })],
     ['padding', getU16Decoder()],
     ['addresses', getArrayDecoder(getAddressDecoder(), { size: 'remainder' })],

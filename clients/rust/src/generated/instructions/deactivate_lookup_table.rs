@@ -9,15 +9,13 @@ use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
 /// Accounts.
-pub struct CloseLut {
+pub struct DeactivateLookupTable {
     pub address: solana_program::pubkey::Pubkey,
 
     pub authority: solana_program::pubkey::Pubkey,
-
-    pub recipient: solana_program::pubkey::Pubkey,
 }
 
-impl CloseLut {
+impl DeactivateLookupTable {
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
         self.instruction_with_remaining_accounts(&[])
     }
@@ -26,7 +24,7 @@ impl CloseLut {
         &self,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
-        let mut accounts = Vec::with_capacity(3 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(2 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.address,
             false,
@@ -35,12 +33,10 @@ impl CloseLut {
             self.authority,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.recipient,
-            false,
-        ));
         accounts.extend_from_slice(remaining_accounts);
-        let data = CloseLutInstructionData::new().try_to_vec().unwrap();
+        let data = DeactivateLookupTableInstructionData::new()
+            .try_to_vec()
+            .unwrap();
 
         solana_program::instruction::Instruction {
             program_id: crate::SPL_ADDRESS_LOOKUP_TABLE_ID,
@@ -51,32 +47,30 @@ impl CloseLut {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct CloseLutInstructionData {
+struct DeactivateLookupTableInstructionData {
     discriminator: u32,
 }
 
-impl CloseLutInstructionData {
+impl DeactivateLookupTableInstructionData {
     fn new() -> Self {
-        Self { discriminator: 4 }
+        Self { discriminator: 3 }
     }
 }
 
-/// Instruction builder for `CloseLut`.
+/// Instruction builder for `DeactivateLookupTable`.
 ///
 /// ### Accounts:
 ///
 ///   0. `[writable]` address
 ///   1. `[signer]` authority
-///   2. `[writable]` recipient
 #[derive(Default)]
-pub struct CloseLutBuilder {
+pub struct DeactivateLookupTableBuilder {
     address: Option<solana_program::pubkey::Pubkey>,
     authority: Option<solana_program::pubkey::Pubkey>,
-    recipient: Option<solana_program::pubkey::Pubkey>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
-impl CloseLutBuilder {
+impl DeactivateLookupTableBuilder {
     pub fn new() -> Self {
         Self::default()
     }
@@ -88,11 +82,6 @@ impl CloseLutBuilder {
     #[inline(always)]
     pub fn authority(&mut self, authority: solana_program::pubkey::Pubkey) -> &mut Self {
         self.authority = Some(authority);
-        self
-    }
-    #[inline(always)]
-    pub fn recipient(&mut self, recipient: solana_program::pubkey::Pubkey) -> &mut Self {
-        self.recipient = Some(recipient);
         self
     }
     /// Add an aditional account to the instruction.
@@ -115,47 +104,41 @@ impl CloseLutBuilder {
     }
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
-        let accounts = CloseLut {
+        let accounts = DeactivateLookupTable {
             address: self.address.expect("address is not set"),
             authority: self.authority.expect("authority is not set"),
-            recipient: self.recipient.expect("recipient is not set"),
         };
 
         accounts.instruction_with_remaining_accounts(&self.__remaining_accounts)
     }
 }
 
-/// `close_lut` CPI accounts.
-pub struct CloseLutCpiAccounts<'a, 'b> {
+/// `deactivate_lookup_table` CPI accounts.
+pub struct DeactivateLookupTableCpiAccounts<'a, 'b> {
     pub address: &'b solana_program::account_info::AccountInfo<'a>,
 
     pub authority: &'b solana_program::account_info::AccountInfo<'a>,
-
-    pub recipient: &'b solana_program::account_info::AccountInfo<'a>,
 }
 
-/// `close_lut` CPI instruction.
-pub struct CloseLutCpi<'a, 'b> {
+/// `deactivate_lookup_table` CPI instruction.
+pub struct DeactivateLookupTableCpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
 
     pub address: &'b solana_program::account_info::AccountInfo<'a>,
 
     pub authority: &'b solana_program::account_info::AccountInfo<'a>,
-
-    pub recipient: &'b solana_program::account_info::AccountInfo<'a>,
 }
 
-impl<'a, 'b> CloseLutCpi<'a, 'b> {
+impl<'a, 'b> DeactivateLookupTableCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
-        accounts: CloseLutCpiAccounts<'a, 'b>,
+        accounts: DeactivateLookupTableCpiAccounts<'a, 'b>,
     ) -> Self {
         Self {
             __program: program,
             address: accounts.address,
             authority: accounts.authority,
-            recipient: accounts.recipient,
         }
     }
     #[inline(always)]
@@ -191,7 +174,7 @@ impl<'a, 'b> CloseLutCpi<'a, 'b> {
             bool,
         )],
     ) -> solana_program::entrypoint::ProgramResult {
-        let mut accounts = Vec::with_capacity(3 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(2 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.address.key,
             false,
@@ -200,10 +183,6 @@ impl<'a, 'b> CloseLutCpi<'a, 'b> {
             *self.authority.key,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.recipient.key,
-            false,
-        ));
         remaining_accounts.iter().for_each(|remaining_account| {
             accounts.push(solana_program::instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
@@ -211,18 +190,19 @@ impl<'a, 'b> CloseLutCpi<'a, 'b> {
                 is_writable: remaining_account.2,
             })
         });
-        let data = CloseLutInstructionData::new().try_to_vec().unwrap();
+        let data = DeactivateLookupTableInstructionData::new()
+            .try_to_vec()
+            .unwrap();
 
         let instruction = solana_program::instruction::Instruction {
             program_id: crate::SPL_ADDRESS_LOOKUP_TABLE_ID,
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(3 + 1 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(2 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
         account_infos.push(self.address.clone());
         account_infos.push(self.authority.clone());
-        account_infos.push(self.recipient.clone());
         remaining_accounts
             .iter()
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
@@ -235,24 +215,22 @@ impl<'a, 'b> CloseLutCpi<'a, 'b> {
     }
 }
 
-/// Instruction builder for `CloseLut` via CPI.
+/// Instruction builder for `DeactivateLookupTable` via CPI.
 ///
 /// ### Accounts:
 ///
 ///   0. `[writable]` address
 ///   1. `[signer]` authority
-///   2. `[writable]` recipient
-pub struct CloseLutCpiBuilder<'a, 'b> {
-    instruction: Box<CloseLutCpiBuilderInstruction<'a, 'b>>,
+pub struct DeactivateLookupTableCpiBuilder<'a, 'b> {
+    instruction: Box<DeactivateLookupTableCpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> CloseLutCpiBuilder<'a, 'b> {
+impl<'a, 'b> DeactivateLookupTableCpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
-        let instruction = Box::new(CloseLutCpiBuilderInstruction {
+        let instruction = Box::new(DeactivateLookupTableCpiBuilderInstruction {
             __program: program,
             address: None,
             authority: None,
-            recipient: None,
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
@@ -271,14 +249,6 @@ impl<'a, 'b> CloseLutCpiBuilder<'a, 'b> {
         authority: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.authority = Some(authority);
-        self
-    }
-    #[inline(always)]
-    pub fn recipient(
-        &mut self,
-        recipient: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
-        self.instruction.recipient = Some(recipient);
         self
     }
     /// Add an additional account to the instruction.
@@ -322,14 +292,12 @@ impl<'a, 'b> CloseLutCpiBuilder<'a, 'b> {
         &self,
         signers_seeds: &[&[&[u8]]],
     ) -> solana_program::entrypoint::ProgramResult {
-        let instruction = CloseLutCpi {
+        let instruction = DeactivateLookupTableCpi {
             __program: self.instruction.__program,
 
             address: self.instruction.address.expect("address is not set"),
 
             authority: self.instruction.authority.expect("authority is not set"),
-
-            recipient: self.instruction.recipient.expect("recipient is not set"),
         };
         instruction.invoke_signed_with_remaining_accounts(
             signers_seeds,
@@ -338,11 +306,10 @@ impl<'a, 'b> CloseLutCpiBuilder<'a, 'b> {
     }
 }
 
-struct CloseLutCpiBuilderInstruction<'a, 'b> {
+struct DeactivateLookupTableCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     address: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    recipient: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(
         &'b solana_program::account_info::AccountInfo<'a>,

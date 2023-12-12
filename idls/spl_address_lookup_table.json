@@ -3,7 +3,7 @@
   "name": "spl_address_lookup_table",
   "instructions": [
     {
-      "name": "createEmptyLut",
+      "name": "CreateLookupTable",
       "accounts": [
         {
           "name": "address",
@@ -42,7 +42,7 @@
       ]
     },
     {
-      "name": "freezeLut",
+      "name": "FreezeLookupTable",
       "accounts": [
         {
           "name": "address",
@@ -62,7 +62,7 @@
       "args": []
     },
     {
-      "name": "extendLut",
+      "name": "ExtendLookupTable",
       "accounts": [
         {
           "name": "address",
@@ -100,7 +100,7 @@
       ]
     },
     {
-      "name": "deactivateLut",
+      "name": "DeactivateLookupTable",
       "accounts": [
         {
           "name": "address",
@@ -120,7 +120,7 @@
       "args": []
     },
     {
-      "name": "closeLut",
+      "name": "CloseLookupTable",
       "accounts": [
         {
           "name": "address",
@@ -164,7 +164,7 @@
             "type": "u64"
           },
           {
-            "name": "lastExtendedStartIndex",
+            "name": "lastExtendedSlotStartIndex",
             "type": "u8"
           },
           {

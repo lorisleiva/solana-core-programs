@@ -36,11 +36,10 @@ import {
   getAccountMetasWithSigners,
 } from '../shared';
 
-export type CloseLutInstruction<
+export type FreezeLookupTableInstruction<
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
   TAccountAddress extends string | IAccountMeta<string> = string,
   TAccountAuthority extends string | IAccountMeta<string> = string,
-  TAccountRecipient extends string | IAccountMeta<string> = string,
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
@@ -52,18 +51,14 @@ export type CloseLutInstruction<
       TAccountAuthority extends string
         ? ReadonlySignerAccount<TAccountAuthority>
         : TAccountAuthority,
-      TAccountRecipient extends string
-        ? WritableAccount<TAccountRecipient>
-        : TAccountRecipient,
       ...TRemainingAccounts
     ]
   >;
 
-export type CloseLutInstructionWithSigners<
+export type FreezeLookupTableInstructionWithSigners<
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
   TAccountAddress extends string | IAccountMeta<string> = string,
   TAccountAuthority extends string | IAccountMeta<string> = string,
-  TAccountRecipient extends string | IAccountMeta<string> = string,
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
@@ -76,138 +71,102 @@ export type CloseLutInstructionWithSigners<
         ? ReadonlySignerAccount<TAccountAuthority> &
             IAccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
-      TAccountRecipient extends string
-        ? WritableAccount<TAccountRecipient>
-        : TAccountRecipient,
       ...TRemainingAccounts
     ]
   >;
 
-export type CloseLutInstructionData = { discriminator: number };
+export type FreezeLookupTableInstructionData = { discriminator: number };
 
-export type CloseLutInstructionDataArgs = {};
+export type FreezeLookupTableInstructionDataArgs = {};
 
-export function getCloseLutInstructionDataEncoder() {
+export function getFreezeLookupTableInstructionDataEncoder() {
   return mapEncoder(
     getStructEncoder<{ discriminator: number }>([
       ['discriminator', getU32Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: 4 })
-  ) satisfies Encoder<CloseLutInstructionDataArgs>;
+    (value) => ({ ...value, discriminator: 1 })
+  ) satisfies Encoder<FreezeLookupTableInstructionDataArgs>;
 }
 
-export function getCloseLutInstructionDataDecoder() {
-  return getStructDecoder<CloseLutInstructionData>([
+export function getFreezeLookupTableInstructionDataDecoder() {
+  return getStructDecoder<FreezeLookupTableInstructionData>([
     ['discriminator', getU32Decoder()],
-  ]) satisfies Decoder<CloseLutInstructionData>;
+  ]) satisfies Decoder<FreezeLookupTableInstructionData>;
 }
 
-export function getCloseLutInstructionDataCodec(): Codec<
-  CloseLutInstructionDataArgs,
-  CloseLutInstructionData
+export function getFreezeLookupTableInstructionDataCodec(): Codec<
+  FreezeLookupTableInstructionDataArgs,
+  FreezeLookupTableInstructionData
 > {
   return combineCodec(
-    getCloseLutInstructionDataEncoder(),
-    getCloseLutInstructionDataDecoder()
+    getFreezeLookupTableInstructionDataEncoder(),
+    getFreezeLookupTableInstructionDataDecoder()
   );
 }
 
-export type CloseLutInput<
+export type FreezeLookupTableInput<
   TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountRecipient extends string
+  TAccountAuthority extends string
 > = {
   address: Address<TAccountAddress>;
   authority?: Address<TAccountAuthority>;
-  recipient: Address<TAccountRecipient>;
 };
 
-export type CloseLutInputWithSigners<
+export type FreezeLookupTableInputWithSigners<
   TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountRecipient extends string
+  TAccountAuthority extends string
 > = {
   address: Address<TAccountAddress>;
   authority?: TransactionSigner<TAccountAuthority>;
-  recipient: Address<TAccountRecipient>;
 };
 
-export function getCloseLutInstruction<
+export function getFreezeLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
-  TAccountRecipient extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
   context: Pick<Context, 'getProgramAddress'>,
-  input: CloseLutInputWithSigners<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountRecipient
-  >
-): CloseLutInstructionWithSigners<
+  input: FreezeLookupTableInputWithSigners<TAccountAddress, TAccountAuthority>
+): FreezeLookupTableInstructionWithSigners<
   TProgram,
   TAccountAddress,
-  TAccountAuthority,
-  TAccountRecipient
+  TAccountAuthority
 >;
-export function getCloseLutInstruction<
+export function getFreezeLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
-  TAccountRecipient extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
   context: Pick<Context, 'getProgramAddress'>,
-  input: CloseLutInput<TAccountAddress, TAccountAuthority, TAccountRecipient>
-): CloseLutInstruction<
-  TProgram,
-  TAccountAddress,
-  TAccountAuthority,
-  TAccountRecipient
->;
-export function getCloseLutInstruction<
+  input: FreezeLookupTableInput<TAccountAddress, TAccountAuthority>
+): FreezeLookupTableInstruction<TProgram, TAccountAddress, TAccountAuthority>;
+export function getFreezeLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
-  TAccountRecipient extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
-  input: CloseLutInputWithSigners<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountRecipient
-  >
-): CloseLutInstructionWithSigners<
+  input: FreezeLookupTableInputWithSigners<TAccountAddress, TAccountAuthority>
+): FreezeLookupTableInstructionWithSigners<
   TProgram,
   TAccountAddress,
-  TAccountAuthority,
-  TAccountRecipient
+  TAccountAuthority
 >;
-export function getCloseLutInstruction<
+export function getFreezeLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
-  TAccountRecipient extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
-  input: CloseLutInput<TAccountAddress, TAccountAuthority, TAccountRecipient>
-): CloseLutInstruction<
-  TProgram,
-  TAccountAddress,
-  TAccountAuthority,
-  TAccountRecipient
->;
-export function getCloseLutInstruction<
+  input: FreezeLookupTableInput<TAccountAddress, TAccountAuthority>
+): FreezeLookupTableInstruction<TProgram, TAccountAddress, TAccountAuthority>;
+export function getFreezeLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
-  TAccountRecipient extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
   rawContext:
     | Pick<Context, 'getProgramAddress'>
-    | CloseLutInput<TAccountAddress, TAccountAuthority, TAccountRecipient>,
-  rawInput?: CloseLutInput<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountRecipient
-  >
+    | FreezeLookupTableInput<TAccountAddress, TAccountAuthority>,
+  rawInput?: FreezeLookupTableInput<TAccountAddress, TAccountAuthority>
 ): IInstruction {
   // Resolve context and input arguments.
   const context = (rawInput === undefined ? {} : rawContext) as Pick<
@@ -216,7 +175,7 @@ export function getCloseLutInstruction<
   >;
   const input = (
     rawInput === undefined ? rawContext : rawInput
-  ) as CloseLutInput<TAccountAddress, TAccountAuthority, TAccountRecipient>;
+  ) as FreezeLookupTableInput<TAccountAddress, TAccountAuthority>;
 
   // Program address.
   const defaultProgramAddress =
@@ -232,17 +191,15 @@ export function getCloseLutInstruction<
 
   // Original accounts.
   type AccountMetas = Parameters<
-    typeof getCloseLutInstructionRaw<
+    typeof getFreezeLookupTableInstructionRaw<
       TProgram,
       TAccountAddress,
-      TAccountAuthority,
-      TAccountRecipient
+      TAccountAuthority
     >
   >[0];
   const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
     address: { value: input.address ?? null, isWritable: true },
     authority: { value: input.authority ?? null, isWritable: false },
-    recipient: { value: input.recipient ?? null, isWritable: true },
   };
 
   // Get account metas and signers.
@@ -259,7 +216,7 @@ export function getCloseLutInstruction<
   const bytesCreatedOnChain = 0;
 
   return Object.freeze({
-    ...getCloseLutInstructionRaw(
+    ...getFreezeLookupTableInstructionRaw(
       accountMetas as Record<keyof AccountMetas, IAccountMeta>,
       programAddress,
       remainingAccounts
@@ -268,11 +225,10 @@ export function getCloseLutInstruction<
   });
 }
 
-export function getCloseLutInstructionRaw<
+export function getFreezeLookupTableInstructionRaw<
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
   TAccountAddress extends string | IAccountMeta<string> = string,
   TAccountAuthority extends string | IAccountMeta<string> = string,
-  TAccountRecipient extends string | IAccountMeta<string> = string,
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
 >(
   accounts: {
@@ -282,9 +238,6 @@ export function getCloseLutInstructionRaw<
     authority: TAccountAuthority extends string
       ? Address<TAccountAuthority>
       : TAccountAuthority;
-    recipient: TAccountRecipient extends string
-      ? Address<TAccountRecipient>
-      : TAccountRecipient;
   },
   programAddress: Address<TProgram> = 'AddressLookupTab1e1111111111111111111111111' as Address<TProgram>,
   remainingAccounts?: TRemainingAccounts
@@ -293,16 +246,14 @@ export function getCloseLutInstructionRaw<
     accounts: [
       accountMetaWithDefault(accounts.address, AccountRole.WRITABLE),
       accountMetaWithDefault(accounts.authority, AccountRole.READONLY_SIGNER),
-      accountMetaWithDefault(accounts.recipient, AccountRole.WRITABLE),
       ...(remainingAccounts ?? []),
     ],
-    data: getCloseLutInstructionDataEncoder().encode({}),
+    data: getFreezeLookupTableInstructionDataEncoder().encode({}),
     programAddress,
-  } as CloseLutInstruction<
+  } as FreezeLookupTableInstruction<
     TProgram,
     TAccountAddress,
     TAccountAuthority,
-    TAccountRecipient,
     TRemainingAccounts
   >;
 }

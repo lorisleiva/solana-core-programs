@@ -9,35 +9,31 @@ use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
 /// Accounts.
-pub struct FreezeLut {
-    pub address: solana_program::pubkey::Pubkey,
+pub struct SetLoadedAccountsDataSizeLimit {}
 
-    pub authority: solana_program::pubkey::Pubkey,
-}
-
-impl FreezeLut {
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
-        self.instruction_with_remaining_accounts(&[])
+impl SetLoadedAccountsDataSizeLimit {
+    pub fn instruction(
+        &self,
+        args: SetLoadedAccountsDataSizeLimitInstructionArgs,
+    ) -> solana_program::instruction::Instruction {
+        self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::vec_init_then_push)]
     pub fn instruction_with_remaining_accounts(
         &self,
+        args: SetLoadedAccountsDataSizeLimitInstructionArgs,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
-        let mut accounts = Vec::with_capacity(2 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.address,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-            self.authority,
-            true,
-        ));
+        let mut accounts = Vec::with_capacity(0 + remaining_accounts.len());
         accounts.extend_from_slice(remaining_accounts);
-        let data = FreezeLutInstructionData::new().try_to_vec().unwrap();
+        let mut data = SetLoadedAccountsDataSizeLimitInstructionData::new()
+            .try_to_vec()
+            .unwrap();
+        let mut args = args.try_to_vec().unwrap();
+        data.append(&mut args);
 
         solana_program::instruction::Instruction {
-            program_id: crate::SPL_ADDRESS_LOOKUP_TABLE_ID,
+            program_id: crate::SPL_COMPUTE_BUDGET_ID,
             accounts,
             data,
         }
@@ -45,41 +41,39 @@ impl FreezeLut {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct FreezeLutInstructionData {
-    discriminator: u32,
+struct SetLoadedAccountsDataSizeLimitInstructionData {
+    discriminator: u8,
 }
 
-impl FreezeLutInstructionData {
+impl SetLoadedAccountsDataSizeLimitInstructionData {
     fn new() -> Self {
-        Self { discriminator: 1 }
+        Self { discriminator: 4 }
     }
 }
 
-/// Instruction builder for `FreezeLut`.
+#[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct SetLoadedAccountsDataSizeLimitInstructionArgs {
+    pub account_data_size_limit: u32,
+}
+
+/// Instruction builder for `SetLoadedAccountsDataSizeLimit`.
 ///
 /// ### Accounts:
 ///
-///   0. `[writable]` address
-///   1. `[signer]` authority
 #[derive(Default)]
-pub struct FreezeLutBuilder {
-    address: Option<solana_program::pubkey::Pubkey>,
-    authority: Option<solana_program::pubkey::Pubkey>,
+pub struct SetLoadedAccountsDataSizeLimitBuilder {
+    account_data_size_limit: Option<u32>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
-impl FreezeLutBuilder {
+impl SetLoadedAccountsDataSizeLimitBuilder {
     pub fn new() -> Self {
         Self::default()
     }
     #[inline(always)]
-    pub fn address(&mut self, address: solana_program::pubkey::Pubkey) -> &mut Self {
-        self.address = Some(address);
-        self
-    }
-    #[inline(always)]
-    pub fn authority(&mut self, authority: solana_program::pubkey::Pubkey) -> &mut Self {
-        self.authority = Some(authority);
+    pub fn account_data_size_limit(&mut self, account_data_size_limit: u32) -> &mut Self {
+        self.account_data_size_limit = Some(account_data_size_limit);
         self
     }
     /// Add an aditional account to the instruction.
@@ -102,41 +96,38 @@ impl FreezeLutBuilder {
     }
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
-        let accounts = FreezeLut {
-            address: self.address.expect("address is not set"),
-            authority: self.authority.expect("authority is not set"),
+        let accounts = SetLoadedAccountsDataSizeLimit {};
+        let args = SetLoadedAccountsDataSizeLimitInstructionArgs {
+            account_data_size_limit: self
+                .account_data_size_limit
+                .clone()
+                .expect("account_data_size_limit is not set"),
         };
 
-        accounts.instruction_with_remaining_accounts(&self.__remaining_accounts)
+        accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
     }
 }
 
-/// `freeze_lut` CPI accounts.
-pub struct FreezeLutCpiAccounts<'a, 'b> {
-    pub address: &'b solana_program::account_info::AccountInfo<'a>,
+/// `set_loaded_accounts_data_size_limit` CPI accounts.
+pub struct SetLoadedAccountsDataSizeLimitCpiAccounts<'a, 'b> {}
 
-    pub authority: &'b solana_program::account_info::AccountInfo<'a>,
-}
-
-/// `freeze_lut` CPI instruction.
-pub struct FreezeLutCpi<'a, 'b> {
+/// `set_loaded_accounts_data_size_limit` CPI instruction.
+pub struct SetLoadedAccountsDataSizeLimitCpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
-
-    pub address: &'b solana_program::account_info::AccountInfo<'a>,
-
-    pub authority: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The arguments for the instruction.
+    pub __args: SetLoadedAccountsDataSizeLimitInstructionArgs,
 }
 
-impl<'a, 'b> FreezeLutCpi<'a, 'b> {
+impl<'a, 'b> SetLoadedAccountsDataSizeLimitCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
-        accounts: FreezeLutCpiAccounts<'a, 'b>,
+        accounts: SetLoadedAccountsDataSizeLimitCpiAccounts<'a, 'b>,
+        args: SetLoadedAccountsDataSizeLimitInstructionArgs,
     ) -> Self {
         Self {
             __program: program,
-            address: accounts.address,
-            authority: accounts.authority,
+            __args: args,
         }
     }
     #[inline(always)]
@@ -172,15 +163,7 @@ impl<'a, 'b> FreezeLutCpi<'a, 'b> {
             bool,
         )],
     ) -> solana_program::entrypoint::ProgramResult {
-        let mut accounts = Vec::with_capacity(2 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.address.key,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-            *self.authority.key,
-            true,
-        ));
+        let mut accounts = Vec::with_capacity(0 + remaining_accounts.len());
         remaining_accounts.iter().for_each(|remaining_account| {
             accounts.push(solana_program::instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
@@ -188,17 +171,19 @@ impl<'a, 'b> FreezeLutCpi<'a, 'b> {
                 is_writable: remaining_account.2,
             })
         });
-        let data = FreezeLutInstructionData::new().try_to_vec().unwrap();
+        let mut data = SetLoadedAccountsDataSizeLimitInstructionData::new()
+            .try_to_vec()
+            .unwrap();
+        let mut args = self.__args.try_to_vec().unwrap();
+        data.append(&mut args);
 
         let instruction = solana_program::instruction::Instruction {
-            program_id: crate::SPL_ADDRESS_LOOKUP_TABLE_ID,
+            program_id: crate::SPL_COMPUTE_BUDGET_ID,
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(2 + 1 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(0 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
-        account_infos.push(self.address.clone());
-        account_infos.push(self.authority.clone());
         remaining_accounts
             .iter()
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
@@ -211,40 +196,26 @@ impl<'a, 'b> FreezeLutCpi<'a, 'b> {
     }
 }
 
-/// Instruction builder for `FreezeLut` via CPI.
+/// Instruction builder for `SetLoadedAccountsDataSizeLimit` via CPI.
 ///
 /// ### Accounts:
 ///
-///   0. `[writable]` address
-///   1. `[signer]` authority
-pub struct FreezeLutCpiBuilder<'a, 'b> {
-    instruction: Box<FreezeLutCpiBuilderInstruction<'a, 'b>>,
+pub struct SetLoadedAccountsDataSizeLimitCpiBuilder<'a, 'b> {
+    instruction: Box<SetLoadedAccountsDataSizeLimitCpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> FreezeLutCpiBuilder<'a, 'b> {
+impl<'a, 'b> SetLoadedAccountsDataSizeLimitCpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
-        let instruction = Box::new(FreezeLutCpiBuilderInstruction {
+        let instruction = Box::new(SetLoadedAccountsDataSizeLimitCpiBuilderInstruction {
             __program: program,
-            address: None,
-            authority: None,
+            account_data_size_limit: None,
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
     }
     #[inline(always)]
-    pub fn address(
-        &mut self,
-        address: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
-        self.instruction.address = Some(address);
-        self
-    }
-    #[inline(always)]
-    pub fn authority(
-        &mut self,
-        authority: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
-        self.instruction.authority = Some(authority);
+    pub fn account_data_size_limit(&mut self, account_data_size_limit: u32) -> &mut Self {
+        self.instruction.account_data_size_limit = Some(account_data_size_limit);
         self
     }
     /// Add an additional account to the instruction.
@@ -288,12 +259,16 @@ impl<'a, 'b> FreezeLutCpiBuilder<'a, 'b> {
         &self,
         signers_seeds: &[&[&[u8]]],
     ) -> solana_program::entrypoint::ProgramResult {
-        let instruction = FreezeLutCpi {
+        let args = SetLoadedAccountsDataSizeLimitInstructionArgs {
+            account_data_size_limit: self
+                .instruction
+                .account_data_size_limit
+                .clone()
+                .expect("account_data_size_limit is not set"),
+        };
+        let instruction = SetLoadedAccountsDataSizeLimitCpi {
             __program: self.instruction.__program,
-
-            address: self.instruction.address.expect("address is not set"),
-
-            authority: self.instruction.authority.expect("authority is not set"),
+            __args: args,
         };
         instruction.invoke_signed_with_remaining_accounts(
             signers_seeds,
@@ -302,10 +277,9 @@ impl<'a, 'b> FreezeLutCpiBuilder<'a, 'b> {
     }
 }
 
-struct FreezeLutCpiBuilderInstruction<'a, 'b> {
+struct SetLoadedAccountsDataSizeLimitCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
-    address: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    account_data_size_limit: Option<u32>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(
         &'b solana_program::account_info::AccountInfo<'a>,

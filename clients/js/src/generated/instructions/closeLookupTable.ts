@@ -18,24 +18,15 @@ import {
   getStructDecoder,
   getStructEncoder,
 } from '@solana/codecs-data-structures';
-import {
-  getU32Decoder,
-  getU32Encoder,
-  getU64Decoder,
-  getU64Encoder,
-  getU8Decoder,
-  getU8Encoder,
-} from '@solana/codecs-numbers';
+import { getU32Decoder, getU32Encoder } from '@solana/codecs-numbers';
 import {
   AccountRole,
   IAccountMeta,
   IInstruction,
   IInstructionWithAccounts,
   IInstructionWithData,
-  ReadonlyAccount,
   ReadonlySignerAccount,
   WritableAccount,
-  WritableSignerAccount,
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import {
@@ -43,17 +34,13 @@ import {
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
-  getProgramAddress,
 } from '../shared';
 
-export type CreateEmptyLutInstruction<
+export type CloseLookupTableInstruction<
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
   TAccountAddress extends string | IAccountMeta<string> = string,
   TAccountAuthority extends string | IAccountMeta<string> = string,
-  TAccountPayer extends string | IAccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | IAccountMeta<string> = '11111111111111111111111111111111',
+  TAccountRecipient extends string | IAccountMeta<string> = string,
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
@@ -65,24 +52,18 @@ export type CreateEmptyLutInstruction<
       TAccountAuthority extends string
         ? ReadonlySignerAccount<TAccountAuthority>
         : TAccountAuthority,
-      TAccountPayer extends string
-        ? WritableSignerAccount<TAccountPayer>
-        : TAccountPayer,
-      TAccountSystemProgram extends string
-        ? ReadonlyAccount<TAccountSystemProgram>
-        : TAccountSystemProgram,
+      TAccountRecipient extends string
+        ? WritableAccount<TAccountRecipient>
+        : TAccountRecipient,
       ...TRemainingAccounts
     ]
   >;
 
-export type CreateEmptyLutInstructionWithSigners<
+export type CloseLookupTableInstructionWithSigners<
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
   TAccountAddress extends string | IAccountMeta<string> = string,
   TAccountAuthority extends string | IAccountMeta<string> = string,
-  TAccountPayer extends string | IAccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | IAccountMeta<string> = '11111111111111111111111111111111',
+  TAccountRecipient extends string | IAccountMeta<string> = string,
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
@@ -95,191 +76,149 @@ export type CreateEmptyLutInstructionWithSigners<
         ? ReadonlySignerAccount<TAccountAuthority> &
             IAccountSignerMeta<TAccountAuthority>
         : TAccountAuthority,
-      TAccountPayer extends string
-        ? WritableSignerAccount<TAccountPayer> &
-            IAccountSignerMeta<TAccountPayer>
-        : TAccountPayer,
-      TAccountSystemProgram extends string
-        ? ReadonlyAccount<TAccountSystemProgram>
-        : TAccountSystemProgram,
+      TAccountRecipient extends string
+        ? WritableAccount<TAccountRecipient>
+        : TAccountRecipient,
       ...TRemainingAccounts
     ]
   >;
 
-export type CreateEmptyLutInstructionData = {
-  discriminator: number;
-  recentSlot: bigint;
-  bump: number;
-};
+export type CloseLookupTableInstructionData = { discriminator: number };
 
-export type CreateEmptyLutInstructionDataArgs = {
-  recentSlot: number | bigint;
-  bump: number;
-};
+export type CloseLookupTableInstructionDataArgs = {};
 
-export function getCreateEmptyLutInstructionDataEncoder() {
+export function getCloseLookupTableInstructionDataEncoder() {
   return mapEncoder(
-    getStructEncoder<{
-      discriminator: number;
-      recentSlot: number | bigint;
-      bump: number;
-    }>([
+    getStructEncoder<{ discriminator: number }>([
       ['discriminator', getU32Encoder()],
-      ['recentSlot', getU64Encoder()],
-      ['bump', getU8Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: 0 })
-  ) satisfies Encoder<CreateEmptyLutInstructionDataArgs>;
+    (value) => ({ ...value, discriminator: 4 })
+  ) satisfies Encoder<CloseLookupTableInstructionDataArgs>;
 }
 
-export function getCreateEmptyLutInstructionDataDecoder() {
-  return getStructDecoder<CreateEmptyLutInstructionData>([
+export function getCloseLookupTableInstructionDataDecoder() {
+  return getStructDecoder<CloseLookupTableInstructionData>([
     ['discriminator', getU32Decoder()],
-    ['recentSlot', getU64Decoder()],
-    ['bump', getU8Decoder()],
-  ]) satisfies Decoder<CreateEmptyLutInstructionData>;
+  ]) satisfies Decoder<CloseLookupTableInstructionData>;
 }
 
-export function getCreateEmptyLutInstructionDataCodec(): Codec<
-  CreateEmptyLutInstructionDataArgs,
-  CreateEmptyLutInstructionData
+export function getCloseLookupTableInstructionDataCodec(): Codec<
+  CloseLookupTableInstructionDataArgs,
+  CloseLookupTableInstructionData
 > {
   return combineCodec(
-    getCreateEmptyLutInstructionDataEncoder(),
-    getCreateEmptyLutInstructionDataDecoder()
+    getCloseLookupTableInstructionDataEncoder(),
+    getCloseLookupTableInstructionDataDecoder()
   );
 }
 
-export type CreateEmptyLutInput<
+export type CloseLookupTableInput<
   TAccountAddress extends string,
   TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string
+  TAccountRecipient extends string
 > = {
   address: Address<TAccountAddress>;
   authority?: Address<TAccountAuthority>;
-  payer?: Address<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  recentSlot: CreateEmptyLutInstructionDataArgs['recentSlot'];
-  bump: CreateEmptyLutInstructionDataArgs['bump'];
+  recipient: Address<TAccountRecipient>;
 };
 
-export type CreateEmptyLutInputWithSigners<
+export type CloseLookupTableInputWithSigners<
   TAccountAddress extends string,
   TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string
+  TAccountRecipient extends string
 > = {
   address: Address<TAccountAddress>;
   authority?: TransactionSigner<TAccountAuthority>;
-  payer?: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  recentSlot: CreateEmptyLutInstructionDataArgs['recentSlot'];
-  bump: CreateEmptyLutInstructionDataArgs['bump'];
+  recipient: Address<TAccountRecipient>;
 };
 
-export function getCreateEmptyLutInstruction<
+export function getCloseLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
+  TAccountRecipient extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
   context: Pick<Context, 'getProgramAddress'>,
-  input: CreateEmptyLutInputWithSigners<
+  input: CloseLookupTableInputWithSigners<
     TAccountAddress,
     TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
+    TAccountRecipient
   >
-): CreateEmptyLutInstructionWithSigners<
+): CloseLookupTableInstructionWithSigners<
   TProgram,
   TAccountAddress,
   TAccountAuthority,
-  TAccountPayer,
-  TAccountSystemProgram
+  TAccountRecipient
 >;
-export function getCreateEmptyLutInstruction<
+export function getCloseLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
+  TAccountRecipient extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
   context: Pick<Context, 'getProgramAddress'>,
-  input: CreateEmptyLutInput<
+  input: CloseLookupTableInput<
     TAccountAddress,
     TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
+    TAccountRecipient
   >
-): CreateEmptyLutInstruction<
+): CloseLookupTableInstruction<
   TProgram,
   TAccountAddress,
   TAccountAuthority,
-  TAccountPayer,
-  TAccountSystemProgram
+  TAccountRecipient
 >;
-export function getCreateEmptyLutInstruction<
+export function getCloseLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
+  TAccountRecipient extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
-  input: CreateEmptyLutInputWithSigners<
+  input: CloseLookupTableInputWithSigners<
     TAccountAddress,
     TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
+    TAccountRecipient
   >
-): CreateEmptyLutInstructionWithSigners<
+): CloseLookupTableInstructionWithSigners<
   TProgram,
   TAccountAddress,
   TAccountAuthority,
-  TAccountPayer,
-  TAccountSystemProgram
+  TAccountRecipient
 >;
-export function getCreateEmptyLutInstruction<
+export function getCloseLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
+  TAccountRecipient extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
-  input: CreateEmptyLutInput<
+  input: CloseLookupTableInput<
     TAccountAddress,
     TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
+    TAccountRecipient
   >
-): CreateEmptyLutInstruction<
+): CloseLookupTableInstruction<
   TProgram,
   TAccountAddress,
   TAccountAuthority,
-  TAccountPayer,
-  TAccountSystemProgram
+  TAccountRecipient
 >;
-export function getCreateEmptyLutInstruction<
+export function getCloseLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
+  TAccountRecipient extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
   rawContext:
     | Pick<Context, 'getProgramAddress'>
-    | CreateEmptyLutInput<
+    | CloseLookupTableInput<
         TAccountAddress,
         TAccountAuthority,
-        TAccountPayer,
-        TAccountSystemProgram
+        TAccountRecipient
       >,
-  rawInput?: CreateEmptyLutInput<
+  rawInput?: CloseLookupTableInput<
     TAccountAddress,
     TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
+    TAccountRecipient
   >
 ): IInstruction {
   // Resolve context and input arguments.
@@ -289,11 +228,10 @@ export function getCreateEmptyLutInstruction<
   >;
   const input = (
     rawInput === undefined ? rawContext : rawInput
-  ) as CreateEmptyLutInput<
+  ) as CloseLookupTableInput<
     TAccountAddress,
     TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
+    TAccountRecipient
   >;
 
   // Program address.
@@ -310,33 +248,18 @@ export function getCreateEmptyLutInstruction<
 
   // Original accounts.
   type AccountMetas = Parameters<
-    typeof getCreateEmptyLutInstructionRaw<
+    typeof getCloseLookupTableInstructionRaw<
       TProgram,
       TAccountAddress,
       TAccountAuthority,
-      TAccountPayer,
-      TAccountSystemProgram
+      TAccountRecipient
     >
   >[0];
   const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
     address: { value: input.address ?? null, isWritable: true },
     authority: { value: input.authority ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    recipient: { value: input.recipient ?? null, isWritable: true },
   };
-
-  // Original args.
-  const args = { ...input };
-
-  // Resolve default values.
-  if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value = getProgramAddress(
-      context,
-      'splSystem',
-      '11111111111111111111111111111111'
-    );
-    accounts.systemProgram.isWritable = false;
-  }
 
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(
@@ -352,9 +275,8 @@ export function getCreateEmptyLutInstruction<
   const bytesCreatedOnChain = 0;
 
   return Object.freeze({
-    ...getCreateEmptyLutInstructionRaw(
+    ...getCloseLookupTableInstructionRaw(
       accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-      args as CreateEmptyLutInstructionDataArgs,
       programAddress,
       remainingAccounts
     ),
@@ -362,14 +284,11 @@ export function getCreateEmptyLutInstruction<
   });
 }
 
-export function getCreateEmptyLutInstructionRaw<
+export function getCloseLookupTableInstructionRaw<
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111',
   TAccountAddress extends string | IAccountMeta<string> = string,
   TAccountAuthority extends string | IAccountMeta<string> = string,
-  TAccountPayer extends string | IAccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | IAccountMeta<string> = '11111111111111111111111111111111',
+  TAccountRecipient extends string | IAccountMeta<string> = string,
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
 >(
   accounts: {
@@ -379,14 +298,10 @@ export function getCreateEmptyLutInstructionRaw<
     authority: TAccountAuthority extends string
       ? Address<TAccountAuthority>
       : TAccountAuthority;
-    payer: TAccountPayer extends string
-      ? Address<TAccountPayer>
-      : TAccountPayer;
-    systemProgram?: TAccountSystemProgram extends string
-      ? Address<TAccountSystemProgram>
-      : TAccountSystemProgram;
+    recipient: TAccountRecipient extends string
+      ? Address<TAccountRecipient>
+      : TAccountRecipient;
   },
-  args: CreateEmptyLutInstructionDataArgs,
   programAddress: Address<TProgram> = 'AddressLookupTab1e1111111111111111111111111' as Address<TProgram>,
   remainingAccounts?: TRemainingAccounts
 ) {
@@ -394,25 +309,16 @@ export function getCreateEmptyLutInstructionRaw<
     accounts: [
       accountMetaWithDefault(accounts.address, AccountRole.WRITABLE),
       accountMetaWithDefault(accounts.authority, AccountRole.READONLY_SIGNER),
-      accountMetaWithDefault(accounts.payer, AccountRole.WRITABLE_SIGNER),
-      accountMetaWithDefault(
-        accounts.systemProgram ?? {
-          address:
-            '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>,
-          role: AccountRole.READONLY,
-        },
-        AccountRole.READONLY
-      ),
+      accountMetaWithDefault(accounts.recipient, AccountRole.WRITABLE),
       ...(remainingAccounts ?? []),
     ],
-    data: getCreateEmptyLutInstructionDataEncoder().encode(args),
+    data: getCloseLookupTableInstructionDataEncoder().encode({}),
     programAddress,
-  } as CreateEmptyLutInstruction<
+  } as CloseLookupTableInstruction<
     TProgram,
     TAccountAddress,
     TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram,
+    TAccountRecipient,
     TRemainingAccounts
   >;
 }

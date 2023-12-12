@@ -7,9 +7,11 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
+use kaigan::types::U64PrefixVec;
+use solana_program::pubkey::Pubkey;
 
 /// Accounts.
-pub struct CreateEmptyLut {
+pub struct ExtendLookupTable {
     pub address: solana_program::pubkey::Pubkey,
 
     pub authority: solana_program::pubkey::Pubkey,
@@ -19,17 +21,17 @@ pub struct CreateEmptyLut {
     pub system_program: solana_program::pubkey::Pubkey,
 }
 
-impl CreateEmptyLut {
+impl ExtendLookupTable {
     pub fn instruction(
         &self,
-        args: CreateEmptyLutInstructionArgs,
+        args: ExtendLookupTableInstructionArgs,
     ) -> solana_program::instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::vec_init_then_push)]
     pub fn instruction_with_remaining_accounts(
         &self,
-        args: CreateEmptyLutInstructionArgs,
+        args: ExtendLookupTableInstructionArgs,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
         let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
@@ -49,7 +51,9 @@ impl CreateEmptyLut {
             false,
         ));
         accounts.extend_from_slice(remaining_accounts);
-        let mut data = CreateEmptyLutInstructionData::new().try_to_vec().unwrap();
+        let mut data = ExtendLookupTableInstructionData::new()
+            .try_to_vec()
+            .unwrap();
         let mut args = args.try_to_vec().unwrap();
         data.append(&mut args);
 
@@ -62,24 +66,23 @@ impl CreateEmptyLut {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct CreateEmptyLutInstructionData {
+struct ExtendLookupTableInstructionData {
     discriminator: u32,
 }
 
-impl CreateEmptyLutInstructionData {
+impl ExtendLookupTableInstructionData {
     fn new() -> Self {
-        Self { discriminator: 0 }
+        Self { discriminator: 2 }
     }
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct CreateEmptyLutInstructionArgs {
-    pub recent_slot: u64,
-    pub bump: u8,
+pub struct ExtendLookupTableInstructionArgs {
+    pub addresses: U64PrefixVec<Pubkey>,
 }
 
-/// Instruction builder for `CreateEmptyLut`.
+/// Instruction builder for `ExtendLookupTable`.
 ///
 /// ### Accounts:
 ///
@@ -88,17 +91,16 @@ pub struct CreateEmptyLutInstructionArgs {
 ///   2. `[writable, signer]` payer
 ///   3. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Default)]
-pub struct CreateEmptyLutBuilder {
+pub struct ExtendLookupTableBuilder {
     address: Option<solana_program::pubkey::Pubkey>,
     authority: Option<solana_program::pubkey::Pubkey>,
     payer: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
-    recent_slot: Option<u64>,
-    bump: Option<u8>,
+    addresses: Option<U64PrefixVec<Pubkey>>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
-impl CreateEmptyLutBuilder {
+impl ExtendLookupTableBuilder {
     pub fn new() -> Self {
         Self::default()
     }
@@ -124,13 +126,8 @@ impl CreateEmptyLutBuilder {
         self
     }
     #[inline(always)]
-    pub fn recent_slot(&mut self, recent_slot: u64) -> &mut Self {
-        self.recent_slot = Some(recent_slot);
-        self
-    }
-    #[inline(always)]
-    pub fn bump(&mut self, bump: u8) -> &mut Self {
-        self.bump = Some(bump);
+    pub fn addresses(&mut self, addresses: U64PrefixVec<Pubkey>) -> &mut Self {
+        self.addresses = Some(addresses);
         self
     }
     /// Add an aditional account to the instruction.
@@ -153,7 +150,7 @@ impl CreateEmptyLutBuilder {
     }
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
-        let accounts = CreateEmptyLut {
+        let accounts = ExtendLookupTable {
             address: self.address.expect("address is not set"),
             authority: self.authority.expect("authority is not set"),
             payer: self.payer.expect("payer is not set"),
@@ -161,17 +158,16 @@ impl CreateEmptyLutBuilder {
                 .system_program
                 .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
         };
-        let args = CreateEmptyLutInstructionArgs {
-            recent_slot: self.recent_slot.clone().expect("recent_slot is not set"),
-            bump: self.bump.clone().expect("bump is not set"),
+        let args = ExtendLookupTableInstructionArgs {
+            addresses: self.addresses.clone().expect("addresses is not set"),
         };
 
         accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
     }
 }
 
-/// `create_empty_lut` CPI accounts.
-pub struct CreateEmptyLutCpiAccounts<'a, 'b> {
+/// `extend_lookup_table` CPI accounts.
+pub struct ExtendLookupTableCpiAccounts<'a, 'b> {
     pub address: &'b solana_program::account_info::AccountInfo<'a>,
 
     pub authority: &'b solana_program::account_info::AccountInfo<'a>,
@@ -181,8 +177,8 @@ pub struct CreateEmptyLutCpiAccounts<'a, 'b> {
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
 
-/// `create_empty_lut` CPI instruction.
-pub struct CreateEmptyLutCpi<'a, 'b> {
+/// `extend_lookup_table` CPI instruction.
+pub struct ExtendLookupTableCpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
 
@@ -194,14 +190,14 @@ pub struct CreateEmptyLutCpi<'a, 'b> {
 
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
-    pub __args: CreateEmptyLutInstructionArgs,
+    pub __args: ExtendLookupTableInstructionArgs,
 }
 
-impl<'a, 'b> CreateEmptyLutCpi<'a, 'b> {
+impl<'a, 'b> ExtendLookupTableCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
-        accounts: CreateEmptyLutCpiAccounts<'a, 'b>,
-        args: CreateEmptyLutInstructionArgs,
+        accounts: ExtendLookupTableCpiAccounts<'a, 'b>,
+        args: ExtendLookupTableInstructionArgs,
     ) -> Self {
         Self {
             __program: program,
@@ -269,7 +265,9 @@ impl<'a, 'b> CreateEmptyLutCpi<'a, 'b> {
                 is_writable: remaining_account.2,
             })
         });
-        let mut data = CreateEmptyLutInstructionData::new().try_to_vec().unwrap();
+        let mut data = ExtendLookupTableInstructionData::new()
+            .try_to_vec()
+            .unwrap();
         let mut args = self.__args.try_to_vec().unwrap();
         data.append(&mut args);
 
@@ -296,7 +294,7 @@ impl<'a, 'b> CreateEmptyLutCpi<'a, 'b> {
     }
 }
 
-/// Instruction builder for `CreateEmptyLut` via CPI.
+/// Instruction builder for `ExtendLookupTable` via CPI.
 ///
 /// ### Accounts:
 ///
@@ -304,20 +302,19 @@ impl<'a, 'b> CreateEmptyLutCpi<'a, 'b> {
 ///   1. `[signer]` authority
 ///   2. `[writable, signer]` payer
 ///   3. `[]` system_program
-pub struct CreateEmptyLutCpiBuilder<'a, 'b> {
-    instruction: Box<CreateEmptyLutCpiBuilderInstruction<'a, 'b>>,
+pub struct ExtendLookupTableCpiBuilder<'a, 'b> {
+    instruction: Box<ExtendLookupTableCpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> CreateEmptyLutCpiBuilder<'a, 'b> {
+impl<'a, 'b> ExtendLookupTableCpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
-        let instruction = Box::new(CreateEmptyLutCpiBuilderInstruction {
+        let instruction = Box::new(ExtendLookupTableCpiBuilderInstruction {
             __program: program,
             address: None,
             authority: None,
             payer: None,
             system_program: None,
-            recent_slot: None,
-            bump: None,
+            addresses: None,
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
@@ -352,13 +349,8 @@ impl<'a, 'b> CreateEmptyLutCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn recent_slot(&mut self, recent_slot: u64) -> &mut Self {
-        self.instruction.recent_slot = Some(recent_slot);
-        self
-    }
-    #[inline(always)]
-    pub fn bump(&mut self, bump: u8) -> &mut Self {
-        self.instruction.bump = Some(bump);
+    pub fn addresses(&mut self, addresses: U64PrefixVec<Pubkey>) -> &mut Self {
+        self.instruction.addresses = Some(addresses);
         self
     }
     /// Add an additional account to the instruction.
@@ -402,15 +394,14 @@ impl<'a, 'b> CreateEmptyLutCpiBuilder<'a, 'b> {
         &self,
         signers_seeds: &[&[&[u8]]],
     ) -> solana_program::entrypoint::ProgramResult {
-        let args = CreateEmptyLutInstructionArgs {
-            recent_slot: self
+        let args = ExtendLookupTableInstructionArgs {
+            addresses: self
                 .instruction
-                .recent_slot
+                .addresses
                 .clone()
-                .expect("recent_slot is not set"),
-            bump: self.instruction.bump.clone().expect("bump is not set"),
+                .expect("addresses is not set"),
         };
-        let instruction = CreateEmptyLutCpi {
+        let instruction = ExtendLookupTableCpi {
             __program: self.instruction.__program,
 
             address: self.instruction.address.expect("address is not set"),
@@ -432,14 +423,13 @@ impl<'a, 'b> CreateEmptyLutCpiBuilder<'a, 'b> {
     }
 }
 
-struct CreateEmptyLutCpiBuilderInstruction<'a, 'b> {
+struct ExtendLookupTableCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     address: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    recent_slot: Option<u64>,
-    bump: Option<u8>,
+    addresses: Option<U64PrefixVec<Pubkey>>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(
         &'b solana_program::account_info::AccountInfo<'a>,

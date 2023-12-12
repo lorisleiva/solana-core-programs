@@ -59,6 +59,20 @@
           ]
         }
       ]
+    },
+    {
+      "name": "setLoadedAccountsDataSizeLimit",
+      "accounts": [],
+      "args": [
+        {
+          "name": "accountDataSizeLimit",
+          "type": "u32"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 4
+      }
     }
   ],
   "metadata": {
