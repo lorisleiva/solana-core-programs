@@ -167,12 +167,6 @@ export function getUpgradeNonceAccountInstruction<
     nonceAccount: { value: input.nonceAccount ?? null, isWritable: true },
   };
 
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
-
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
-
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(
     accounts,
@@ -180,14 +174,12 @@ export function getUpgradeNonceAccountInstruction<
     programAddress
   );
 
-  return Object.freeze({
-    ...getUpgradeNonceAccountInstructionRaw(
-      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  });
+  const instruction = getUpgradeNonceAccountInstructionRaw(
+    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
+    programAddress
+  );
+
+  return instruction;
 }
 
 export function getUpgradeNonceAccountInstructionRaw<

@@ -274,11 +274,6 @@ export function getAdvanceNonceAccountInstruction<
     accounts.recentBlockhashesSysvar.value =
       'SysvarRecentB1ockHashes11111111111111111111' as Address<'SysvarRecentB1ockHashes11111111111111111111'>;
   }
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
-
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
 
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(
@@ -287,14 +282,12 @@ export function getAdvanceNonceAccountInstruction<
     programAddress
   );
 
-  return Object.freeze({
-    ...getAdvanceNonceAccountInstructionRaw(
-      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  });
+  const instruction = getAdvanceNonceAccountInstructionRaw(
+    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
+    programAddress
+  );
+
+  return instruction;
 }
 
 export function getAdvanceNonceAccountInstructionRaw<

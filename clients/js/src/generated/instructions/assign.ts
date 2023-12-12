@@ -179,12 +179,6 @@ export function getAssignInstruction<
   // Original args.
   const args = { ...input };
 
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
-
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
-
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(
     accounts,
@@ -192,15 +186,13 @@ export function getAssignInstruction<
     programAddress
   );
 
-  return Object.freeze({
-    ...getAssignInstructionRaw(
-      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-      args as AssignInstructionDataArgs,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  });
+  const instruction = getAssignInstructionRaw(
+    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
+    args as AssignInstructionDataArgs,
+    programAddress
+  );
+
+  return instruction;
 }
 
 export function getAssignInstructionRaw<

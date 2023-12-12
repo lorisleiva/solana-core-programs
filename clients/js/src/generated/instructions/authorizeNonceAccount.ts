@@ -246,11 +246,6 @@ export function getAuthorizeNonceAccountInstruction<
   if (!args.nonceAccountArg) {
     args.nonceAccountArg = expectAddress(accounts.nonceAccount.value);
   }
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
-
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
 
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(
@@ -259,15 +254,13 @@ export function getAuthorizeNonceAccountInstruction<
     programAddress
   );
 
-  return Object.freeze({
-    ...getAuthorizeNonceAccountInstructionRaw(
-      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-      args as AuthorizeNonceAccountInstructionDataArgs,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  });
+  const instruction = getAuthorizeNonceAccountInstructionRaw(
+    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
+    args as AuthorizeNonceAccountInstructionDataArgs,
+    programAddress
+  );
+
+  return instruction;
 }
 
 export function getAuthorizeNonceAccountInstructionRaw<

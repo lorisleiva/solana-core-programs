@@ -261,12 +261,6 @@ export function getCloseLookupTableInstruction<
     recipient: { value: input.recipient ?? null, isWritable: true },
   };
 
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
-
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
-
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(
     accounts,
@@ -274,14 +268,12 @@ export function getCloseLookupTableInstruction<
     programAddress
   );
 
-  return Object.freeze({
-    ...getCloseLookupTableInstructionRaw(
-      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  });
+  const instruction = getCloseLookupTableInstructionRaw(
+    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
+    programAddress
+  );
+
+  return instruction;
 }
 
 export function getCloseLookupTableInstructionRaw<

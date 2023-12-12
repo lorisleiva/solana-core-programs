@@ -300,12 +300,6 @@ export function getTransferSolWithSeedInstruction<
   // Original args.
   const args = { ...input };
 
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
-
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
-
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(
     accounts,
@@ -313,15 +307,13 @@ export function getTransferSolWithSeedInstruction<
     programAddress
   );
 
-  return Object.freeze({
-    ...getTransferSolWithSeedInstructionRaw(
-      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-      args as TransferSolWithSeedInstructionDataArgs,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  });
+  const instruction = getTransferSolWithSeedInstructionRaw(
+    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
+    args as TransferSolWithSeedInstructionDataArgs,
+    programAddress
+  );
+
+  return instruction;
 }
 
 export function getTransferSolWithSeedInstructionRaw<

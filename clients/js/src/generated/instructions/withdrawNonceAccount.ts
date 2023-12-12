@@ -365,11 +365,6 @@ export function getWithdrawNonceAccountInstruction<
     accounts.rentSysvar.value =
       'SysvarRent111111111111111111111111111111111' as Address<'SysvarRent111111111111111111111111111111111'>;
   }
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
-
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
 
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(
@@ -378,15 +373,13 @@ export function getWithdrawNonceAccountInstruction<
     programAddress
   );
 
-  return Object.freeze({
-    ...getWithdrawNonceAccountInstructionRaw(
-      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-      args as WithdrawNonceAccountInstructionDataArgs,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  });
+  const instruction = getWithdrawNonceAccountInstructionRaw(
+    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
+    args as WithdrawNonceAccountInstructionDataArgs,
+    programAddress
+  );
+
+  return instruction;
 }
 
 export function getWithdrawNonceAccountInstructionRaw<

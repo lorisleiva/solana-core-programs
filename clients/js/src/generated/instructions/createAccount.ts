@@ -241,9 +241,6 @@ export function getCreateAccountInstruction<
   // Original args.
   const args = { ...input };
 
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
-
   // Bytes created on chain.
   const bytesCreatedOnChain = Number(args.space) + BASE_ACCOUNT_SIZE;
 
@@ -254,15 +251,13 @@ export function getCreateAccountInstruction<
     programAddress
   );
 
-  return Object.freeze({
-    ...getCreateAccountInstructionRaw(
-      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-      args as CreateAccountInstructionDataArgs,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  });
+  const instruction = getCreateAccountInstructionRaw(
+    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
+    args as CreateAccountInstructionDataArgs,
+    programAddress
+  );
+
+  return Object.freeze({ ...instruction, bytesCreatedOnChain });
 }
 
 export function getCreateAccountInstructionRaw<

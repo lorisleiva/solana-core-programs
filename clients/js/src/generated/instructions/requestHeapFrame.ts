@@ -155,20 +155,12 @@ export function getRequestHeapFrameInstruction<
   // Original args.
   const args = { ...input };
 
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
+  const instruction = getRequestHeapFrameInstructionRaw(
+    args as RequestHeapFrameInstructionDataArgs,
+    programAddress
+  );
 
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
-
-  return Object.freeze({
-    ...getRequestHeapFrameInstructionRaw(
-      args as RequestHeapFrameInstructionDataArgs,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  });
+  return instruction;
 }
 
 export function getRequestHeapFrameInstructionRaw<

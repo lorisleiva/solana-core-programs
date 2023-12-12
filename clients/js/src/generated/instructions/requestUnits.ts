@@ -156,20 +156,12 @@ export function getRequestUnitsInstruction<
   // Original args.
   const args = { ...input };
 
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
+  const instruction = getRequestUnitsInstructionRaw(
+    args as RequestUnitsInstructionDataArgs,
+    programAddress
+  );
 
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
-
-  return Object.freeze({
-    ...getRequestUnitsInstructionRaw(
-      args as RequestUnitsInstructionDataArgs,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  });
+  return instruction;
 }
 
 export function getRequestUnitsInstructionRaw<

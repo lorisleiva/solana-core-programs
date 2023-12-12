@@ -144,20 +144,12 @@ export function getSetLoadedAccountsDataSizeLimitInstruction<
   // Original args.
   const args = { ...input };
 
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
+  const instruction = getSetLoadedAccountsDataSizeLimitInstructionRaw(
+    args as SetLoadedAccountsDataSizeLimitInstructionDataArgs,
+    programAddress
+  );
 
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
-
-  return Object.freeze({
-    ...getSetLoadedAccountsDataSizeLimitInstructionRaw(
-      args as SetLoadedAccountsDataSizeLimitInstructionDataArgs,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  });
+  return instruction;
 }
 
 export function getSetLoadedAccountsDataSizeLimitInstructionRaw<

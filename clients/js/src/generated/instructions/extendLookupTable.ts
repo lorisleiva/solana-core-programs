@@ -341,8 +341,6 @@ export function getExtendLookupTableInstruction<
     );
     accounts.systemProgram.isWritable = false;
   }
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
 
   // Bytes created on chain.
   const bytesCreatedOnChain = resolveExtendLookupTableBytes(resolverScope);
@@ -354,15 +352,13 @@ export function getExtendLookupTableInstruction<
     programAddress
   );
 
-  return Object.freeze({
-    ...getExtendLookupTableInstructionRaw(
-      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-      args as ExtendLookupTableInstructionDataArgs,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  });
+  const instruction = getExtendLookupTableInstructionRaw(
+    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
+    args as ExtendLookupTableInstructionDataArgs,
+    programAddress
+  );
+
+  return Object.freeze({ ...instruction, bytesCreatedOnChain });
 }
 
 export function getExtendLookupTableInstructionRaw<

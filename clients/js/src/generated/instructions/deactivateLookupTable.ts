@@ -216,12 +216,6 @@ export function getDeactivateLookupTableInstruction<
     authority: { value: input.authority ?? null, isWritable: false },
   };
 
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
-
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
-
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(
     accounts,
@@ -229,14 +223,12 @@ export function getDeactivateLookupTableInstruction<
     programAddress
   );
 
-  return Object.freeze({
-    ...getDeactivateLookupTableInstructionRaw(
-      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  });
+  const instruction = getDeactivateLookupTableInstructionRaw(
+    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
+    programAddress
+  );
+
+  return instruction;
 }
 
 export function getDeactivateLookupTableInstructionRaw<

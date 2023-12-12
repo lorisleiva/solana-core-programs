@@ -146,20 +146,12 @@ export function getSetComputeUnitPriceInstruction<
   // Original args.
   const args = { ...input };
 
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
+  const instruction = getSetComputeUnitPriceInstructionRaw(
+    args as SetComputeUnitPriceInstructionDataArgs,
+    programAddress
+  );
 
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
-
-  return Object.freeze({
-    ...getSetComputeUnitPriceInstructionRaw(
-      args as SetComputeUnitPriceInstructionDataArgs,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  });
+  return instruction;
 }
 
 export function getSetComputeUnitPriceInstructionRaw<

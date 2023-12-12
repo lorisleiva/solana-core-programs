@@ -359,8 +359,6 @@ export async function getCreateLookupTableInstructionAsync<
   if (!args.bump) {
     args.bump = expectProgramDerivedAddress(accounts.address.value)[1];
   }
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
 
   // Bytes created on chain.
   const bytesCreatedOnChain = 56 + BASE_ACCOUNT_SIZE;
@@ -372,15 +370,13 @@ export async function getCreateLookupTableInstructionAsync<
     programAddress
   );
 
-  return Object.freeze({
-    ...getCreateLookupTableInstructionRaw(
-      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-      args as CreateLookupTableInstructionDataArgs,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  });
+  const instruction = getCreateLookupTableInstructionRaw(
+    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
+    args as CreateLookupTableInstructionDataArgs,
+    programAddress
+  );
+
+  return Object.freeze({ ...instruction, bytesCreatedOnChain });
 }
 
 export type CreateLookupTableInput<
@@ -573,8 +569,6 @@ export function getCreateLookupTableInstruction<
   if (!args.bump) {
     args.bump = expectProgramDerivedAddress(accounts.address.value)[1];
   }
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
 
   // Bytes created on chain.
   const bytesCreatedOnChain = 56 + BASE_ACCOUNT_SIZE;
@@ -586,15 +580,13 @@ export function getCreateLookupTableInstruction<
     programAddress
   );
 
-  return Object.freeze({
-    ...getCreateLookupTableInstructionRaw(
-      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-      args as CreateLookupTableInstructionDataArgs,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  });
+  const instruction = getCreateLookupTableInstructionRaw(
+    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
+    args as CreateLookupTableInstructionDataArgs,
+    programAddress
+  );
+
+  return Object.freeze({ ...instruction, bytesCreatedOnChain });
 }
 
 export function getCreateLookupTableInstructionRaw<

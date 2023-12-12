@@ -236,12 +236,6 @@ export function getAssignWithSeedInstruction<
   // Original args.
   const args = { ...input };
 
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
-
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
-
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(
     accounts,
@@ -249,15 +243,13 @@ export function getAssignWithSeedInstruction<
     programAddress
   );
 
-  return Object.freeze({
-    ...getAssignWithSeedInstructionRaw(
-      accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-      args as AssignWithSeedInstructionDataArgs,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  });
+  const instruction = getAssignWithSeedInstructionRaw(
+    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
+    args as AssignWithSeedInstructionDataArgs,
+    programAddress
+  );
+
+  return instruction;
 }
 
 export function getAssignWithSeedInstructionRaw<

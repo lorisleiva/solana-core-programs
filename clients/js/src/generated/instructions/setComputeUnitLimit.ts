@@ -146,20 +146,12 @@ export function getSetComputeUnitLimitInstruction<
   // Original args.
   const args = { ...input };
 
-  // Remaining accounts.
-  const remainingAccounts: IAccountMeta[] = [];
+  const instruction = getSetComputeUnitLimitInstructionRaw(
+    args as SetComputeUnitLimitInstructionDataArgs,
+    programAddress
+  );
 
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 0;
-
-  return Object.freeze({
-    ...getSetComputeUnitLimitInstructionRaw(
-      args as SetComputeUnitLimitInstructionDataArgs,
-      programAddress,
-      remainingAccounts
-    ),
-    bytesCreatedOnChain,
-  });
+  return instruction;
 }
 
 export function getSetComputeUnitLimitInstructionRaw<
