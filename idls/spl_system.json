@@ -213,7 +213,7 @@
       ],
       "args": [
         {
-          "name": "nonceAccountArg",
+          "name": "nonceAuthority",
           "type": "publicKey"
         }
       ],
@@ -238,7 +238,7 @@
       ],
       "args": [
         {
-          "name": "nonceAccountArg",
+          "name": "newNonceAuthority",
           "type": "publicKey"
         }
       ],

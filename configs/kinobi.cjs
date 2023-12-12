@@ -39,11 +39,6 @@ kinobi.update(
 // Update instructions.
 kinobi.update(
   new k.UpdateInstructionsVisitor({
-    authorizeNonceAccount: {
-      args: {
-        nonceAccountArg: { defaultsTo: k.accountDefault("nonceAccount") },
-      },
-    },
     createAccount: {
       bytesCreatedOnChain: k.bytesFromArg("space"),
     },
@@ -60,11 +55,6 @@ kinobi.update(
       bytesCreatedOnChain: k.resolverDefault("resolveExtendLookupTableBytes", [
         k.dependsOnArg("addresses"),
       ]),
-    },
-    initializeNonceAccount: {
-      args: {
-        nonceAccountArg: { defaultsTo: k.accountDefault("nonceAccount") },
-      },
     },
     //
   })

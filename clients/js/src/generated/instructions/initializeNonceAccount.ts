@@ -36,7 +36,6 @@ import {
   Context,
   ResolvedAccount,
   accountMetaWithDefault,
-  expectAddress,
   getAccountMetasWithSigners,
   getProgramAddress,
 } from '../shared';
@@ -97,18 +96,18 @@ export type InitializeNonceAccountInstructionWithSigners<
 
 export type InitializeNonceAccountInstructionData = {
   discriminator: number;
-  nonceAccountArg: Address;
+  nonceAuthority: Address;
 };
 
 export type InitializeNonceAccountInstructionDataArgs = {
-  nonceAccountArg: Address;
+  nonceAuthority: Address;
 };
 
 export function getInitializeNonceAccountInstructionDataEncoder() {
   return mapEncoder(
-    getStructEncoder<{ discriminator: number; nonceAccountArg: Address }>([
+    getStructEncoder<{ discriminator: number; nonceAuthority: Address }>([
       ['discriminator', getU32Encoder()],
-      ['nonceAccountArg', getAddressEncoder()],
+      ['nonceAuthority', getAddressEncoder()],
     ]),
     (value) => ({ ...value, discriminator: 6 })
   ) satisfies Encoder<InitializeNonceAccountInstructionDataArgs>;
@@ -117,7 +116,7 @@ export function getInitializeNonceAccountInstructionDataEncoder() {
 export function getInitializeNonceAccountInstructionDataDecoder() {
   return getStructDecoder<InitializeNonceAccountInstructionData>([
     ['discriminator', getU32Decoder()],
-    ['nonceAccountArg', getAddressDecoder()],
+    ['nonceAuthority', getAddressDecoder()],
   ]) satisfies Decoder<InitializeNonceAccountInstructionData>;
 }
 
@@ -139,7 +138,7 @@ export type InitializeNonceAccountInput<
   nonceAccount: Address<TAccountNonceAccount>;
   recentBlockhashesSysvar?: Address<TAccountRecentBlockhashesSysvar>;
   rentSysvar?: Address<TAccountRentSysvar>;
-  nonceAccountArg?: InitializeNonceAccountInstructionDataArgs['nonceAccountArg'];
+  nonceAuthority: InitializeNonceAccountInstructionDataArgs['nonceAuthority'];
 };
 
 export type InitializeNonceAccountInputWithSigners<
@@ -150,7 +149,7 @@ export type InitializeNonceAccountInputWithSigners<
   nonceAccount: Address<TAccountNonceAccount>;
   recentBlockhashesSysvar?: Address<TAccountRecentBlockhashesSysvar>;
   rentSysvar?: Address<TAccountRentSysvar>;
-  nonceAccountArg?: InitializeNonceAccountInstructionDataArgs['nonceAccountArg'];
+  nonceAuthority: InitializeNonceAccountInstructionDataArgs['nonceAuthority'];
 };
 
 export function getInitializeNonceAccountInstruction<
@@ -291,9 +290,6 @@ export function getInitializeNonceAccountInstruction<
   if (!accounts.rentSysvar.value) {
     accounts.rentSysvar.value =
       'SysvarRent111111111111111111111111111111111' as Address<'SysvarRent111111111111111111111111111111111'>;
-  }
-  if (!args.nonceAccountArg) {
-    args.nonceAccountArg = expectAddress(accounts.nonceAccount.value);
   }
 
   // Get account metas and signers.

@@ -37,7 +37,6 @@ import {
   Context,
   ResolvedAccount,
   accountMetaWithDefault,
-  expectAddress,
   getAccountMetasWithSigners,
   getProgramAddress,
 } from '../shared';
@@ -83,18 +82,18 @@ export type AuthorizeNonceAccountInstructionWithSigners<
 
 export type AuthorizeNonceAccountInstructionData = {
   discriminator: number;
-  nonceAccountArg: Address;
+  newNonceAuthority: Address;
 };
 
 export type AuthorizeNonceAccountInstructionDataArgs = {
-  nonceAccountArg: Address;
+  newNonceAuthority: Address;
 };
 
 export function getAuthorizeNonceAccountInstructionDataEncoder() {
   return mapEncoder(
-    getStructEncoder<{ discriminator: number; nonceAccountArg: Address }>([
+    getStructEncoder<{ discriminator: number; newNonceAuthority: Address }>([
       ['discriminator', getU32Encoder()],
-      ['nonceAccountArg', getAddressEncoder()],
+      ['newNonceAuthority', getAddressEncoder()],
     ]),
     (value) => ({ ...value, discriminator: 7 })
   ) satisfies Encoder<AuthorizeNonceAccountInstructionDataArgs>;
@@ -103,7 +102,7 @@ export function getAuthorizeNonceAccountInstructionDataEncoder() {
 export function getAuthorizeNonceAccountInstructionDataDecoder() {
   return getStructDecoder<AuthorizeNonceAccountInstructionData>([
     ['discriminator', getU32Decoder()],
-    ['nonceAccountArg', getAddressDecoder()],
+    ['newNonceAuthority', getAddressDecoder()],
   ]) satisfies Decoder<AuthorizeNonceAccountInstructionData>;
 }
 
@@ -123,7 +122,7 @@ export type AuthorizeNonceAccountInput<
 > = {
   nonceAccount: Address<TAccountNonceAccount>;
   nonceAuthority: Address<TAccountNonceAuthority>;
-  nonceAccountArg?: AuthorizeNonceAccountInstructionDataArgs['nonceAccountArg'];
+  newNonceAuthority: AuthorizeNonceAccountInstructionDataArgs['newNonceAuthority'];
 };
 
 export type AuthorizeNonceAccountInputWithSigners<
@@ -132,7 +131,7 @@ export type AuthorizeNonceAccountInputWithSigners<
 > = {
   nonceAccount: Address<TAccountNonceAccount>;
   nonceAuthority: TransactionSigner<TAccountNonceAuthority>;
-  nonceAccountArg?: AuthorizeNonceAccountInstructionDataArgs['nonceAccountArg'];
+  newNonceAuthority: AuthorizeNonceAccountInstructionDataArgs['newNonceAuthority'];
 };
 
 export function getAuthorizeNonceAccountInstruction<
@@ -237,11 +236,6 @@ export function getAuthorizeNonceAccountInstruction<
 
   // Original args.
   const args = { ...input };
-
-  // Resolve default values.
-  if (!args.nonceAccountArg) {
-    args.nonceAccountArg = expectAddress(accounts.nonceAccount.value);
-  }
 
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(

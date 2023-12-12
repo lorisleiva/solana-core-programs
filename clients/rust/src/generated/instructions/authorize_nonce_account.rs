@@ -67,7 +67,7 @@ impl AuthorizeNonceAccountInstructionData {
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AuthorizeNonceAccountInstructionArgs {
-    pub nonce_account_arg: Pubkey,
+    pub new_nonce_authority: Pubkey,
 }
 
 /// Instruction builder for `AuthorizeNonceAccount`.
@@ -80,7 +80,7 @@ pub struct AuthorizeNonceAccountInstructionArgs {
 pub struct AuthorizeNonceAccountBuilder {
     nonce_account: Option<solana_program::pubkey::Pubkey>,
     nonce_authority: Option<solana_program::pubkey::Pubkey>,
-    nonce_account_arg: Option<Pubkey>,
+    new_nonce_authority: Option<Pubkey>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
@@ -102,8 +102,8 @@ impl AuthorizeNonceAccountBuilder {
         self
     }
     #[inline(always)]
-    pub fn nonce_account_arg(&mut self, nonce_account_arg: Pubkey) -> &mut Self {
-        self.nonce_account_arg = Some(nonce_account_arg);
+    pub fn new_nonce_authority(&mut self, new_nonce_authority: Pubkey) -> &mut Self {
+        self.new_nonce_authority = Some(new_nonce_authority);
         self
     }
     /// Add an aditional account to the instruction.
@@ -131,10 +131,10 @@ impl AuthorizeNonceAccountBuilder {
             nonce_authority: self.nonce_authority.expect("nonce_authority is not set"),
         };
         let args = AuthorizeNonceAccountInstructionArgs {
-            nonce_account_arg: self
-                .nonce_account_arg
+            new_nonce_authority: self
+                .new_nonce_authority
                 .clone()
-                .expect("nonce_account_arg is not set"),
+                .expect("new_nonce_authority is not set"),
         };
 
         accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
@@ -265,7 +265,7 @@ impl<'a, 'b> AuthorizeNonceAccountCpiBuilder<'a, 'b> {
             __program: program,
             nonce_account: None,
             nonce_authority: None,
-            nonce_account_arg: None,
+            new_nonce_authority: None,
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
@@ -287,8 +287,8 @@ impl<'a, 'b> AuthorizeNonceAccountCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn nonce_account_arg(&mut self, nonce_account_arg: Pubkey) -> &mut Self {
-        self.instruction.nonce_account_arg = Some(nonce_account_arg);
+    pub fn new_nonce_authority(&mut self, new_nonce_authority: Pubkey) -> &mut Self {
+        self.instruction.new_nonce_authority = Some(new_nonce_authority);
         self
     }
     /// Add an additional account to the instruction.
@@ -333,11 +333,11 @@ impl<'a, 'b> AuthorizeNonceAccountCpiBuilder<'a, 'b> {
         signers_seeds: &[&[&[u8]]],
     ) -> solana_program::entrypoint::ProgramResult {
         let args = AuthorizeNonceAccountInstructionArgs {
-            nonce_account_arg: self
+            new_nonce_authority: self
                 .instruction
-                .nonce_account_arg
+                .new_nonce_authority
                 .clone()
-                .expect("nonce_account_arg is not set"),
+                .expect("new_nonce_authority is not set"),
         };
         let instruction = AuthorizeNonceAccountCpi {
             __program: self.instruction.__program,
@@ -364,7 +364,7 @@ struct AuthorizeNonceAccountCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     nonce_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     nonce_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    nonce_account_arg: Option<Pubkey>,
+    new_nonce_authority: Option<Pubkey>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(
         &'b solana_program::account_info::AccountInfo<'a>,
