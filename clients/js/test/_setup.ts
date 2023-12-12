@@ -8,6 +8,7 @@ import {
 } from '@solana/signers';
 import {
   Address,
+  Commitment,
   CompilableTransaction,
   ITransactionWithBlockhashLifetime,
   createDefaultAirdropRequester,
@@ -17,6 +18,7 @@ import {
   createSolanaRpc,
   createSolanaRpcSubscriptions,
   createTransaction,
+  getSignatureFromTransaction,
   lamports,
   setTransactionFeePayer,
   setTransactionLifetimeUsingBlockhash,
@@ -70,12 +72,15 @@ export const createDefaultTransaction = async (
 
 export const signAndSendTransaction = async (
   client: Client,
-  transaction: CompilableTransaction & ITransactionWithBlockhashLifetime
+  transaction: CompilableTransaction & ITransactionWithBlockhashLifetime,
+  commitment: Commitment = 'confirmed'
 ) => {
   const signedTransaction = await signTransactionWithSigners(transaction);
+  const signature = getSignatureFromTransaction(signedTransaction);
   await createDefaultTransactionSender(client)(signedTransaction, {
-    commitment: 'confirmed',
+    commitment,
   });
+  return signature;
 };
 
 export const getBalance = async (client: Client, address: Address) =>
