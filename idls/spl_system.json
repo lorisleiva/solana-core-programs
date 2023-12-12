@@ -1,7 +1,36 @@
 {
   "version": "0.0.1",
   "name": "spl_system",
-  "accounts": [],
+  "accounts": [
+    {
+      "name": "Nonce",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "discriminator",
+            "type": "u32"
+          },
+          {
+            "name": "state",
+            "type": "u32"
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "blockhash",
+            "type": "publicKey"
+          },
+          {
+            "name": "lamportsPerSignature",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ],
   "instructions": [
     {
       "name": "CreateAccount",

@@ -7,3 +7,4 @@
  */
 
 export * from './addressLookupTable';
+export * from './nonce';
