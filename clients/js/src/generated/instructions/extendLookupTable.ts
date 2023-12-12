@@ -45,6 +45,7 @@ import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import { resolveExtendLookupTableBytes } from '../../hooked';
 import {
   Context,
+  IInstructionWithBytesCreatedOnChain,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
@@ -199,7 +200,8 @@ export function getExtendLookupTableInstruction<
   TAccountAuthority,
   TAccountPayer,
   TAccountSystemProgram
->;
+> &
+  IInstructionWithBytesCreatedOnChain;
 export function getExtendLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
@@ -220,7 +222,8 @@ export function getExtendLookupTableInstruction<
   TAccountAuthority,
   TAccountPayer,
   TAccountSystemProgram
->;
+> &
+  IInstructionWithBytesCreatedOnChain;
 export function getExtendLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
@@ -240,7 +243,8 @@ export function getExtendLookupTableInstruction<
   TAccountAuthority,
   TAccountPayer,
   TAccountSystemProgram
->;
+> &
+  IInstructionWithBytesCreatedOnChain;
 export function getExtendLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
@@ -260,7 +264,8 @@ export function getExtendLookupTableInstruction<
   TAccountAuthority,
   TAccountPayer,
   TAccountSystemProgram
->;
+> &
+  IInstructionWithBytesCreatedOnChain;
 export function getExtendLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
@@ -282,7 +287,7 @@ export function getExtendLookupTableInstruction<
     TAccountPayer,
     TAccountSystemProgram
   >
-): IInstruction {
+): IInstruction & IInstructionWithBytesCreatedOnChain {
   // Resolve context and input arguments.
   const context = (rawInput === undefined ? {} : rawContext) as Pick<
     Context,
@@ -298,16 +303,11 @@ export function getExtendLookupTableInstruction<
   >;
 
   // Program address.
-  const defaultProgramAddress =
-    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
-  const programAddress = (
-    context.getProgramAddress
-      ? context.getProgramAddress({
-          name: 'splAddressLookupTable',
-          address: defaultProgramAddress,
-        })
-      : defaultProgramAddress
-  ) as Address<TProgram>;
+  const programAddress = getProgramAddress(
+    context,
+    'splAddressLookupTable',
+    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>
+  );
 
   // Original accounts.
   type AccountMetas = Parameters<

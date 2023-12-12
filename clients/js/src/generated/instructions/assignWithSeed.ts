@@ -39,6 +39,7 @@ import {
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
+  getProgramAddress,
 } from '../shared';
 
 export type AssignWithSeedInstruction<
@@ -209,16 +210,11 @@ export function getAssignWithSeedInstruction<
   ) as AssignWithSeedInput<TAccountAccount, TAccountBaseAccount>;
 
   // Program address.
-  const defaultProgramAddress =
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
-  const programAddress = (
-    context.getProgramAddress
-      ? context.getProgramAddress({
-          name: 'splSystem',
-          address: defaultProgramAddress,
-        })
-      : defaultProgramAddress
-  ) as Address<TProgram>;
+  const programAddress = getProgramAddress(
+    context,
+    'splSystem',
+    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>
+  );
 
   // Original accounts.
   type AccountMetas = Parameters<

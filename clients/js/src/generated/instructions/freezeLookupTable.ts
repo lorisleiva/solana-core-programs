@@ -34,6 +34,7 @@ import {
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
+  getProgramAddress,
 } from '../shared';
 
 export type FreezeLookupTableInstruction<
@@ -178,16 +179,11 @@ export function getFreezeLookupTableInstruction<
   ) as FreezeLookupTableInput<TAccountAddress, TAccountAuthority>;
 
   // Program address.
-  const defaultProgramAddress =
-    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
-  const programAddress = (
-    context.getProgramAddress
-      ? context.getProgramAddress({
-          name: 'splAddressLookupTable',
-          address: defaultProgramAddress,
-        })
-      : defaultProgramAddress
-  ) as Address<TProgram>;
+  const programAddress = getProgramAddress(
+    context,
+    'splAddressLookupTable',
+    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>
+  );
 
   // Original accounts.
   type AccountMetas = Parameters<

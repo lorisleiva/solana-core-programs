@@ -19,7 +19,7 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
-import { Context } from '../shared';
+import { Context, getProgramAddress } from '../shared';
 
 export type AddMemoInstruction<
   TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo',
@@ -103,16 +103,11 @@ export function getAddMemoInstruction<
   ) as AddMemoInput;
 
   // Program address.
-  const defaultProgramAddress =
-    'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo' as Address<'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'>;
-  const programAddress = (
-    context.getProgramAddress
-      ? context.getProgramAddress({
-          name: 'splMemo',
-          address: defaultProgramAddress,
-        })
-      : defaultProgramAddress
-  ) as Address<TProgram>;
+  const programAddress = getProgramAddress(
+    context,
+    'splMemo',
+    'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo' as Address<'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'>
+  );
 
   // Original args.
   const args = { ...input };

@@ -40,9 +40,11 @@ import {
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import {
   Context,
+  IInstructionWithBytesCreatedOnChain,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
+  getProgramAddress,
 } from '../shared';
 
 export type CreateAccountInstruction<
@@ -167,7 +169,8 @@ export function getCreateAccountInstruction<
   TProgram,
   TAccountPayer,
   TAccountNewAccount
->;
+> &
+  IInstructionWithBytesCreatedOnChain;
 export function getCreateAccountInstruction<
   TAccountPayer extends string,
   TAccountNewAccount extends string,
@@ -175,7 +178,8 @@ export function getCreateAccountInstruction<
 >(
   context: Pick<Context, 'getProgramAddress'>,
   input: CreateAccountInput<TAccountPayer, TAccountNewAccount>
-): CreateAccountInstruction<TProgram, TAccountPayer, TAccountNewAccount>;
+): CreateAccountInstruction<TProgram, TAccountPayer, TAccountNewAccount> &
+  IInstructionWithBytesCreatedOnChain;
 export function getCreateAccountInstruction<
   TAccountPayer extends string,
   TAccountNewAccount extends string,
@@ -186,14 +190,16 @@ export function getCreateAccountInstruction<
   TProgram,
   TAccountPayer,
   TAccountNewAccount
->;
+> &
+  IInstructionWithBytesCreatedOnChain;
 export function getCreateAccountInstruction<
   TAccountPayer extends string,
   TAccountNewAccount extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
   input: CreateAccountInput<TAccountPayer, TAccountNewAccount>
-): CreateAccountInstruction<TProgram, TAccountPayer, TAccountNewAccount>;
+): CreateAccountInstruction<TProgram, TAccountPayer, TAccountNewAccount> &
+  IInstructionWithBytesCreatedOnChain;
 export function getCreateAccountInstruction<
   TAccountPayer extends string,
   TAccountNewAccount extends string,
@@ -203,7 +209,7 @@ export function getCreateAccountInstruction<
     | Pick<Context, 'getProgramAddress'>
     | CreateAccountInput<TAccountPayer, TAccountNewAccount>,
   rawInput?: CreateAccountInput<TAccountPayer, TAccountNewAccount>
-): IInstruction {
+): IInstruction & IInstructionWithBytesCreatedOnChain {
   // Resolve context and input arguments.
   const context = (rawInput === undefined ? {} : rawContext) as Pick<
     Context,
@@ -214,16 +220,11 @@ export function getCreateAccountInstruction<
   ) as CreateAccountInput<TAccountPayer, TAccountNewAccount>;
 
   // Program address.
-  const defaultProgramAddress =
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
-  const programAddress = (
-    context.getProgramAddress
-      ? context.getProgramAddress({
-          name: 'splSystem',
-          address: defaultProgramAddress,
-        })
-      : defaultProgramAddress
-  ) as Address<TProgram>;
+  const programAddress = getProgramAddress(
+    context,
+    'splSystem',
+    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>
+  );
 
   // Original accounts.
   type AccountMetas = Parameters<

@@ -42,6 +42,7 @@ import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import { findAddressLookupTablePda } from '../accounts';
 import {
   Context,
+  IInstructionWithBytesCreatedOnChain,
   ResolvedAccount,
   accountMetaWithDefault,
   expectAddress,
@@ -204,7 +205,8 @@ export async function getCreateLookupTableInstructionAsync<
     TAccountAuthority,
     TAccountPayer,
     TAccountSystemProgram
-  >
+  > &
+    IInstructionWithBytesCreatedOnChain
 >;
 export async function getCreateLookupTableInstructionAsync<
   TAccountAddress extends string,
@@ -227,7 +229,8 @@ export async function getCreateLookupTableInstructionAsync<
     TAccountAuthority,
     TAccountPayer,
     TAccountSystemProgram
-  >
+  > &
+    IInstructionWithBytesCreatedOnChain
 >;
 export async function getCreateLookupTableInstructionAsync<
   TAccountAddress extends string,
@@ -249,7 +252,8 @@ export async function getCreateLookupTableInstructionAsync<
     TAccountAuthority,
     TAccountPayer,
     TAccountSystemProgram
-  >
+  > &
+    IInstructionWithBytesCreatedOnChain
 >;
 export async function getCreateLookupTableInstructionAsync<
   TAccountAddress extends string,
@@ -271,7 +275,8 @@ export async function getCreateLookupTableInstructionAsync<
     TAccountAuthority,
     TAccountPayer,
     TAccountSystemProgram
-  >
+  > &
+    IInstructionWithBytesCreatedOnChain
 >;
 export async function getCreateLookupTableInstructionAsync<
   TAccountAddress extends string,
@@ -294,7 +299,7 @@ export async function getCreateLookupTableInstructionAsync<
     TAccountPayer,
     TAccountSystemProgram
   >
-): Promise<IInstruction> {
+): Promise<IInstruction & IInstructionWithBytesCreatedOnChain> {
   // Resolve context and input arguments.
   const context = (rawInput === undefined ? {} : rawContext) as Pick<
     Context,
@@ -310,16 +315,11 @@ export async function getCreateLookupTableInstructionAsync<
   >;
 
   // Program address.
-  const defaultProgramAddress =
-    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
-  const programAddress = (
-    context.getProgramAddress
-      ? context.getProgramAddress({
-          name: 'splAddressLookupTable',
-          address: defaultProgramAddress,
-        })
-      : defaultProgramAddress
-  ) as Address<TProgram>;
+  const programAddress = getProgramAddress(
+    context,
+    'splAddressLookupTable',
+    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>
+  );
 
   // Original accounts.
   type AccountMetas = Parameters<
@@ -427,7 +427,8 @@ export function getCreateLookupTableInstruction<
   TAccountAuthority,
   TAccountPayer,
   TAccountSystemProgram
->;
+> &
+  IInstructionWithBytesCreatedOnChain;
 export function getCreateLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
@@ -448,7 +449,8 @@ export function getCreateLookupTableInstruction<
   TAccountAuthority,
   TAccountPayer,
   TAccountSystemProgram
->;
+> &
+  IInstructionWithBytesCreatedOnChain;
 export function getCreateLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
@@ -468,7 +470,8 @@ export function getCreateLookupTableInstruction<
   TAccountAuthority,
   TAccountPayer,
   TAccountSystemProgram
->;
+> &
+  IInstructionWithBytesCreatedOnChain;
 export function getCreateLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
@@ -488,7 +491,8 @@ export function getCreateLookupTableInstruction<
   TAccountAuthority,
   TAccountPayer,
   TAccountSystemProgram
->;
+> &
+  IInstructionWithBytesCreatedOnChain;
 export function getCreateLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
@@ -510,7 +514,7 @@ export function getCreateLookupTableInstruction<
     TAccountPayer,
     TAccountSystemProgram
   >
-): IInstruction {
+): IInstruction & IInstructionWithBytesCreatedOnChain {
   // Resolve context and input arguments.
   const context = (rawInput === undefined ? {} : rawContext) as Pick<
     Context,
@@ -526,16 +530,11 @@ export function getCreateLookupTableInstruction<
   >;
 
   // Program address.
-  const defaultProgramAddress =
-    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
-  const programAddress = (
-    context.getProgramAddress
-      ? context.getProgramAddress({
-          name: 'splAddressLookupTable',
-          address: defaultProgramAddress,
-        })
-      : defaultProgramAddress
-  ) as Address<TProgram>;
+  const programAddress = getProgramAddress(
+    context,
+    'splAddressLookupTable',
+    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>
+  );
 
   // Original accounts.
   type AccountMetas = Parameters<

@@ -39,6 +39,7 @@ import {
   accountMetaWithDefault,
   expectAddress,
   getAccountMetasWithSigners,
+  getProgramAddress,
 } from '../shared';
 
 export type AuthorizeNonceAccountInstruction<
@@ -215,16 +216,11 @@ export function getAuthorizeNonceAccountInstruction<
   ) as AuthorizeNonceAccountInput<TAccountNonceAccount, TAccountNonceAuthority>;
 
   // Program address.
-  const defaultProgramAddress =
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
-  const programAddress = (
-    context.getProgramAddress
-      ? context.getProgramAddress({
-          name: 'splSystem',
-          address: defaultProgramAddress,
-        })
-      : defaultProgramAddress
-  ) as Address<TProgram>;
+  const programAddress = getProgramAddress(
+    context,
+    'splSystem',
+    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>
+  );
 
   // Original accounts.
   type AccountMetas = Parameters<

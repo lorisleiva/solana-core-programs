@@ -30,7 +30,7 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
-import { Context } from '../shared';
+import { Context, getProgramAddress } from '../shared';
 
 export type SetLoadedAccountsDataSizeLimitInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
@@ -130,16 +130,11 @@ export function getSetLoadedAccountsDataSizeLimitInstruction<
   ) as SetLoadedAccountsDataSizeLimitInput;
 
   // Program address.
-  const defaultProgramAddress =
-    'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
-  const programAddress = (
-    context.getProgramAddress
-      ? context.getProgramAddress({
-          name: 'splComputeBudget',
-          address: defaultProgramAddress,
-        })
-      : defaultProgramAddress
-  ) as Address<TProgram>;
+  const programAddress = getProgramAddress(
+    context,
+    'splComputeBudget',
+    'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>
+  );
 
   // Original args.
   const args = { ...input };
