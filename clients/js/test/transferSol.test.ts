@@ -30,8 +30,10 @@ test('it can transfer SOL from one account to another', async (t) => {
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  // Then the source account new has less than 2 SOL.
-  t.true((await getBalance(client, source.address)) < 2_000_000_000n);
+  // Then the source account now has roughly 2 SOL (minus the transaction fee).
+  const sourceBalance = await getBalance(client, source.address);
+  t.true(sourceBalance < 2_000_000_000n);
+  t.true(sourceBalance > 1_999_000_000n);
 
   // And the destination account has exactly 1 SOL.
   t.is(await getBalance(client, destination), lamports(1_000_000_000n));
