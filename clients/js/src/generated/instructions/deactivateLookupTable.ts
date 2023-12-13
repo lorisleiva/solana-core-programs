@@ -110,7 +110,7 @@ export type DeactivateLookupTableInput<
   TAccountAuthority extends string
 > = {
   address: Address<TAccountAddress>;
-  authority?: Address<TAccountAuthority>;
+  authority: Address<TAccountAuthority>;
 };
 
 export type DeactivateLookupTableInputWithSigners<
@@ -118,7 +118,7 @@ export type DeactivateLookupTableInputWithSigners<
   TAccountAuthority extends string
 > = {
   address: Address<TAccountAddress>;
-  authority?: TransactionSigner<TAccountAuthority>;
+  authority: TransactionSigner<TAccountAuthority>;
 };
 
 export function getDeactivateLookupTableInstruction<

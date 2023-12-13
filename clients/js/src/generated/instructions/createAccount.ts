@@ -140,7 +140,7 @@ export type CreateAccountInput<
   TAccountPayer extends string,
   TAccountNewAccount extends string
 > = {
-  payer?: Address<TAccountPayer>;
+  payer: Address<TAccountPayer>;
   newAccount: Address<TAccountNewAccount>;
   lamports: CreateAccountInstructionDataArgs['lamports'];
   space: CreateAccountInstructionDataArgs['space'];
@@ -151,7 +151,7 @@ export type CreateAccountInputWithSigners<
   TAccountPayer extends string,
   TAccountNewAccount extends string
 > = {
-  payer?: TransactionSigner<TAccountPayer>;
+  payer: TransactionSigner<TAccountPayer>;
   newAccount: TransactionSigner<TAccountNewAccount>;
   lamports: CreateAccountInstructionDataArgs['lamports'];
   space: CreateAccountInstructionDataArgs['space'];

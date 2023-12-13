@@ -163,8 +163,8 @@ export type CreateLookupTableAsyncInput<
   TAccountSystemProgram extends string
 > = {
   address?: ProgramDerivedAddress<TAccountAddress>;
-  authority?: Address<TAccountAuthority>;
-  payer?: Address<TAccountPayer>;
+  authority: Address<TAccountAuthority>;
+  payer: Address<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   recentSlot: CreateLookupTableInstructionDataArgs['recentSlot'];
   bump?: CreateLookupTableInstructionDataArgs['bump'];
@@ -177,8 +177,8 @@ export type CreateLookupTableAsyncInputWithSigners<
   TAccountSystemProgram extends string
 > = {
   address?: ProgramDerivedAddress<TAccountAddress>;
-  authority?: TransactionSigner<TAccountAuthority>;
-  payer?: TransactionSigner<TAccountPayer>;
+  authority: TransactionSigner<TAccountAuthority>;
+  payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   recentSlot: CreateLookupTableInstructionDataArgs['recentSlot'];
   bump?: CreateLookupTableInstructionDataArgs['bump'];
@@ -386,8 +386,8 @@ export type CreateLookupTableInput<
   TAccountSystemProgram extends string
 > = {
   address: ProgramDerivedAddress<TAccountAddress>;
-  authority?: Address<TAccountAuthority>;
-  payer?: Address<TAccountPayer>;
+  authority: Address<TAccountAuthority>;
+  payer: Address<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   recentSlot: CreateLookupTableInstructionDataArgs['recentSlot'];
   bump?: CreateLookupTableInstructionDataArgs['bump'];
@@ -400,8 +400,8 @@ export type CreateLookupTableInputWithSigners<
   TAccountSystemProgram extends string
 > = {
   address: ProgramDerivedAddress<TAccountAddress>;
-  authority?: TransactionSigner<TAccountAuthority>;
-  payer?: TransactionSigner<TAccountPayer>;
+  authority: TransactionSigner<TAccountAuthority>;
+  payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   recentSlot: CreateLookupTableInstructionDataArgs['recentSlot'];
   bump?: CreateLookupTableInstructionDataArgs['bump'];

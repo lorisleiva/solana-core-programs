@@ -114,9 +114,6 @@ impl RequestUnitsBuilder {
     }
 }
 
-/// `request_units` CPI accounts.
-pub struct RequestUnitsCpiAccounts<'a, 'b> {}
-
 /// `request_units` CPI instruction.
 pub struct RequestUnitsCpi<'a, 'b> {
     /// The program to invoke.
@@ -128,7 +125,6 @@ pub struct RequestUnitsCpi<'a, 'b> {
 impl<'a, 'b> RequestUnitsCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
-        accounts: RequestUnitsCpiAccounts<'a, 'b>,
         args: RequestUnitsInstructionArgs,
     ) -> Self {
         Self {

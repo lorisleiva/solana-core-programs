@@ -103,9 +103,6 @@ impl RequestHeapFrameBuilder {
     }
 }
 
-/// `request_heap_frame` CPI accounts.
-pub struct RequestHeapFrameCpiAccounts<'a, 'b> {}
-
 /// `request_heap_frame` CPI instruction.
 pub struct RequestHeapFrameCpi<'a, 'b> {
     /// The program to invoke.
@@ -117,7 +114,6 @@ pub struct RequestHeapFrameCpi<'a, 'b> {
 impl<'a, 'b> RequestHeapFrameCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
-        accounts: RequestHeapFrameCpiAccounts<'a, 'b>,
         args: RequestHeapFrameInstructionArgs,
     ) -> Self {
         Self {

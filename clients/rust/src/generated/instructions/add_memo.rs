@@ -101,9 +101,6 @@ impl AddMemoBuilder {
     }
 }
 
-/// `add_memo` CPI accounts.
-pub struct AddMemoCpiAccounts<'a, 'b> {}
-
 /// `add_memo` CPI instruction.
 pub struct AddMemoCpi<'a, 'b> {
     /// The program to invoke.
@@ -115,7 +112,6 @@ pub struct AddMemoCpi<'a, 'b> {
 impl<'a, 'b> AddMemoCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
-        accounts: AddMemoCpiAccounts<'a, 'b>,
         args: AddMemoInstructionArgs,
     ) -> Self {
         Self {

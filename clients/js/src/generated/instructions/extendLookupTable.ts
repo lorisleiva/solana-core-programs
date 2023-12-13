@@ -161,8 +161,8 @@ export type ExtendLookupTableInput<
   TAccountSystemProgram extends string
 > = {
   address: Address<TAccountAddress>;
-  authority?: Address<TAccountAuthority>;
-  payer?: Address<TAccountPayer>;
+  authority: Address<TAccountAuthority>;
+  payer: Address<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   addresses: ExtendLookupTableInstructionDataArgs['addresses'];
 };
@@ -174,8 +174,8 @@ export type ExtendLookupTableInputWithSigners<
   TAccountSystemProgram extends string
 > = {
   address: Address<TAccountAddress>;
-  authority?: TransactionSigner<TAccountAuthority>;
-  payer?: TransactionSigner<TAccountPayer>;
+  authority: TransactionSigner<TAccountAuthority>;
+  payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
   addresses: ExtendLookupTableInstructionDataArgs['addresses'];
 };

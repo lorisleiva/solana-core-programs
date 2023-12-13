@@ -160,7 +160,7 @@ export type CreateAccountWithSeedInput<
   TAccountNewAccount extends string,
   TAccountBaseAccount extends string
 > = {
-  payer?: Address<TAccountPayer>;
+  payer: Address<TAccountPayer>;
   newAccount: Address<TAccountNewAccount>;
   baseAccount: Address<TAccountBaseAccount>;
   base: CreateAccountWithSeedInstructionDataArgs['base'];
@@ -175,7 +175,7 @@ export type CreateAccountWithSeedInputWithSigners<
   TAccountNewAccount extends string,
   TAccountBaseAccount extends string
 > = {
-  payer?: TransactionSigner<TAccountPayer>;
+  payer: TransactionSigner<TAccountPayer>;
   newAccount: Address<TAccountNewAccount>;
   baseAccount: TransactionSigner<TAccountBaseAccount>;
   base: CreateAccountWithSeedInstructionDataArgs['base'];

@@ -119,7 +119,7 @@ export type CloseLookupTableInput<
   TAccountRecipient extends string
 > = {
   address: Address<TAccountAddress>;
-  authority?: Address<TAccountAuthority>;
+  authority: Address<TAccountAuthority>;
   recipient: Address<TAccountRecipient>;
 };
 
@@ -129,7 +129,7 @@ export type CloseLookupTableInputWithSigners<
   TAccountRecipient extends string
 > = {
   address: Address<TAccountAddress>;
-  authority?: TransactionSigner<TAccountAuthority>;
+  authority: TransactionSigner<TAccountAuthority>;
   recipient: Address<TAccountRecipient>;
 };
 

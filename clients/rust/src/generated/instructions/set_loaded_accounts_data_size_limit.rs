@@ -108,9 +108,6 @@ impl SetLoadedAccountsDataSizeLimitBuilder {
     }
 }
 
-/// `set_loaded_accounts_data_size_limit` CPI accounts.
-pub struct SetLoadedAccountsDataSizeLimitCpiAccounts<'a, 'b> {}
-
 /// `set_loaded_accounts_data_size_limit` CPI instruction.
 pub struct SetLoadedAccountsDataSizeLimitCpi<'a, 'b> {
     /// The program to invoke.
@@ -122,7 +119,6 @@ pub struct SetLoadedAccountsDataSizeLimitCpi<'a, 'b> {
 impl<'a, 'b> SetLoadedAccountsDataSizeLimitCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
-        accounts: SetLoadedAccountsDataSizeLimitCpiAccounts<'a, 'b>,
         args: SetLoadedAccountsDataSizeLimitInstructionArgs,
     ) -> Self {
         Self {

@@ -108,9 +108,6 @@ impl SetComputeUnitPriceBuilder {
     }
 }
 
-/// `set_compute_unit_price` CPI accounts.
-pub struct SetComputeUnitPriceCpiAccounts<'a, 'b> {}
-
 /// `set_compute_unit_price` CPI instruction.
 pub struct SetComputeUnitPriceCpi<'a, 'b> {
     /// The program to invoke.
@@ -122,7 +119,6 @@ pub struct SetComputeUnitPriceCpi<'a, 'b> {
 impl<'a, 'b> SetComputeUnitPriceCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
-        accounts: SetComputeUnitPriceCpiAccounts<'a, 'b>,
         args: SetComputeUnitPriceInstructionArgs,
     ) -> Self {
         Self {

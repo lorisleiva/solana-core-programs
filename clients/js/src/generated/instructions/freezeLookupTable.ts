@@ -110,7 +110,7 @@ export type FreezeLookupTableInput<
   TAccountAuthority extends string
 > = {
   address: Address<TAccountAddress>;
-  authority?: Address<TAccountAuthority>;
+  authority: Address<TAccountAuthority>;
 };
 
 export type FreezeLookupTableInputWithSigners<
@@ -118,7 +118,7 @@ export type FreezeLookupTableInputWithSigners<
   TAccountAuthority extends string
 > = {
   address: Address<TAccountAddress>;
-  authority?: TransactionSigner<TAccountAuthority>;
+  authority: TransactionSigner<TAccountAuthority>;
 };
 
 export function getFreezeLookupTableInstruction<

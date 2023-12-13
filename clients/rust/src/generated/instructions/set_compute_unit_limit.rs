@@ -105,9 +105,6 @@ impl SetComputeUnitLimitBuilder {
     }
 }
 
-/// `set_compute_unit_limit` CPI accounts.
-pub struct SetComputeUnitLimitCpiAccounts<'a, 'b> {}
-
 /// `set_compute_unit_limit` CPI instruction.
 pub struct SetComputeUnitLimitCpi<'a, 'b> {
     /// The program to invoke.
@@ -119,7 +116,6 @@ pub struct SetComputeUnitLimitCpi<'a, 'b> {
 impl<'a, 'b> SetComputeUnitLimitCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
-        accounts: SetComputeUnitLimitCpiAccounts<'a, 'b>,
         args: SetComputeUnitLimitInstructionArgs,
     ) -> Self {
         Self {
