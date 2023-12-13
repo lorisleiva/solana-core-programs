@@ -8,12 +8,12 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "discriminator",
-            "type": "u32"
+            "name": "version",
+            "type": { "defined": "NonceVersion" }
           },
           {
             "name": "state",
-            "type": "u32"
+            "type": { "defined": "NonceState" }
           },
           {
             "name": "authority",
@@ -420,7 +420,24 @@
       }
     }
   ],
-  "types": [],
+  "types": [
+    {
+      "name": "NonceVersion",
+      "type": {
+        "kind": "enum",
+        "size": "u32",
+        "variants": [{ "name": "Legacy" }, { "name": "Current" }]
+      }
+    },
+    {
+      "name": "NonceState",
+      "type": {
+        "kind": "enum",
+        "size": "u32",
+        "variants": [{ "name": "Uninitialized" }, { "name": "Initialized" }]
+      }
+    }
+  ],
   "errors": [
     {
       "code": 0,

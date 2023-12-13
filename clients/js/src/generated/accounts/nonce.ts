@@ -24,13 +24,18 @@ import {
   getStructDecoder,
   getStructEncoder,
 } from '@solana/codecs-data-structures';
-import {
-  getU32Decoder,
-  getU32Encoder,
-  getU64Decoder,
-  getU64Encoder,
-} from '@solana/codecs-numbers';
+import { getU64Decoder, getU64Encoder } from '@solana/codecs-numbers';
 import { Context } from '../shared';
+import {
+  NonceState,
+  NonceStateArgs,
+  NonceVersion,
+  NonceVersionArgs,
+  getNonceStateDecoder,
+  getNonceStateEncoder,
+  getNonceVersionDecoder,
+  getNonceVersionEncoder,
+} from '../types';
 
 export type Nonce<TAddress extends string = string> = Account<
   NonceAccountData,
@@ -38,16 +43,16 @@ export type Nonce<TAddress extends string = string> = Account<
 >;
 
 export type NonceAccountData = {
-  discriminator: number;
-  state: number;
+  version: NonceVersion;
+  state: NonceState;
   authority: Address;
   blockhash: Address;
   lamportsPerSignature: bigint;
 };
 
 export type NonceAccountDataArgs = {
-  discriminator: number;
-  state: number;
+  version: NonceVersionArgs;
+  state: NonceStateArgs;
   authority: Address;
   blockhash: Address;
   lamportsPerSignature: number | bigint;
@@ -55,8 +60,8 @@ export type NonceAccountDataArgs = {
 
 export function getNonceAccountDataEncoder() {
   return getStructEncoder<NonceAccountDataArgs>([
-    ['discriminator', getU32Encoder()],
-    ['state', getU32Encoder()],
+    ['version', getNonceVersionEncoder()],
+    ['state', getNonceStateEncoder()],
     ['authority', getAddressEncoder()],
     ['blockhash', getAddressEncoder()],
     ['lamportsPerSignature', getU64Encoder()],
@@ -65,8 +70,8 @@ export function getNonceAccountDataEncoder() {
 
 export function getNonceAccountDataDecoder() {
   return getStructDecoder<NonceAccountData>([
-    ['discriminator', getU32Decoder()],
-    ['state', getU32Decoder()],
+    ['version', getNonceVersionDecoder()],
+    ['state', getNonceStateDecoder()],
     ['authority', getAddressDecoder()],
     ['blockhash', getAddressDecoder()],
     ['lamportsPerSignature', getU64Decoder()],

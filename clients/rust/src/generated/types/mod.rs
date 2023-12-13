@@ -5,10 +5,8 @@
 //! [https://github.com/metaplex-foundation/kinobi]
 //!
 
-pub mod accounts;
-pub mod errors;
-pub mod instructions;
-pub mod programs;
-pub mod types;
+pub(crate) mod r#nonce_state;
+pub(crate) mod r#nonce_version;
 
-pub(crate) use programs::*;
+pub use self::r#nonce_state::*;
+pub use self::r#nonce_version::*;

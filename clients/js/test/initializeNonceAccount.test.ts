@@ -1,11 +1,11 @@
-import { fetchEncodedAccount } from '@solana/accounts';
 import { pipe } from '@solana/functional';
 import { generateKeyPairSigner } from '@solana/signers';
 import { appendTransactionInstruction } from '@solana/web3.js';
 import test from 'ava';
 import {
-  Context,
   Nonce,
+  NonceState,
+  NonceVersion,
   SPL_SYSTEM_PROGRAM_ADDRESS,
   fetchNonce,
   getCreateAccountInstruction,
@@ -13,18 +13,21 @@ import {
 } from '../src';
 import {
   createClient,
+  createContext,
   createDefaultTransaction,
   generateKeyPairSignerWithSol,
   signAndSendTransaction,
 } from './_setup';
 
 test('it can create and initialize a durable nonce account', async (t) => {
-  // Given
+  // Given some brand now payer, authority, and nonce KeyPairSigners.
   const client = createClient();
+  const context = createContext(client);
   const payer = await generateKeyPairSignerWithSol(client);
   const nonce = await generateKeyPairSigner();
+  const nonceAuthority = await generateKeyPairSigner();
 
-  // When
+  // When we use them to create and initialize a nonce account.
   const rent = await client.rpc.getMinimumBalanceForRentExemption(80n).send();
   const createAccount = getCreateAccountInstruction({
     payer,
@@ -35,7 +38,7 @@ test('it can create and initialize a durable nonce account', async (t) => {
   });
   const initializeNonceAccount = getInitializeNonceAccountInstruction({
     nonceAccount: nonce.address,
-    nonceAuthority: payer.address,
+    nonceAuthority: nonceAuthority.address,
   });
   await pipe(
     await createDefaultTransaction(client, payer.address),
@@ -44,22 +47,16 @@ test('it can create and initialize a durable nonce account', async (t) => {
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  // Then
-  const context = {
-    fetchEncodedAccount: (
-      address: Parameters<typeof fetchEncodedAccount>[1],
-      config: Parameters<typeof fetchEncodedAccount>[2]
-    ) => fetchEncodedAccount(client.rpc, address, config),
-  } as Pick<Context, 'fetchEncodedAccount'>;
-  const account = await fetchNonce(context, nonce.address, {
-    commitment: 'confirmed',
-  });
-  t.like(account, <Nonce>{
-    address: nonce.address,
-    data: {
-      discriminator: 1,
-      state: 1,
-      authority: payer.address,
-    },
-  });
+  // Then we expect the nonce account to exist with the following data.
+  t.like(
+    await fetchNonce(context, nonce.address, { commitment: 'confirmed' }),
+    <Nonce>{
+      address: nonce.address,
+      data: {
+        version: NonceVersion.Current,
+        state: NonceState.Initialized,
+        authority: nonceAuthority.address,
+      },
+    }
+  );
 });
