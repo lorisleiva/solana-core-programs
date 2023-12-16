@@ -30,7 +30,6 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
-import { Context, getProgramAddress } from '../shared';
 
 export type RequestUnitsInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
@@ -109,18 +108,6 @@ export type RequestUnitsInputWithSigners = {
 export function getRequestUnitsInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: RequestUnitsInputWithSigners
-): RequestUnitsInstructionWithSigners<TProgram>;
-export function getRequestUnitsInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: RequestUnitsInput
-): RequestUnitsInstruction<TProgram>;
-export function getRequestUnitsInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
->(
   input: RequestUnitsInputWithSigners
 ): RequestUnitsInstructionWithSigners<TProgram>;
 export function getRequestUnitsInstruction<
@@ -128,25 +115,10 @@ export function getRequestUnitsInstruction<
 >(input: RequestUnitsInput): RequestUnitsInstruction<TProgram>;
 export function getRequestUnitsInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
->(
-  rawContext: Pick<Context, 'getProgramAddress'> | RequestUnitsInput,
-  rawInput?: RequestUnitsInput
-): IInstruction {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as Pick<
-    Context,
-    'getProgramAddress'
-  >;
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as RequestUnitsInput;
-
+>(input: RequestUnitsInput): IInstruction {
   // Program address.
-  const programAddress = getProgramAddress(
-    context,
-    'splComputeBudget',
-    'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>
-  );
+  const programAddress =
+    'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
 
   // Original args.
   const args = { ...input };

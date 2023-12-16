@@ -30,11 +30,9 @@ import {
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import {
-  Context,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
-  getProgramAddress,
 } from '../shared';
 
 export type CloseLookupTableInstruction<
@@ -139,42 +137,6 @@ export function getCloseLookupTableInstruction<
   TAccountRecipient extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: CloseLookupTableInputWithSigners<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountRecipient
-  >
-): CloseLookupTableInstructionWithSigners<
-  TProgram,
-  TAccountAddress,
-  TAccountAuthority,
-  TAccountRecipient
->;
-export function getCloseLookupTableInstruction<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountRecipient extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: CloseLookupTableInput<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountRecipient
-  >
-): CloseLookupTableInstruction<
-  TProgram,
-  TAccountAddress,
-  TAccountAuthority,
-  TAccountRecipient
->;
-export function getCloseLookupTableInstruction<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountRecipient extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
   input: CloseLookupTableInputWithSigners<
     TAccountAddress,
     TAccountAuthority,
@@ -209,38 +171,15 @@ export function getCloseLookupTableInstruction<
   TAccountRecipient extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | CloseLookupTableInput<
-        TAccountAddress,
-        TAccountAuthority,
-        TAccountRecipient
-      >,
-  rawInput?: CloseLookupTableInput<
+  input: CloseLookupTableInput<
     TAccountAddress,
     TAccountAuthority,
     TAccountRecipient
   >
 ): IInstruction {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as Pick<
-    Context,
-    'getProgramAddress'
-  >;
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as CloseLookupTableInput<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountRecipient
-  >;
-
   // Program address.
-  const programAddress = getProgramAddress(
-    context,
-    'splAddressLookupTable',
-    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>
-  );
+  const programAddress =
+    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
 
   // Original accounts.
   type AccountMetas = Parameters<

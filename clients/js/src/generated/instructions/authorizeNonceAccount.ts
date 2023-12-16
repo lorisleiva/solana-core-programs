@@ -34,11 +34,9 @@ import {
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import {
-  Context,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
-  getProgramAddress,
 } from '../shared';
 
 export type AuthorizeNonceAccountInstruction<
@@ -139,36 +137,6 @@ export function getAuthorizeNonceAccountInstruction<
   TAccountNonceAuthority extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: AuthorizeNonceAccountInputWithSigners<
-    TAccountNonceAccount,
-    TAccountNonceAuthority
-  >
-): AuthorizeNonceAccountInstructionWithSigners<
-  TProgram,
-  TAccountNonceAccount,
-  TAccountNonceAuthority
->;
-export function getAuthorizeNonceAccountInstruction<
-  TAccountNonceAccount extends string,
-  TAccountNonceAuthority extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: AuthorizeNonceAccountInput<
-    TAccountNonceAccount,
-    TAccountNonceAuthority
-  >
-): AuthorizeNonceAccountInstruction<
-  TProgram,
-  TAccountNonceAccount,
-  TAccountNonceAuthority
->;
-export function getAuthorizeNonceAccountInstruction<
-  TAccountNonceAccount extends string,
-  TAccountNonceAuthority extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
   input: AuthorizeNonceAccountInputWithSigners<
     TAccountNonceAccount,
     TAccountNonceAuthority
@@ -197,29 +165,14 @@ export function getAuthorizeNonceAccountInstruction<
   TAccountNonceAuthority extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | AuthorizeNonceAccountInput<TAccountNonceAccount, TAccountNonceAuthority>,
-  rawInput?: AuthorizeNonceAccountInput<
+  input: AuthorizeNonceAccountInput<
     TAccountNonceAccount,
     TAccountNonceAuthority
   >
 ): IInstruction {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as Pick<
-    Context,
-    'getProgramAddress'
-  >;
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as AuthorizeNonceAccountInput<TAccountNonceAccount, TAccountNonceAuthority>;
-
   // Program address.
-  const programAddress = getProgramAddress(
-    context,
-    'splSystem',
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>
-  );
+  const programAddress =
+    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
 
   // Original accounts.
   type AccountMetas = Parameters<

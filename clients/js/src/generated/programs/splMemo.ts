@@ -7,7 +7,7 @@
  */
 
 import { Address } from '@solana/addresses';
-import { Context, Program, getProgramAddress } from '../shared';
+import { Program } from '../shared';
 
 export const SPL_MEMO_PROGRAM_ADDRESS =
   'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo' as Address<'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'>;
@@ -20,10 +20,4 @@ export function createSplMemoProgram(): SplMemoProgram {
     name: 'splMemo',
     address: SPL_MEMO_PROGRAM_ADDRESS,
   };
-}
-
-export async function getSplMemoProgramAddress(
-  context: Pick<Context, 'getProgramAddress'> = {}
-): Promise<Address> {
-  return getProgramAddress(context, 'splMemo', SPL_MEMO_PROGRAM_ADDRESS);
 }

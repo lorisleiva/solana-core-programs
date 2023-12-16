@@ -13,7 +13,6 @@ import {
 } from '../src';
 import {
   createClient,
-  createContext,
   createDefaultTransaction,
   generateKeyPairSignerWithSol,
   signAndSendTransaction,
@@ -22,7 +21,6 @@ import {
 test('it can create and initialize a durable nonce account', async (t) => {
   // Given some brand now payer, authority, and nonce KeyPairSigners.
   const client = createClient();
-  const context = createContext(client);
   const payer = await generateKeyPairSignerWithSol(client);
   const nonce = await generateKeyPairSigner();
   const nonceAuthority = await generateKeyPairSigner();
@@ -49,7 +47,7 @@ test('it can create and initialize a durable nonce account', async (t) => {
 
   // Then we expect the nonce account to exist with the following data.
   t.like(
-    await fetchNonce(context, nonce.address, { commitment: 'confirmed' }),
+    await fetchNonce(client.rpc, nonce.address, { commitment: 'confirmed' }),
     <Nonce>{
       address: nonce.address,
       data: {

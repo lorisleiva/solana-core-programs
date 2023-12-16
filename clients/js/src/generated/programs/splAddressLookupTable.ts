@@ -7,7 +7,7 @@
  */
 
 import { Address } from '@solana/addresses';
-import { Context, Program, getProgramAddress } from '../shared';
+import { Program } from '../shared';
 
 export const SPL_ADDRESS_LOOKUP_TABLE_PROGRAM_ADDRESS =
   'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
@@ -20,14 +20,4 @@ export function createSplAddressLookupTableProgram(): SplAddressLookupTableProgr
     name: 'splAddressLookupTable',
     address: SPL_ADDRESS_LOOKUP_TABLE_PROGRAM_ADDRESS,
   };
-}
-
-export async function getSplAddressLookupTableProgramAddress(
-  context: Pick<Context, 'getProgramAddress'> = {}
-): Promise<Address> {
-  return getProgramAddress(
-    context,
-    'splAddressLookupTable',
-    SPL_ADDRESS_LOOKUP_TABLE_PROGRAM_ADDRESS
-  );
 }

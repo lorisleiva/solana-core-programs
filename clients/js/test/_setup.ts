@@ -23,8 +23,6 @@ import {
   setTransactionFeePayer,
   setTransactionLifetimeUsingBlockhash,
 } from '@solana/web3.js';
-import { fetchEncodedAccount, fetchEncodedAccounts } from '@solana/accounts';
-import { Context } from '../src';
 
 type Client = {
   rpc: ReturnType<typeof createSolanaRpc>;
@@ -43,13 +41,6 @@ export const createClient = (): Client => {
 
   return { rpc, rpcSubscriptions };
 };
-
-export const createContext = (client: Client): Context => ({
-  fetchEncodedAccount: async (address, config) =>
-    fetchEncodedAccount(client.rpc, address, config),
-  fetchEncodedAccounts: async (addresses, config) =>
-    fetchEncodedAccounts(client.rpc, addresses, config),
-});
 
 export const generateKeyPairSignerWithSol = async (
   client: Client,

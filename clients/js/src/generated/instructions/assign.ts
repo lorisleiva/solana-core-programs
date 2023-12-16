@@ -33,11 +33,9 @@ import {
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import {
-  Context,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
-  getProgramAddress,
 } from '../shared';
 
 export type AssignInstruction<
@@ -119,20 +117,6 @@ export function getAssignInstruction<
   TAccountAccount extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: AssignInputWithSigners<TAccountAccount>
-): AssignInstructionWithSigners<TProgram, TAccountAccount>;
-export function getAssignInstruction<
-  TAccountAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: AssignInput<TAccountAccount>
-): AssignInstruction<TProgram, TAccountAccount>;
-export function getAssignInstruction<
-  TAccountAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
   input: AssignInputWithSigners<TAccountAccount>
 ): AssignInstructionWithSigners<TProgram, TAccountAccount>;
 export function getAssignInstruction<
@@ -144,25 +128,10 @@ export function getAssignInstruction<
 export function getAssignInstruction<
   TAccountAccount extends string,
   TProgram extends string = '11111111111111111111111111111111'
->(
-  rawContext: Pick<Context, 'getProgramAddress'> | AssignInput<TAccountAccount>,
-  rawInput?: AssignInput<TAccountAccount>
-): IInstruction {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as Pick<
-    Context,
-    'getProgramAddress'
-  >;
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as AssignInput<TAccountAccount>;
-
+>(input: AssignInput<TAccountAccount>): IInstruction {
   // Program address.
-  const programAddress = getProgramAddress(
-    context,
-    'splSystem',
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>
-  );
+  const programAddress =
+    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
 
   // Original accounts.
   type AccountMetas = Parameters<

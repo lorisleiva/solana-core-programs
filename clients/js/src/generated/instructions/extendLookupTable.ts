@@ -44,12 +44,10 @@ import {
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import { resolveExtendLookupTableBytes } from '../../hooked';
 import {
-  Context,
   IInstructionWithBytesCreatedOnChain,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
-  getProgramAddress,
 } from '../shared';
 
 export type ExtendLookupTableInstruction<
@@ -187,50 +185,6 @@ export function getExtendLookupTableInstruction<
   TAccountSystemProgram extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress' | 'getProgramDerivedAddress'>,
-  input: ExtendLookupTableInputWithSigners<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
-  >
-): ExtendLookupTableInstructionWithSigners<
-  TProgram,
-  TAccountAddress,
-  TAccountAuthority,
-  TAccountPayer,
-  TAccountSystemProgram
-> &
-  IInstructionWithBytesCreatedOnChain;
-export function getExtendLookupTableInstruction<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress' | 'getProgramDerivedAddress'>,
-  input: ExtendLookupTableInput<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
-  >
-): ExtendLookupTableInstruction<
-  TProgram,
-  TAccountAddress,
-  TAccountAuthority,
-  TAccountPayer,
-  TAccountSystemProgram
-> &
-  IInstructionWithBytesCreatedOnChain;
-export function getExtendLookupTableInstruction<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
   input: ExtendLookupTableInputWithSigners<
     TAccountAddress,
     TAccountAuthority,
@@ -273,41 +227,16 @@ export function getExtendLookupTableInstruction<
   TAccountSystemProgram extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
-  rawContext:
-    | Pick<Context, 'getProgramAddress' | 'getProgramDerivedAddress'>
-    | ExtendLookupTableInput<
-        TAccountAddress,
-        TAccountAuthority,
-        TAccountPayer,
-        TAccountSystemProgram
-      >,
-  rawInput?: ExtendLookupTableInput<
+  input: ExtendLookupTableInput<
     TAccountAddress,
     TAccountAuthority,
     TAccountPayer,
     TAccountSystemProgram
   >
 ): IInstruction & IInstructionWithBytesCreatedOnChain {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as Pick<
-    Context,
-    'getProgramAddress' | 'getProgramDerivedAddress'
-  >;
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as ExtendLookupTableInput<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
-  >;
-
   // Program address.
-  const programAddress = getProgramAddress(
-    context,
-    'splAddressLookupTable',
-    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>
-  );
+  const programAddress =
+    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
 
   // Original accounts.
   type AccountMetas = Parameters<
@@ -330,15 +259,12 @@ export function getExtendLookupTableInstruction<
   const args = { ...input };
 
   // Resolver scope.
-  const resolverScope = { context, programAddress, accounts, args };
+  const resolverScope = { programAddress, accounts, args };
 
   // Resolve default values.
   if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value = getProgramAddress(
-      context,
-      'splSystem',
-      '11111111111111111111111111111111'
-    );
+    accounts.systemProgram.value =
+      '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
     accounts.systemProgram.isWritable = false;
   }
 

@@ -35,11 +35,9 @@ import {
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import {
-  Context,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
-  getProgramAddress,
 } from '../shared';
 
 export type AssignWithSeedInstruction<
@@ -157,26 +155,6 @@ export function getAssignWithSeedInstruction<
   TAccountBaseAccount extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: AssignWithSeedInputWithSigners<TAccountAccount, TAccountBaseAccount>
-): AssignWithSeedInstructionWithSigners<
-  TProgram,
-  TAccountAccount,
-  TAccountBaseAccount
->;
-export function getAssignWithSeedInstruction<
-  TAccountAccount extends string,
-  TAccountBaseAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: AssignWithSeedInput<TAccountAccount, TAccountBaseAccount>
-): AssignWithSeedInstruction<TProgram, TAccountAccount, TAccountBaseAccount>;
-export function getAssignWithSeedInstruction<
-  TAccountAccount extends string,
-  TAccountBaseAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
   input: AssignWithSeedInputWithSigners<TAccountAccount, TAccountBaseAccount>
 ): AssignWithSeedInstructionWithSigners<
   TProgram,
@@ -195,26 +173,11 @@ export function getAssignWithSeedInstruction<
   TAccountBaseAccount extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | AssignWithSeedInput<TAccountAccount, TAccountBaseAccount>,
-  rawInput?: AssignWithSeedInput<TAccountAccount, TAccountBaseAccount>
+  input: AssignWithSeedInput<TAccountAccount, TAccountBaseAccount>
 ): IInstruction {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as Pick<
-    Context,
-    'getProgramAddress'
-  >;
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as AssignWithSeedInput<TAccountAccount, TAccountBaseAccount>;
-
   // Program address.
-  const programAddress = getProgramAddress(
-    context,
-    'splSystem',
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>
-  );
+  const programAddress =
+    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
 
   // Original accounts.
   type AccountMetas = Parameters<

@@ -41,7 +41,6 @@ import {
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import { findAddressLookupTablePda } from '../accounts';
 import {
-  Context,
   IInstructionWithBytesCreatedOnChain,
   ResolvedAccount,
   accountMetaWithDefault,
@@ -49,7 +48,6 @@ import {
   expectProgramDerivedAddress,
   expectSome,
   getAccountMetasWithSigners,
-  getProgramAddress,
 } from '../shared';
 
 export type CreateLookupTableInstruction<
@@ -191,54 +189,6 @@ export async function getCreateLookupTableInstructionAsync<
   TAccountSystemProgram extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress' | 'getProgramDerivedAddress'>,
-  input: CreateLookupTableAsyncInputWithSigners<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
-  >
-): Promise<
-  CreateLookupTableInstructionWithSigners<
-    TProgram,
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
-  > &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function getCreateLookupTableInstructionAsync<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress' | 'getProgramDerivedAddress'>,
-  input: CreateLookupTableAsyncInput<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
-  >
-): Promise<
-  CreateLookupTableInstruction<
-    TProgram,
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
-  > &
-    IInstructionWithBytesCreatedOnChain
->;
-export async function getCreateLookupTableInstructionAsync<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
   input: CreateLookupTableAsyncInputWithSigners<
     TAccountAddress,
     TAccountAuthority,
@@ -285,41 +235,16 @@ export async function getCreateLookupTableInstructionAsync<
   TAccountSystemProgram extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
-  rawContext:
-    | Pick<Context, 'getProgramAddress' | 'getProgramDerivedAddress'>
-    | CreateLookupTableAsyncInput<
-        TAccountAddress,
-        TAccountAuthority,
-        TAccountPayer,
-        TAccountSystemProgram
-      >,
-  rawInput?: CreateLookupTableAsyncInput<
+  input: CreateLookupTableAsyncInput<
     TAccountAddress,
     TAccountAuthority,
     TAccountPayer,
     TAccountSystemProgram
   >
 ): Promise<IInstruction & IInstructionWithBytesCreatedOnChain> {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as Pick<
-    Context,
-    'getProgramAddress' | 'getProgramDerivedAddress'
-  >;
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as CreateLookupTableAsyncInput<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
-  >;
-
   // Program address.
-  const programAddress = getProgramAddress(
-    context,
-    'splAddressLookupTable',
-    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>
-  );
+  const programAddress =
+    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
 
   // Original accounts.
   type AccountMetas = Parameters<
@@ -343,17 +268,14 @@ export async function getCreateLookupTableInstructionAsync<
 
   // Resolve default values.
   if (!accounts.address.value) {
-    accounts.address.value = await findAddressLookupTablePda(context, {
+    accounts.address.value = await findAddressLookupTablePda({
       authority: expectAddress(accounts.authority.value),
       recentSlot: expectSome(args.recentSlot),
     });
   }
   if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value = getProgramAddress(
-      context,
-      'splSystem',
-      '11111111111111111111111111111111'
-    );
+    accounts.systemProgram.value =
+      '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
     accounts.systemProgram.isWritable = false;
   }
   if (!args.bump) {
@@ -414,50 +336,6 @@ export function getCreateLookupTableInstruction<
   TAccountSystemProgram extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: CreateLookupTableInputWithSigners<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
-  >
-): CreateLookupTableInstructionWithSigners<
-  TProgram,
-  TAccountAddress,
-  TAccountAuthority,
-  TAccountPayer,
-  TAccountSystemProgram
-> &
-  IInstructionWithBytesCreatedOnChain;
-export function getCreateLookupTableInstruction<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: CreateLookupTableInput<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
-  >
-): CreateLookupTableInstruction<
-  TProgram,
-  TAccountAddress,
-  TAccountAuthority,
-  TAccountPayer,
-  TAccountSystemProgram
-> &
-  IInstructionWithBytesCreatedOnChain;
-export function getCreateLookupTableInstruction<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
   input: CreateLookupTableInputWithSigners<
     TAccountAddress,
     TAccountAuthority,
@@ -500,41 +378,16 @@ export function getCreateLookupTableInstruction<
   TAccountSystemProgram extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | CreateLookupTableInput<
-        TAccountAddress,
-        TAccountAuthority,
-        TAccountPayer,
-        TAccountSystemProgram
-      >,
-  rawInput?: CreateLookupTableInput<
+  input: CreateLookupTableInput<
     TAccountAddress,
     TAccountAuthority,
     TAccountPayer,
     TAccountSystemProgram
   >
 ): IInstruction & IInstructionWithBytesCreatedOnChain {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as Pick<
-    Context,
-    'getProgramAddress'
-  >;
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as CreateLookupTableInput<
-    TAccountAddress,
-    TAccountAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
-  >;
-
   // Program address.
-  const programAddress = getProgramAddress(
-    context,
-    'splAddressLookupTable',
-    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>
-  );
+  const programAddress =
+    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
 
   // Original accounts.
   type AccountMetas = Parameters<
@@ -558,11 +411,8 @@ export function getCreateLookupTableInstruction<
 
   // Resolve default values.
   if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value = getProgramAddress(
-      context,
-      'splSystem',
-      '11111111111111111111111111111111'
-    );
+    accounts.systemProgram.value =
+      '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
     accounts.systemProgram.isWritable = false;
   }
   if (!args.bump) {

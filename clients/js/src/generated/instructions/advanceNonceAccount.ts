@@ -31,11 +31,9 @@ import {
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import {
-  Context,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
-  getProgramAddress,
 } from '../shared';
 
 export type AdvanceNonceAccountInstruction<
@@ -144,42 +142,6 @@ export function getAdvanceNonceAccountInstruction<
   TAccountNonceAuthority extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: AdvanceNonceAccountInputWithSigners<
-    TAccountNonceAccount,
-    TAccountRecentBlockhashesSysvar,
-    TAccountNonceAuthority
-  >
-): AdvanceNonceAccountInstructionWithSigners<
-  TProgram,
-  TAccountNonceAccount,
-  TAccountRecentBlockhashesSysvar,
-  TAccountNonceAuthority
->;
-export function getAdvanceNonceAccountInstruction<
-  TAccountNonceAccount extends string,
-  TAccountRecentBlockhashesSysvar extends string,
-  TAccountNonceAuthority extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: AdvanceNonceAccountInput<
-    TAccountNonceAccount,
-    TAccountRecentBlockhashesSysvar,
-    TAccountNonceAuthority
-  >
-): AdvanceNonceAccountInstruction<
-  TProgram,
-  TAccountNonceAccount,
-  TAccountRecentBlockhashesSysvar,
-  TAccountNonceAuthority
->;
-export function getAdvanceNonceAccountInstruction<
-  TAccountNonceAccount extends string,
-  TAccountRecentBlockhashesSysvar extends string,
-  TAccountNonceAuthority extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
   input: AdvanceNonceAccountInputWithSigners<
     TAccountNonceAccount,
     TAccountRecentBlockhashesSysvar,
@@ -214,38 +176,15 @@ export function getAdvanceNonceAccountInstruction<
   TAccountNonceAuthority extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | AdvanceNonceAccountInput<
-        TAccountNonceAccount,
-        TAccountRecentBlockhashesSysvar,
-        TAccountNonceAuthority
-      >,
-  rawInput?: AdvanceNonceAccountInput<
+  input: AdvanceNonceAccountInput<
     TAccountNonceAccount,
     TAccountRecentBlockhashesSysvar,
     TAccountNonceAuthority
   >
 ): IInstruction {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as Pick<
-    Context,
-    'getProgramAddress'
-  >;
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as AdvanceNonceAccountInput<
-    TAccountNonceAccount,
-    TAccountRecentBlockhashesSysvar,
-    TAccountNonceAuthority
-  >;
-
   // Program address.
-  const programAddress = getProgramAddress(
-    context,
-    'splSystem',
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>
-  );
+  const programAddress =
+    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
 
   // Original accounts.
   type AccountMetas = Parameters<

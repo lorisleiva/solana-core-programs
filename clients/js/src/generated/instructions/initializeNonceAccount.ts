@@ -33,11 +33,9 @@ import {
   WritableAccount,
 } from '@solana/instructions';
 import {
-  Context,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
-  getProgramAddress,
 } from '../shared';
 
 export type InitializeNonceAccountInstruction<
@@ -158,42 +156,6 @@ export function getInitializeNonceAccountInstruction<
   TAccountRentSysvar extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: InitializeNonceAccountInputWithSigners<
-    TAccountNonceAccount,
-    TAccountRecentBlockhashesSysvar,
-    TAccountRentSysvar
-  >
-): InitializeNonceAccountInstructionWithSigners<
-  TProgram,
-  TAccountNonceAccount,
-  TAccountRecentBlockhashesSysvar,
-  TAccountRentSysvar
->;
-export function getInitializeNonceAccountInstruction<
-  TAccountNonceAccount extends string,
-  TAccountRecentBlockhashesSysvar extends string,
-  TAccountRentSysvar extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: InitializeNonceAccountInput<
-    TAccountNonceAccount,
-    TAccountRecentBlockhashesSysvar,
-    TAccountRentSysvar
-  >
-): InitializeNonceAccountInstruction<
-  TProgram,
-  TAccountNonceAccount,
-  TAccountRecentBlockhashesSysvar,
-  TAccountRentSysvar
->;
-export function getInitializeNonceAccountInstruction<
-  TAccountNonceAccount extends string,
-  TAccountRecentBlockhashesSysvar extends string,
-  TAccountRentSysvar extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
   input: InitializeNonceAccountInputWithSigners<
     TAccountNonceAccount,
     TAccountRecentBlockhashesSysvar,
@@ -228,38 +190,15 @@ export function getInitializeNonceAccountInstruction<
   TAccountRentSysvar extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | InitializeNonceAccountInput<
-        TAccountNonceAccount,
-        TAccountRecentBlockhashesSysvar,
-        TAccountRentSysvar
-      >,
-  rawInput?: InitializeNonceAccountInput<
+  input: InitializeNonceAccountInput<
     TAccountNonceAccount,
     TAccountRecentBlockhashesSysvar,
     TAccountRentSysvar
   >
 ): IInstruction {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as Pick<
-    Context,
-    'getProgramAddress'
-  >;
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as InitializeNonceAccountInput<
-    TAccountNonceAccount,
-    TAccountRecentBlockhashesSysvar,
-    TAccountRentSysvar
-  >;
-
   // Program address.
-  const programAddress = getProgramAddress(
-    context,
-    'splSystem',
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>
-  );
+  const programAddress =
+    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
 
   // Original accounts.
   type AccountMetas = Parameters<

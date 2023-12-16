@@ -30,7 +30,6 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
-import { Context, getProgramAddress } from '../shared';
 
 export type SetLoadedAccountsDataSizeLimitInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
@@ -93,18 +92,6 @@ export type SetLoadedAccountsDataSizeLimitInputWithSigners = {
 export function getSetLoadedAccountsDataSizeLimitInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: SetLoadedAccountsDataSizeLimitInputWithSigners
-): SetLoadedAccountsDataSizeLimitInstructionWithSigners<TProgram>;
-export function getSetLoadedAccountsDataSizeLimitInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: SetLoadedAccountsDataSizeLimitInput
-): SetLoadedAccountsDataSizeLimitInstruction<TProgram>;
-export function getSetLoadedAccountsDataSizeLimitInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
->(
   input: SetLoadedAccountsDataSizeLimitInputWithSigners
 ): SetLoadedAccountsDataSizeLimitInstructionWithSigners<TProgram>;
 export function getSetLoadedAccountsDataSizeLimitInstruction<
@@ -114,27 +101,10 @@ export function getSetLoadedAccountsDataSizeLimitInstruction<
 ): SetLoadedAccountsDataSizeLimitInstruction<TProgram>;
 export function getSetLoadedAccountsDataSizeLimitInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111'
->(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | SetLoadedAccountsDataSizeLimitInput,
-  rawInput?: SetLoadedAccountsDataSizeLimitInput
-): IInstruction {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as Pick<
-    Context,
-    'getProgramAddress'
-  >;
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as SetLoadedAccountsDataSizeLimitInput;
-
+>(input: SetLoadedAccountsDataSizeLimitInput): IInstruction {
   // Program address.
-  const programAddress = getProgramAddress(
-    context,
-    'splComputeBudget',
-    'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>
-  );
+  const programAddress =
+    'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
 
   // Original args.
   const args = { ...input };

@@ -39,12 +39,10 @@ import {
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import {
-  Context,
   IInstructionWithBytesCreatedOnChain,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
-  getProgramAddress,
 } from '../shared';
 
 export type CreateAccountInstruction<
@@ -163,28 +161,6 @@ export function getCreateAccountInstruction<
   TAccountNewAccount extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: CreateAccountInputWithSigners<TAccountPayer, TAccountNewAccount>
-): CreateAccountInstructionWithSigners<
-  TProgram,
-  TAccountPayer,
-  TAccountNewAccount
-> &
-  IInstructionWithBytesCreatedOnChain;
-export function getCreateAccountInstruction<
-  TAccountPayer extends string,
-  TAccountNewAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: CreateAccountInput<TAccountPayer, TAccountNewAccount>
-): CreateAccountInstruction<TProgram, TAccountPayer, TAccountNewAccount> &
-  IInstructionWithBytesCreatedOnChain;
-export function getCreateAccountInstruction<
-  TAccountPayer extends string,
-  TAccountNewAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
   input: CreateAccountInputWithSigners<TAccountPayer, TAccountNewAccount>
 ): CreateAccountInstructionWithSigners<
   TProgram,
@@ -205,26 +181,11 @@ export function getCreateAccountInstruction<
   TAccountNewAccount extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | CreateAccountInput<TAccountPayer, TAccountNewAccount>,
-  rawInput?: CreateAccountInput<TAccountPayer, TAccountNewAccount>
+  input: CreateAccountInput<TAccountPayer, TAccountNewAccount>
 ): IInstruction & IInstructionWithBytesCreatedOnChain {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as Pick<
-    Context,
-    'getProgramAddress'
-  >;
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as CreateAccountInput<TAccountPayer, TAccountNewAccount>;
-
   // Program address.
-  const programAddress = getProgramAddress(
-    context,
-    'splSystem',
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>
-  );
+  const programAddress =
+    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
 
   // Original accounts.
   type AccountMetas = Parameters<

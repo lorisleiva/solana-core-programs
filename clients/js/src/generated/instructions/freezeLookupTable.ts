@@ -30,11 +30,9 @@ import {
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import {
-  Context,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
-  getProgramAddress,
 } from '../shared';
 
 export type FreezeLookupTableInstruction<
@@ -126,26 +124,6 @@ export function getFreezeLookupTableInstruction<
   TAccountAuthority extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: FreezeLookupTableInputWithSigners<TAccountAddress, TAccountAuthority>
-): FreezeLookupTableInstructionWithSigners<
-  TProgram,
-  TAccountAddress,
-  TAccountAuthority
->;
-export function getFreezeLookupTableInstruction<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: FreezeLookupTableInput<TAccountAddress, TAccountAuthority>
-): FreezeLookupTableInstruction<TProgram, TAccountAddress, TAccountAuthority>;
-export function getFreezeLookupTableInstruction<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
   input: FreezeLookupTableInputWithSigners<TAccountAddress, TAccountAuthority>
 ): FreezeLookupTableInstructionWithSigners<
   TProgram,
@@ -164,26 +142,11 @@ export function getFreezeLookupTableInstruction<
   TAccountAuthority extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | FreezeLookupTableInput<TAccountAddress, TAccountAuthority>,
-  rawInput?: FreezeLookupTableInput<TAccountAddress, TAccountAuthority>
+  input: FreezeLookupTableInput<TAccountAddress, TAccountAuthority>
 ): IInstruction {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as Pick<
-    Context,
-    'getProgramAddress'
-  >;
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as FreezeLookupTableInput<TAccountAddress, TAccountAuthority>;
-
   // Program address.
-  const programAddress = getProgramAddress(
-    context,
-    'splAddressLookupTable',
-    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>
-  );
+  const programAddress =
+    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
 
   // Original accounts.
   type AccountMetas = Parameters<

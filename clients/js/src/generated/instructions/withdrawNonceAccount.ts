@@ -36,11 +36,9 @@ import {
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import {
-  Context,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
-  getProgramAddress,
 } from '../shared';
 
 export type WithdrawNonceAccountInstruction<
@@ -191,54 +189,6 @@ export function getWithdrawNonceAccountInstruction<
   TAccountNonceAuthority extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: WithdrawNonceAccountInputWithSigners<
-    TAccountNonceAccount,
-    TAccountRecipientAccount,
-    TAccountRecentBlockhashesSysvar,
-    TAccountRentSysvar,
-    TAccountNonceAuthority
-  >
-): WithdrawNonceAccountInstructionWithSigners<
-  TProgram,
-  TAccountNonceAccount,
-  TAccountRecipientAccount,
-  TAccountRecentBlockhashesSysvar,
-  TAccountRentSysvar,
-  TAccountNonceAuthority
->;
-export function getWithdrawNonceAccountInstruction<
-  TAccountNonceAccount extends string,
-  TAccountRecipientAccount extends string,
-  TAccountRecentBlockhashesSysvar extends string,
-  TAccountRentSysvar extends string,
-  TAccountNonceAuthority extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: WithdrawNonceAccountInput<
-    TAccountNonceAccount,
-    TAccountRecipientAccount,
-    TAccountRecentBlockhashesSysvar,
-    TAccountRentSysvar,
-    TAccountNonceAuthority
-  >
-): WithdrawNonceAccountInstruction<
-  TProgram,
-  TAccountNonceAccount,
-  TAccountRecipientAccount,
-  TAccountRecentBlockhashesSysvar,
-  TAccountRentSysvar,
-  TAccountNonceAuthority
->;
-export function getWithdrawNonceAccountInstruction<
-  TAccountNonceAccount extends string,
-  TAccountRecipientAccount extends string,
-  TAccountRecentBlockhashesSysvar extends string,
-  TAccountRentSysvar extends string,
-  TAccountNonceAuthority extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
   input: WithdrawNonceAccountInputWithSigners<
     TAccountNonceAccount,
     TAccountRecipientAccount,
@@ -285,16 +235,7 @@ export function getWithdrawNonceAccountInstruction<
   TAccountNonceAuthority extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | WithdrawNonceAccountInput<
-        TAccountNonceAccount,
-        TAccountRecipientAccount,
-        TAccountRecentBlockhashesSysvar,
-        TAccountRentSysvar,
-        TAccountNonceAuthority
-      >,
-  rawInput?: WithdrawNonceAccountInput<
+  input: WithdrawNonceAccountInput<
     TAccountNonceAccount,
     TAccountRecipientAccount,
     TAccountRecentBlockhashesSysvar,
@@ -302,27 +243,9 @@ export function getWithdrawNonceAccountInstruction<
     TAccountNonceAuthority
   >
 ): IInstruction {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as Pick<
-    Context,
-    'getProgramAddress'
-  >;
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as WithdrawNonceAccountInput<
-    TAccountNonceAccount,
-    TAccountRecipientAccount,
-    TAccountRecentBlockhashesSysvar,
-    TAccountRentSysvar,
-    TAccountNonceAuthority
-  >;
-
   // Program address.
-  const programAddress = getProgramAddress(
-    context,
-    'splSystem',
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>
-  );
+  const programAddress =
+    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
 
   // Original accounts.
   type AccountMetas = Parameters<

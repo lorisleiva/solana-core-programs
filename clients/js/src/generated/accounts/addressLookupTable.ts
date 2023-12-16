@@ -13,12 +13,15 @@ import {
   FetchAccountsConfig,
   assertAccountExists,
   decodeAccount,
+  fetchEncodedAccount,
+  fetchEncodedAccounts,
 } from '@solana/accounts';
 import {
   Address,
   ProgramDerivedAddress,
   getAddressDecoder,
   getAddressEncoder,
+  getProgramDerivedAddress,
 } from '@solana/addresses';
 import {
   Codec,
@@ -49,11 +52,6 @@ import {
   getOptionDecoder,
   getOptionEncoder,
 } from '@solana/options';
-import {
-  Context,
-  getProgramAddress,
-  getProgramDerivedAddress,
-} from '../shared';
 
 export type AddressLookupTable<TAddress extends string = string> = Account<
   AddressLookupTableAccountData,
@@ -136,11 +134,11 @@ export function decodeAddressLookupTable<TAddress extends string = string>(
 }
 
 export async function fetchAddressLookupTable<TAddress extends string = string>(
-  context: Pick<Context, 'fetchEncodedAccount'>,
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
   config?: FetchAccountConfig
 ): Promise<AddressLookupTable<TAddress>> {
-  const maybeAccount = await context.fetchEncodedAccount(address, config);
+  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
   assertAccountExists(maybeAccount);
   return decodeAddressLookupTable(maybeAccount);
 }
@@ -148,20 +146,20 @@ export async function fetchAddressLookupTable<TAddress extends string = string>(
 export async function safeFetchAddressLookupTable<
   TAddress extends string = string
 >(
-  context: Pick<Context, 'fetchEncodedAccount'>,
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
   config?: FetchAccountConfig
 ): Promise<AddressLookupTable<TAddress> | null> {
-  const maybeAccount = await context.fetchEncodedAccount(address, config);
+  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
   return maybeAccount.exists ? decodeAddressLookupTable(maybeAccount) : null;
 }
 
 export async function fetchAllAddressLookupTable(
-  context: Pick<Context, 'fetchEncodedAccounts'>,
+  rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Array<Address>,
   config?: FetchAccountsConfig
 ): Promise<AddressLookupTable[]> {
-  const maybeAccounts = await context.fetchEncodedAccounts(addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => {
     assertAccountExists(maybeAccount);
     return decodeAddressLookupTable(maybeAccount);
@@ -169,11 +167,11 @@ export async function fetchAllAddressLookupTable(
 }
 
 export async function safeFetchAllAddressLookupTable(
-  context: Pick<Context, 'fetchEncodedAccounts'>,
+  rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Array<Address>,
   config?: FetchAccountsConfig
 ): Promise<AddressLookupTable[]> {
-  const maybeAccounts = await context.fetchEncodedAccounts(addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts
     .filter((maybeAccount) => maybeAccount.exists)
     .map((maybeAccount) =>
@@ -181,46 +179,45 @@ export async function safeFetchAllAddressLookupTable(
     );
 }
 
+export type AddressLookupTableSeeds = {
+  /** The address of the LUT's authority */
+  authority: Address;
+  /** The recent slot associated with the LUT */
+  recentSlot: number | bigint;
+};
+
 export async function findAddressLookupTablePda(
-  context: Pick<Context, 'getProgramAddress' | 'getProgramDerivedAddress'>,
-  seeds: {
-    /** The address of the LUT's authority */
-    authority: Address;
-    /** The recent slot associated with the LUT */
-    recentSlot: number | bigint;
-  }
+  seeds: AddressLookupTableSeeds,
+  config: { programAddress?: Address | undefined } = {}
 ): Promise<ProgramDerivedAddress> {
-  const programAddress = await getProgramAddress(
-    context,
-    'splAddressLookupTable',
-    'AddressLookupTab1e1111111111111111111111111'
-  );
-  return getProgramDerivedAddress(context, programAddress, [
-    getAddressEncoder().encode(seeds.authority),
-    getU64Encoder().encode(seeds.recentSlot),
-  ]);
+  const {
+    programAddress = 'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>,
+  } = config;
+  return getProgramDerivedAddress({
+    programAddress,
+    seeds: [
+      getAddressEncoder().encode(seeds.authority),
+      getU64Encoder().encode(seeds.recentSlot),
+    ],
+  });
 }
 
 export async function fetchAddressLookupTableFromSeeds(
-  context: Pick<
-    Context,
-    'fetchEncodedAccount' | 'getProgramAddress' | 'getProgramDerivedAddress'
-  >,
-  seeds: Parameters<typeof findAddressLookupTablePda>[1],
-  options?: FetchAccountConfig
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: AddressLookupTableSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {}
 ): Promise<AddressLookupTable> {
-  const [address] = await findAddressLookupTablePda(context, seeds);
-  return fetchAddressLookupTable(context, address, options);
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findAddressLookupTablePda(seeds, { programAddress });
+  return fetchAddressLookupTable(rpc, address, fetchConfig);
 }
 
 export async function safeFetchAddressLookupTableFromSeeds(
-  context: Pick<
-    Context,
-    'fetchEncodedAccount' | 'getProgramAddress' | 'getProgramDerivedAddress'
-  >,
-  seeds: Parameters<typeof findAddressLookupTablePda>[1],
-  options?: FetchAccountConfig
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: AddressLookupTableSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {}
 ): Promise<AddressLookupTable | null> {
-  const [address] = await findAddressLookupTablePda(context, seeds);
-  return safeFetchAddressLookupTable(context, address, options);
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findAddressLookupTablePda(seeds, { programAddress });
+  return safeFetchAddressLookupTable(rpc, address, fetchConfig);
 }

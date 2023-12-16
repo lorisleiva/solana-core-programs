@@ -28,11 +28,9 @@ import {
   WritableAccount,
 } from '@solana/instructions';
 import {
-  Context,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
-  getProgramAddress,
 } from '../shared';
 
 export type UpgradeNonceAccountInstruction<
@@ -108,20 +106,6 @@ export function getUpgradeNonceAccountInstruction<
   TAccountNonceAccount extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: UpgradeNonceAccountInputWithSigners<TAccountNonceAccount>
-): UpgradeNonceAccountInstructionWithSigners<TProgram, TAccountNonceAccount>;
-export function getUpgradeNonceAccountInstruction<
-  TAccountNonceAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: UpgradeNonceAccountInput<TAccountNonceAccount>
-): UpgradeNonceAccountInstruction<TProgram, TAccountNonceAccount>;
-export function getUpgradeNonceAccountInstruction<
-  TAccountNonceAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
   input: UpgradeNonceAccountInputWithSigners<TAccountNonceAccount>
 ): UpgradeNonceAccountInstructionWithSigners<TProgram, TAccountNonceAccount>;
 export function getUpgradeNonceAccountInstruction<
@@ -133,27 +117,10 @@ export function getUpgradeNonceAccountInstruction<
 export function getUpgradeNonceAccountInstruction<
   TAccountNonceAccount extends string,
   TProgram extends string = '11111111111111111111111111111111'
->(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | UpgradeNonceAccountInput<TAccountNonceAccount>,
-  rawInput?: UpgradeNonceAccountInput<TAccountNonceAccount>
-): IInstruction {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as Pick<
-    Context,
-    'getProgramAddress'
-  >;
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as UpgradeNonceAccountInput<TAccountNonceAccount>;
-
+>(input: UpgradeNonceAccountInput<TAccountNonceAccount>): IInstruction {
   // Program address.
-  const programAddress = getProgramAddress(
-    context,
-    'splSystem',
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>
-  );
+  const programAddress =
+    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
 
   // Original accounts.
   type AccountMetas = Parameters<

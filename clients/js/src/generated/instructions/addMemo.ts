@@ -19,7 +19,6 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
-import { Context, getProgramAddress } from '../shared';
 
 export type AddMemoInstruction<
   TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo',
@@ -71,43 +70,16 @@ export type AddMemoInputWithSigners = {
 
 export function getAddMemoInstruction<
   TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: AddMemoInputWithSigners
-): AddMemoInstructionWithSigners<TProgram>;
-export function getAddMemoInstruction<
-  TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: AddMemoInput
-): AddMemoInstruction<TProgram>;
-export function getAddMemoInstruction<
-  TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'
 >(input: AddMemoInputWithSigners): AddMemoInstructionWithSigners<TProgram>;
 export function getAddMemoInstruction<
   TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'
 >(input: AddMemoInput): AddMemoInstruction<TProgram>;
 export function getAddMemoInstruction<
   TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'
->(
-  rawContext: Pick<Context, 'getProgramAddress'> | AddMemoInput,
-  rawInput?: AddMemoInput
-): IInstruction {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as Pick<
-    Context,
-    'getProgramAddress'
-  >;
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as AddMemoInput;
-
+>(input: AddMemoInput): IInstruction {
   // Program address.
-  const programAddress = getProgramAddress(
-    context,
-    'splMemo',
-    'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo' as Address<'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'>
-  );
+  const programAddress =
+    'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo' as Address<'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'>;
 
   // Original args.
   const args = { ...input };

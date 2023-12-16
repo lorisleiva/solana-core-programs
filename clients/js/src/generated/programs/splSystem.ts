@@ -12,12 +12,7 @@ import {
   SplSystemProgramErrorCode,
   getSplSystemProgramErrorFromCode,
 } from '../errors';
-import {
-  Context,
-  Program,
-  ProgramWithErrors,
-  getProgramAddress,
-} from '../shared';
+import { Program, ProgramWithErrors } from '../shared';
 
 export const SPL_SYSTEM_PROGRAM_ADDRESS =
   '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
@@ -33,10 +28,4 @@ export function createSplSystemProgram(): SplSystemProgram {
       return getSplSystemProgramErrorFromCode(code, cause);
     },
   };
-}
-
-export async function getSplSystemProgramAddress(
-  context: Pick<Context, 'getProgramAddress'> = {}
-): Promise<Address> {
-  return getProgramAddress(context, 'splSystem', SPL_SYSTEM_PROGRAM_ADDRESS);
 }

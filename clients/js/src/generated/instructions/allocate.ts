@@ -34,11 +34,9 @@ import {
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import {
-  Context,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
-  getProgramAddress,
 } from '../shared';
 
 export type AllocateInstruction<
@@ -117,20 +115,6 @@ export function getAllocateInstruction<
   TAccountNewAccount extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: AllocateInputWithSigners<TAccountNewAccount>
-): AllocateInstructionWithSigners<TProgram, TAccountNewAccount>;
-export function getAllocateInstruction<
-  TAccountNewAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: AllocateInput<TAccountNewAccount>
-): AllocateInstruction<TProgram, TAccountNewAccount>;
-export function getAllocateInstruction<
-  TAccountNewAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
   input: AllocateInputWithSigners<TAccountNewAccount>
 ): AllocateInstructionWithSigners<TProgram, TAccountNewAccount>;
 export function getAllocateInstruction<
@@ -142,27 +126,10 @@ export function getAllocateInstruction<
 export function getAllocateInstruction<
   TAccountNewAccount extends string,
   TProgram extends string = '11111111111111111111111111111111'
->(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | AllocateInput<TAccountNewAccount>,
-  rawInput?: AllocateInput<TAccountNewAccount>
-): IInstruction {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as Pick<
-    Context,
-    'getProgramAddress'
-  >;
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as AllocateInput<TAccountNewAccount>;
-
+>(input: AllocateInput<TAccountNewAccount>): IInstruction {
   // Program address.
-  const programAddress = getProgramAddress(
-    context,
-    'splSystem',
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>
-  );
+  const programAddress =
+    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
 
   // Original accounts.
   type AccountMetas = Parameters<

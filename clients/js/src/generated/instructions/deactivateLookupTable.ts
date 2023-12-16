@@ -30,11 +30,9 @@ import {
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import {
-  Context,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
-  getProgramAddress,
 } from '../shared';
 
 export type DeactivateLookupTableInstruction<
@@ -126,33 +124,6 @@ export function getDeactivateLookupTableInstruction<
   TAccountAuthority extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: DeactivateLookupTableInputWithSigners<
-    TAccountAddress,
-    TAccountAuthority
-  >
-): DeactivateLookupTableInstructionWithSigners<
-  TProgram,
-  TAccountAddress,
-  TAccountAuthority
->;
-export function getDeactivateLookupTableInstruction<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: DeactivateLookupTableInput<TAccountAddress, TAccountAuthority>
-): DeactivateLookupTableInstruction<
-  TProgram,
-  TAccountAddress,
-  TAccountAuthority
->;
-export function getDeactivateLookupTableInstruction<
-  TAccountAddress extends string,
-  TAccountAuthority extends string,
-  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
->(
   input: DeactivateLookupTableInputWithSigners<
     TAccountAddress,
     TAccountAuthority
@@ -178,26 +149,11 @@ export function getDeactivateLookupTableInstruction<
   TAccountAuthority extends string,
   TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
 >(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | DeactivateLookupTableInput<TAccountAddress, TAccountAuthority>,
-  rawInput?: DeactivateLookupTableInput<TAccountAddress, TAccountAuthority>
+  input: DeactivateLookupTableInput<TAccountAddress, TAccountAuthority>
 ): IInstruction {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as Pick<
-    Context,
-    'getProgramAddress'
-  >;
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as DeactivateLookupTableInput<TAccountAddress, TAccountAuthority>;
-
   // Program address.
-  const programAddress = getProgramAddress(
-    context,
-    'splAddressLookupTable',
-    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>
-  );
+  const programAddress =
+    'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
 
   // Original accounts.
   type AccountMetas = Parameters<

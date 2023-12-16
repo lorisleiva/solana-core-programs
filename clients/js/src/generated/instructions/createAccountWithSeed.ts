@@ -41,11 +41,9 @@ import {
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import {
-  Context,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
-  getProgramAddress,
 } from '../shared';
 
 export type CreateAccountWithSeedInstruction<
@@ -191,42 +189,6 @@ export function getCreateAccountWithSeedInstruction<
   TAccountBaseAccount extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: CreateAccountWithSeedInputWithSigners<
-    TAccountPayer,
-    TAccountNewAccount,
-    TAccountBaseAccount
-  >
-): CreateAccountWithSeedInstructionWithSigners<
-  TProgram,
-  TAccountPayer,
-  TAccountNewAccount,
-  TAccountBaseAccount
->;
-export function getCreateAccountWithSeedInstruction<
-  TAccountPayer extends string,
-  TAccountNewAccount extends string,
-  TAccountBaseAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
-  context: Pick<Context, 'getProgramAddress'>,
-  input: CreateAccountWithSeedInput<
-    TAccountPayer,
-    TAccountNewAccount,
-    TAccountBaseAccount
-  >
-): CreateAccountWithSeedInstruction<
-  TProgram,
-  TAccountPayer,
-  TAccountNewAccount,
-  TAccountBaseAccount
->;
-export function getCreateAccountWithSeedInstruction<
-  TAccountPayer extends string,
-  TAccountNewAccount extends string,
-  TAccountBaseAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
->(
   input: CreateAccountWithSeedInputWithSigners<
     TAccountPayer,
     TAccountNewAccount,
@@ -261,38 +223,15 @@ export function getCreateAccountWithSeedInstruction<
   TAccountBaseAccount extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
-  rawContext:
-    | Pick<Context, 'getProgramAddress'>
-    | CreateAccountWithSeedInput<
-        TAccountPayer,
-        TAccountNewAccount,
-        TAccountBaseAccount
-      >,
-  rawInput?: CreateAccountWithSeedInput<
+  input: CreateAccountWithSeedInput<
     TAccountPayer,
     TAccountNewAccount,
     TAccountBaseAccount
   >
 ): IInstruction {
-  // Resolve context and input arguments.
-  const context = (rawInput === undefined ? {} : rawContext) as Pick<
-    Context,
-    'getProgramAddress'
-  >;
-  const input = (
-    rawInput === undefined ? rawContext : rawInput
-  ) as CreateAccountWithSeedInput<
-    TAccountPayer,
-    TAccountNewAccount,
-    TAccountBaseAccount
-  >;
-
   // Program address.
-  const programAddress = getProgramAddress(
-    context,
-    'splSystem',
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>
-  );
+  const programAddress =
+    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
 
   // Original accounts.
   type AccountMetas = Parameters<
