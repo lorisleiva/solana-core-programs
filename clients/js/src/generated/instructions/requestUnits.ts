@@ -145,3 +145,17 @@ export function getRequestUnitsInstructionRaw<
     programAddress,
   } as RequestUnitsInstruction<TProgram, TRemainingAccounts>;
 }
+
+export type ParsedRequestUnitsInstruction = {
+  data: RequestUnitsInstructionData;
+};
+
+export function parseRequestUnitsInstruction<
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+>(
+  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+): ParsedRequestUnitsInstruction {
+  return {
+    data: getRequestUnitsInstructionDataDecoder().decode(instruction.data),
+  };
+}

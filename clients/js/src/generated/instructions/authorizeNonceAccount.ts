@@ -242,3 +242,37 @@ export function getAuthorizeNonceAccountInstructionRaw<
     TRemainingAccounts
   >;
 }
+
+export type ParsedAuthorizeNonceAccountInstruction = {
+  accounts: {
+    nonceAccount: Address;
+    nonceAuthority: Address;
+  };
+  data: AuthorizeNonceAccountInstructionData;
+};
+
+export function parseAuthorizeNonceAccountInstruction<
+  TProgram extends string = '11111111111111111111111111111111'
+>(
+  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+): ParsedAuthorizeNonceAccountInstruction {
+  if (!instruction.accounts || instruction.accounts.length < 2) {
+    // TODO: Coded error.
+    throw new Error('Not enough accounts');
+  }
+  let accountIndex = 0;
+  const getNextAccount = () => {
+    const { address } = instruction.accounts![accountIndex]!;
+    accountIndex += 1;
+    return address;
+  };
+  return {
+    accounts: {
+      nonceAccount: getNextAccount(),
+      nonceAuthority: getNextAccount(),
+    },
+    data: getAuthorizeNonceAccountInstructionDataDecoder().decode(
+      instruction.data
+    ),
+  };
+}

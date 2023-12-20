@@ -244,3 +244,35 @@ export function getAssignWithSeedInstructionRaw<
     TRemainingAccounts
   >;
 }
+
+export type ParsedAssignWithSeedInstruction = {
+  accounts: {
+    account: Address;
+    baseAccount: Address;
+  };
+  data: AssignWithSeedInstructionData;
+};
+
+export function parseAssignWithSeedInstruction<
+  TProgram extends string = '11111111111111111111111111111111'
+>(
+  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+): ParsedAssignWithSeedInstruction {
+  if (!instruction.accounts || instruction.accounts.length < 2) {
+    // TODO: Coded error.
+    throw new Error('Not enough accounts');
+  }
+  let accountIndex = 0;
+  const getNextAccount = () => {
+    const { address } = instruction.accounts![accountIndex]!;
+    accountIndex += 1;
+    return address;
+  };
+  return {
+    accounts: {
+      account: getNextAccount(),
+      baseAccount: getNextAccount(),
+    },
+    data: getAssignWithSeedInstructionDataDecoder().decode(instruction.data),
+  };
+}

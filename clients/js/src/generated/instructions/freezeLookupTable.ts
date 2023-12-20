@@ -208,3 +208,35 @@ export function getFreezeLookupTableInstructionRaw<
     TRemainingAccounts
   >;
 }
+
+export type ParsedFreezeLookupTableInstruction = {
+  accounts: {
+    address: Address;
+    authority: Address;
+  };
+  data: FreezeLookupTableInstructionData;
+};
+
+export function parseFreezeLookupTableInstruction<
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+): ParsedFreezeLookupTableInstruction {
+  if (!instruction.accounts || instruction.accounts.length < 2) {
+    // TODO: Coded error.
+    throw new Error('Not enough accounts');
+  }
+  let accountIndex = 0;
+  const getNextAccount = () => {
+    const { address } = instruction.accounts![accountIndex]!;
+    accountIndex += 1;
+    return address;
+  };
+  return {
+    accounts: {
+      address: getNextAccount(),
+      authority: getNextAccount(),
+    },
+    data: getFreezeLookupTableInstructionDataDecoder().decode(instruction.data),
+  };
+}

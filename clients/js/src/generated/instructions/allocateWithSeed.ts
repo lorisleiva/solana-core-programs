@@ -263,3 +263,35 @@ export function getAllocateWithSeedInstructionRaw<
     TRemainingAccounts
   >;
 }
+
+export type ParsedAllocateWithSeedInstruction = {
+  accounts: {
+    newAccount: Address;
+    baseAccount: Address;
+  };
+  data: AllocateWithSeedInstructionData;
+};
+
+export function parseAllocateWithSeedInstruction<
+  TProgram extends string = '11111111111111111111111111111111'
+>(
+  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+): ParsedAllocateWithSeedInstruction {
+  if (!instruction.accounts || instruction.accounts.length < 2) {
+    // TODO: Coded error.
+    throw new Error('Not enough accounts');
+  }
+  let accountIndex = 0;
+  const getNextAccount = () => {
+    const { address } = instruction.accounts![accountIndex]!;
+    accountIndex += 1;
+    return address;
+  };
+  return {
+    accounts: {
+      newAccount: getNextAccount(),
+      baseAccount: getNextAccount(),
+    },
+    data: getAllocateWithSeedInstructionDataDecoder().decode(instruction.data),
+  };
+}

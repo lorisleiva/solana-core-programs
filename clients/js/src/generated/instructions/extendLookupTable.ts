@@ -341,3 +341,39 @@ export function getExtendLookupTableInstructionRaw<
     TRemainingAccounts
   >;
 }
+
+export type ParsedExtendLookupTableInstruction = {
+  accounts: {
+    address: Address;
+    authority: Address;
+    payer: Address;
+    systemProgram: Address;
+  };
+  data: ExtendLookupTableInstructionData;
+};
+
+export function parseExtendLookupTableInstruction<
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+): ParsedExtendLookupTableInstruction {
+  if (!instruction.accounts || instruction.accounts.length < 4) {
+    // TODO: Coded error.
+    throw new Error('Not enough accounts');
+  }
+  let accountIndex = 0;
+  const getNextAccount = () => {
+    const { address } = instruction.accounts![accountIndex]!;
+    accountIndex += 1;
+    return address;
+  };
+  return {
+    accounts: {
+      address: getNextAccount(),
+      authority: getNextAccount(),
+      payer: getNextAccount(),
+      systemProgram: getNextAccount(),
+    },
+    data: getExtendLookupTableInstructionDataDecoder().decode(instruction.data),
+  };
+}

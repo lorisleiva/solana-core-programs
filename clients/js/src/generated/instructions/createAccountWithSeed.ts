@@ -306,3 +306,39 @@ export function getCreateAccountWithSeedInstructionRaw<
     TRemainingAccounts
   >;
 }
+
+export type ParsedCreateAccountWithSeedInstruction = {
+  accounts: {
+    payer: Address;
+    newAccount: Address;
+    baseAccount: Address;
+  };
+  data: CreateAccountWithSeedInstructionData;
+};
+
+export function parseCreateAccountWithSeedInstruction<
+  TProgram extends string = '11111111111111111111111111111111'
+>(
+  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+): ParsedCreateAccountWithSeedInstruction {
+  if (!instruction.accounts || instruction.accounts.length < 3) {
+    // TODO: Coded error.
+    throw new Error('Not enough accounts');
+  }
+  let accountIndex = 0;
+  const getNextAccount = () => {
+    const { address } = instruction.accounts![accountIndex]!;
+    accountIndex += 1;
+    return address;
+  };
+  return {
+    accounts: {
+      payer: getNextAccount(),
+      newAccount: getNextAccount(),
+      baseAccount: getNextAccount(),
+    },
+    data: getCreateAccountWithSeedInstructionDataDecoder().decode(
+      instruction.data
+    ),
+  };
+}

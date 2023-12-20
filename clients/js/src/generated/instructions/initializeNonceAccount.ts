@@ -297,3 +297,39 @@ export function getInitializeNonceAccountInstructionRaw<
     TRemainingAccounts
   >;
 }
+
+export type ParsedInitializeNonceAccountInstruction = {
+  accounts: {
+    nonceAccount: Address;
+    recentBlockhashesSysvar: Address;
+    rentSysvar: Address;
+  };
+  data: InitializeNonceAccountInstructionData;
+};
+
+export function parseInitializeNonceAccountInstruction<
+  TProgram extends string = '11111111111111111111111111111111'
+>(
+  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+): ParsedInitializeNonceAccountInstruction {
+  if (!instruction.accounts || instruction.accounts.length < 3) {
+    // TODO: Coded error.
+    throw new Error('Not enough accounts');
+  }
+  let accountIndex = 0;
+  const getNextAccount = () => {
+    const { address } = instruction.accounts![accountIndex]!;
+    accountIndex += 1;
+    return address;
+  };
+  return {
+    accounts: {
+      nonceAccount: getNextAccount(),
+      recentBlockhashesSysvar: getNextAccount(),
+      rentSysvar: getNextAccount(),
+    },
+    data: getInitializeNonceAccountInstructionDataDecoder().decode(
+      instruction.data
+    ),
+  };
+}

@@ -290,3 +290,39 @@ export function getTransferSolWithSeedInstructionRaw<
     TRemainingAccounts
   >;
 }
+
+export type ParsedTransferSolWithSeedInstruction = {
+  accounts: {
+    source: Address;
+    baseAccount: Address;
+    destination: Address;
+  };
+  data: TransferSolWithSeedInstructionData;
+};
+
+export function parseTransferSolWithSeedInstruction<
+  TProgram extends string = '11111111111111111111111111111111'
+>(
+  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+): ParsedTransferSolWithSeedInstruction {
+  if (!instruction.accounts || instruction.accounts.length < 3) {
+    // TODO: Coded error.
+    throw new Error('Not enough accounts');
+  }
+  let accountIndex = 0;
+  const getNextAccount = () => {
+    const { address } = instruction.accounts![accountIndex]!;
+    accountIndex += 1;
+    return address;
+  };
+  return {
+    accounts: {
+      source: getNextAccount(),
+      baseAccount: getNextAccount(),
+      destination: getNextAccount(),
+    },
+    data: getTransferSolWithSeedInstructionDataDecoder().decode(
+      instruction.data
+    ),
+  };
+}

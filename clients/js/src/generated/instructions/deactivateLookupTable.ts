@@ -215,3 +215,37 @@ export function getDeactivateLookupTableInstructionRaw<
     TRemainingAccounts
   >;
 }
+
+export type ParsedDeactivateLookupTableInstruction = {
+  accounts: {
+    address: Address;
+    authority: Address;
+  };
+  data: DeactivateLookupTableInstructionData;
+};
+
+export function parseDeactivateLookupTableInstruction<
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+): ParsedDeactivateLookupTableInstruction {
+  if (!instruction.accounts || instruction.accounts.length < 2) {
+    // TODO: Coded error.
+    throw new Error('Not enough accounts');
+  }
+  let accountIndex = 0;
+  const getNextAccount = () => {
+    const { address } = instruction.accounts![accountIndex]!;
+    accountIndex += 1;
+    return address;
+  };
+  return {
+    accounts: {
+      address: getNextAccount(),
+      authority: getNextAccount(),
+    },
+    data: getDeactivateLookupTableInstructionDataDecoder().decode(
+      instruction.data
+    ),
+  };
+}

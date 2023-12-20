@@ -272,3 +272,39 @@ export function getAdvanceNonceAccountInstructionRaw<
     TRemainingAccounts
   >;
 }
+
+export type ParsedAdvanceNonceAccountInstruction = {
+  accounts: {
+    nonceAccount: Address;
+    recentBlockhashesSysvar: Address;
+    nonceAuthority: Address;
+  };
+  data: AdvanceNonceAccountInstructionData;
+};
+
+export function parseAdvanceNonceAccountInstruction<
+  TProgram extends string = '11111111111111111111111111111111'
+>(
+  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+): ParsedAdvanceNonceAccountInstruction {
+  if (!instruction.accounts || instruction.accounts.length < 3) {
+    // TODO: Coded error.
+    throw new Error('Not enough accounts');
+  }
+  let accountIndex = 0;
+  const getNextAccount = () => {
+    const { address } = instruction.accounts![accountIndex]!;
+    accountIndex += 1;
+    return address;
+  };
+  return {
+    accounts: {
+      nonceAccount: getNextAccount(),
+      recentBlockhashesSysvar: getNextAccount(),
+      nonceAuthority: getNextAccount(),
+    },
+    data: getAdvanceNonceAccountInstructionDataDecoder().decode(
+      instruction.data
+    ),
+  };
+}

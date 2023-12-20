@@ -183,3 +183,33 @@ export function getAssignInstructionRaw<
     programAddress,
   } as AssignInstruction<TProgram, TAccountAccount, TRemainingAccounts>;
 }
+
+export type ParsedAssignInstruction = {
+  accounts: {
+    account: Address;
+  };
+  data: AssignInstructionData;
+};
+
+export function parseAssignInstruction<
+  TProgram extends string = '11111111111111111111111111111111'
+>(
+  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+): ParsedAssignInstruction {
+  if (!instruction.accounts || instruction.accounts.length < 1) {
+    // TODO: Coded error.
+    throw new Error('Not enough accounts');
+  }
+  let accountIndex = 0;
+  const getNextAccount = () => {
+    const { address } = instruction.accounts![accountIndex]!;
+    accountIndex += 1;
+    return address;
+  };
+  return {
+    accounts: {
+      account: getNextAccount(),
+    },
+    data: getAssignInstructionDataDecoder().decode(instruction.data),
+  };
+}

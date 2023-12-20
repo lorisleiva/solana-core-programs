@@ -171,3 +171,35 @@ export function getUpgradeNonceAccountInstructionRaw<
     TRemainingAccounts
   >;
 }
+
+export type ParsedUpgradeNonceAccountInstruction = {
+  accounts: {
+    nonceAccount: Address;
+  };
+  data: UpgradeNonceAccountInstructionData;
+};
+
+export function parseUpgradeNonceAccountInstruction<
+  TProgram extends string = '11111111111111111111111111111111'
+>(
+  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+): ParsedUpgradeNonceAccountInstruction {
+  if (!instruction.accounts || instruction.accounts.length < 1) {
+    // TODO: Coded error.
+    throw new Error('Not enough accounts');
+  }
+  let accountIndex = 0;
+  const getNextAccount = () => {
+    const { address } = instruction.accounts![accountIndex]!;
+    accountIndex += 1;
+    return address;
+  };
+  return {
+    accounts: {
+      nonceAccount: getNextAccount(),
+    },
+    data: getUpgradeNonceAccountInstructionDataDecoder().decode(
+      instruction.data
+    ),
+  };
+}

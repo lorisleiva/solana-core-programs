@@ -144,3 +144,17 @@ export function getRequestHeapFrameInstructionRaw<
     programAddress,
   } as RequestHeapFrameInstruction<TProgram, TRemainingAccounts>;
 }
+
+export type ParsedRequestHeapFrameInstruction = {
+  data: RequestHeapFrameInstructionData;
+};
+
+export function parseRequestHeapFrameInstruction<
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+>(
+  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+): ParsedRequestHeapFrameInstruction {
+  return {
+    data: getRequestHeapFrameInstructionDataDecoder().decode(instruction.data),
+  };
+}

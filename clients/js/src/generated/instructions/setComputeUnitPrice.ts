@@ -135,3 +135,19 @@ export function getSetComputeUnitPriceInstructionRaw<
     programAddress,
   } as SetComputeUnitPriceInstruction<TProgram, TRemainingAccounts>;
 }
+
+export type ParsedSetComputeUnitPriceInstruction = {
+  data: SetComputeUnitPriceInstructionData;
+};
+
+export function parseSetComputeUnitPriceInstruction<
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+>(
+  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+): ParsedSetComputeUnitPriceInstruction {
+  return {
+    data: getSetComputeUnitPriceInstructionDataDecoder().decode(
+      instruction.data
+    ),
+  };
+}

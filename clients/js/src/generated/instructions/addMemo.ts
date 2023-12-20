@@ -106,3 +106,17 @@ export function getAddMemoInstructionRaw<
     programAddress,
   } as AddMemoInstruction<TProgram, TRemainingAccounts>;
 }
+
+export type ParsedAddMemoInstruction = {
+  data: AddMemoInstructionData;
+};
+
+export function parseAddMemoInstruction<
+  TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'
+>(
+  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+): ParsedAddMemoInstruction {
+  return {
+    data: getAddMemoInstructionDataDecoder().decode(instruction.data),
+  };
+}

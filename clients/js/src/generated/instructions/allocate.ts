@@ -181,3 +181,33 @@ export function getAllocateInstructionRaw<
     programAddress,
   } as AllocateInstruction<TProgram, TAccountNewAccount, TRemainingAccounts>;
 }
+
+export type ParsedAllocateInstruction = {
+  accounts: {
+    newAccount: Address;
+  };
+  data: AllocateInstructionData;
+};
+
+export function parseAllocateInstruction<
+  TProgram extends string = '11111111111111111111111111111111'
+>(
+  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+): ParsedAllocateInstruction {
+  if (!instruction.accounts || instruction.accounts.length < 1) {
+    // TODO: Coded error.
+    throw new Error('Not enough accounts');
+  }
+  let accountIndex = 0;
+  const getNextAccount = () => {
+    const { address } = instruction.accounts![accountIndex]!;
+    accountIndex += 1;
+    return address;
+  };
+  return {
+    accounts: {
+      newAccount: getNextAccount(),
+    },
+    data: getAllocateInstructionDataDecoder().decode(instruction.data),
+  };
+}

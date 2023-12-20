@@ -366,3 +366,43 @@ export function getWithdrawNonceAccountInstructionRaw<
     TRemainingAccounts
   >;
 }
+
+export type ParsedWithdrawNonceAccountInstruction = {
+  accounts: {
+    nonceAccount: Address;
+    recipientAccount: Address;
+    recentBlockhashesSysvar: Address;
+    rentSysvar: Address;
+    nonceAuthority: Address;
+  };
+  data: WithdrawNonceAccountInstructionData;
+};
+
+export function parseWithdrawNonceAccountInstruction<
+  TProgram extends string = '11111111111111111111111111111111'
+>(
+  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+): ParsedWithdrawNonceAccountInstruction {
+  if (!instruction.accounts || instruction.accounts.length < 5) {
+    // TODO: Coded error.
+    throw new Error('Not enough accounts');
+  }
+  let accountIndex = 0;
+  const getNextAccount = () => {
+    const { address } = instruction.accounts![accountIndex]!;
+    accountIndex += 1;
+    return address;
+  };
+  return {
+    accounts: {
+      nonceAccount: getNextAccount(),
+      recipientAccount: getNextAccount(),
+      recentBlockhashesSysvar: getNextAccount(),
+      rentSysvar: getNextAccount(),
+      nonceAuthority: getNextAccount(),
+    },
+    data: getWithdrawNonceAccountInstructionDataDecoder().decode(
+      instruction.data
+    ),
+  };
+}

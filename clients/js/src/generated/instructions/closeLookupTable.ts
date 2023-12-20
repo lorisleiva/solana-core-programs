@@ -249,3 +249,37 @@ export function getCloseLookupTableInstructionRaw<
     TRemainingAccounts
   >;
 }
+
+export type ParsedCloseLookupTableInstruction = {
+  accounts: {
+    address: Address;
+    authority: Address;
+    recipient: Address;
+  };
+  data: CloseLookupTableInstructionData;
+};
+
+export function parseCloseLookupTableInstruction<
+  TProgram extends string = 'AddressLookupTab1e1111111111111111111111111'
+>(
+  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+): ParsedCloseLookupTableInstruction {
+  if (!instruction.accounts || instruction.accounts.length < 3) {
+    // TODO: Coded error.
+    throw new Error('Not enough accounts');
+  }
+  let accountIndex = 0;
+  const getNextAccount = () => {
+    const { address } = instruction.accounts![accountIndex]!;
+    accountIndex += 1;
+    return address;
+  };
+  return {
+    accounts: {
+      address: getNextAccount(),
+      authority: getNextAccount(),
+      recipient: getNextAccount(),
+    },
+    data: getCloseLookupTableInstructionDataDecoder().decode(instruction.data),
+  };
+}

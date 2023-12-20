@@ -3,7 +3,7 @@ import { lamports } from '@solana/rpc-types';
 import { generateKeyPairSigner } from '@solana/signers';
 import { appendTransactionInstruction } from '@solana/web3.js';
 import test from 'ava';
-import { getTransferSolInstruction } from '../src';
+import { getTransferSolInstruction, parseTransferSolInstruction } from '../src';
 import {
   createClient,
   createDefaultTransaction,
@@ -37,4 +37,23 @@ test('it can transfer SOL from one account to another', async (t) => {
 
   // And the destination account has exactly 1 SOL.
   t.is(await getBalance(client, destination), lamports(1_000_000_000n));
+});
+
+test('it can parse the accounts and data of an existing transfer SOL instruction', async (t) => {
+  // Given a transfer SOL instruction with the following accounts and data.
+  const source = (await generateKeyPairSigner()).address;
+  const destination = (await generateKeyPairSigner()).address;
+  const transferSol = getTransferSolInstruction({
+    source,
+    destination,
+    amount: 1_000_000_000,
+  });
+
+  // When we parse this instruction.
+  const parsedTransferSol = parseTransferSolInstruction(transferSol);
+
+  // Then we expect the following accounts and data.
+  t.is(parsedTransferSol.accounts.source, source);
+  t.is(parsedTransferSol.accounts.destination, destination);
+  t.is(parsedTransferSol.data.amount, 1_000_000_000n);
 });
