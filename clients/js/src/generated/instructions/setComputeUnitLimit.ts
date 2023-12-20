@@ -136,16 +136,18 @@ export function getSetComputeUnitLimitInstructionRaw<
   } as SetComputeUnitLimitInstruction<TProgram, TRemainingAccounts>;
 }
 
-export type ParsedSetComputeUnitLimitInstruction = {
+export type ParsedSetComputeUnitLimitInstruction<
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+> = {
+  programAddress: Address<TProgram>;
   data: SetComputeUnitLimitInstructionData;
 };
 
-export function parseSetComputeUnitLimitInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
->(
+export function parseSetComputeUnitLimitInstruction<TProgram extends string>(
   instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
-): ParsedSetComputeUnitLimitInstruction {
+): ParsedSetComputeUnitLimitInstruction<TProgram> {
   return {
+    programAddress: instruction.programAddress,
     data: getSetComputeUnitLimitInstructionDataDecoder().decode(
       instruction.data
     ),

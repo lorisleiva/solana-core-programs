@@ -367,33 +367,41 @@ export function getWithdrawNonceAccountInstructionRaw<
   >;
 }
 
-export type ParsedWithdrawNonceAccountInstruction = {
+export type ParsedWithdrawNonceAccountInstruction<
+  TProgram extends string = '11111111111111111111111111111111',
+  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[]
+> = {
+  programAddress: Address<TProgram>;
   accounts: {
-    nonceAccount: Address;
-    recipientAccount: Address;
-    recentBlockhashesSysvar: Address;
-    rentSysvar: Address;
-    nonceAuthority: Address;
+    nonceAccount: TAccountMetas[0];
+    recipientAccount: TAccountMetas[1];
+    recentBlockhashesSysvar: TAccountMetas[2];
+    rentSysvar: TAccountMetas[3];
+    nonceAuthority: TAccountMetas[4];
   };
   data: WithdrawNonceAccountInstructionData;
 };
 
 export function parseWithdrawNonceAccountInstruction<
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string,
+  TAccountMetas extends readonly IAccountMeta[]
 >(
-  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
-): ParsedWithdrawNonceAccountInstruction {
-  if (!instruction.accounts || instruction.accounts.length < 5) {
+  instruction: IInstruction<TProgram> &
+    IInstructionWithAccounts<TAccountMetas> &
+    IInstructionWithData<Uint8Array>
+): ParsedWithdrawNonceAccountInstruction<TProgram, TAccountMetas> {
+  if (instruction.accounts.length < 5) {
     // TODO: Coded error.
     throw new Error('Not enough accounts');
   }
   let accountIndex = 0;
   const getNextAccount = () => {
-    const { address } = instruction.accounts![accountIndex]!;
+    const accountMeta = instruction.accounts![accountIndex]!;
     accountIndex += 1;
-    return address;
+    return accountMeta;
   };
   return {
+    programAddress: instruction.programAddress,
     accounts: {
       nonceAccount: getNextAccount(),
       recipientAccount: getNextAccount(),

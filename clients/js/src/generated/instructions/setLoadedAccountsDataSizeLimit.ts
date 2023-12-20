@@ -134,16 +134,20 @@ export function getSetLoadedAccountsDataSizeLimitInstructionRaw<
   } as SetLoadedAccountsDataSizeLimitInstruction<TProgram, TRemainingAccounts>;
 }
 
-export type ParsedSetLoadedAccountsDataSizeLimitInstruction = {
+export type ParsedSetLoadedAccountsDataSizeLimitInstruction<
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+> = {
+  programAddress: Address<TProgram>;
   data: SetLoadedAccountsDataSizeLimitInstructionData;
 };
 
 export function parseSetLoadedAccountsDataSizeLimitInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+  TProgram extends string
 >(
   instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
-): ParsedSetLoadedAccountsDataSizeLimitInstruction {
+): ParsedSetLoadedAccountsDataSizeLimitInstruction<TProgram> {
   return {
+    programAddress: instruction.programAddress,
     data: getSetLoadedAccountsDataSizeLimitInstructionDataDecoder().decode(
       instruction.data
     ),

@@ -136,16 +136,18 @@ export function getSetComputeUnitPriceInstructionRaw<
   } as SetComputeUnitPriceInstruction<TProgram, TRemainingAccounts>;
 }
 
-export type ParsedSetComputeUnitPriceInstruction = {
+export type ParsedSetComputeUnitPriceInstruction<
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+> = {
+  programAddress: Address<TProgram>;
   data: SetComputeUnitPriceInstructionData;
 };
 
-export function parseSetComputeUnitPriceInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
->(
+export function parseSetComputeUnitPriceInstruction<TProgram extends string>(
   instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
-): ParsedSetComputeUnitPriceInstruction {
+): ParsedSetComputeUnitPriceInstruction<TProgram> {
   return {
+    programAddress: instruction.programAddress,
     data: getSetComputeUnitPriceInstructionDataDecoder().decode(
       instruction.data
     ),

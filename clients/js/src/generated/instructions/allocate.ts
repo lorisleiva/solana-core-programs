@@ -182,29 +182,37 @@ export function getAllocateInstructionRaw<
   } as AllocateInstruction<TProgram, TAccountNewAccount, TRemainingAccounts>;
 }
 
-export type ParsedAllocateInstruction = {
+export type ParsedAllocateInstruction<
+  TProgram extends string = '11111111111111111111111111111111',
+  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[]
+> = {
+  programAddress: Address<TProgram>;
   accounts: {
-    newAccount: Address;
+    newAccount: TAccountMetas[0];
   };
   data: AllocateInstructionData;
 };
 
 export function parseAllocateInstruction<
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string,
+  TAccountMetas extends readonly IAccountMeta[]
 >(
-  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
-): ParsedAllocateInstruction {
-  if (!instruction.accounts || instruction.accounts.length < 1) {
+  instruction: IInstruction<TProgram> &
+    IInstructionWithAccounts<TAccountMetas> &
+    IInstructionWithData<Uint8Array>
+): ParsedAllocateInstruction<TProgram, TAccountMetas> {
+  if (instruction.accounts.length < 1) {
     // TODO: Coded error.
     throw new Error('Not enough accounts');
   }
   let accountIndex = 0;
   const getNextAccount = () => {
-    const { address } = instruction.accounts![accountIndex]!;
+    const accountMeta = instruction.accounts![accountIndex]!;
     accountIndex += 1;
-    return address;
+    return accountMeta;
   };
   return {
+    programAddress: instruction.programAddress,
     accounts: {
       newAccount: getNextAccount(),
     },

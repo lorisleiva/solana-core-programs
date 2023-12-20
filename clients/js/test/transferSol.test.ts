@@ -1,7 +1,11 @@
 import { pipe } from '@solana/functional';
 import { lamports } from '@solana/rpc-types';
 import { generateKeyPairSigner } from '@solana/signers';
-import { appendTransactionInstruction } from '@solana/web3.js';
+import {
+  AccountRole,
+  Address,
+  appendTransactionInstruction,
+} from '@solana/web3.js';
 import test from 'ava';
 import { getTransferSolInstruction, parseTransferSolInstruction } from '../src';
 import {
@@ -41,7 +45,7 @@ test('it can transfer SOL from one account to another', async (t) => {
 
 test('it can parse the accounts and data of an existing transfer SOL instruction', async (t) => {
   // Given a transfer SOL instruction with the following accounts and data.
-  const source = (await generateKeyPairSigner()).address;
+  const source = await generateKeyPairSigner();
   const destination = (await generateKeyPairSigner()).address;
   const transferSol = getTransferSolInstruction({
     source,
@@ -53,7 +57,14 @@ test('it can parse the accounts and data of an existing transfer SOL instruction
   const parsedTransferSol = parseTransferSolInstruction(transferSol);
 
   // Then we expect the following accounts and data.
-  t.is(parsedTransferSol.accounts.source, source);
-  t.is(parsedTransferSol.accounts.destination, destination);
+  t.is(parsedTransferSol.accounts.source.address, source.address);
+  t.is(parsedTransferSol.accounts.source.role, AccountRole.WRITABLE_SIGNER);
+  t.is(parsedTransferSol.accounts.source.signer, source);
+  t.is(parsedTransferSol.accounts.destination.address, destination);
+  t.is(parsedTransferSol.accounts.destination.role, AccountRole.WRITABLE);
   t.is(parsedTransferSol.data.amount, 1_000_000_000n);
+  t.is(
+    parsedTransferSol.programAddress,
+    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>
+  );
 });

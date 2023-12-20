@@ -291,31 +291,39 @@ export function getTransferSolWithSeedInstructionRaw<
   >;
 }
 
-export type ParsedTransferSolWithSeedInstruction = {
+export type ParsedTransferSolWithSeedInstruction<
+  TProgram extends string = '11111111111111111111111111111111',
+  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[]
+> = {
+  programAddress: Address<TProgram>;
   accounts: {
-    source: Address;
-    baseAccount: Address;
-    destination: Address;
+    source: TAccountMetas[0];
+    baseAccount: TAccountMetas[1];
+    destination: TAccountMetas[2];
   };
   data: TransferSolWithSeedInstructionData;
 };
 
 export function parseTransferSolWithSeedInstruction<
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string,
+  TAccountMetas extends readonly IAccountMeta[]
 >(
-  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
-): ParsedTransferSolWithSeedInstruction {
-  if (!instruction.accounts || instruction.accounts.length < 3) {
+  instruction: IInstruction<TProgram> &
+    IInstructionWithAccounts<TAccountMetas> &
+    IInstructionWithData<Uint8Array>
+): ParsedTransferSolWithSeedInstruction<TProgram, TAccountMetas> {
+  if (instruction.accounts.length < 3) {
     // TODO: Coded error.
     throw new Error('Not enough accounts');
   }
   let accountIndex = 0;
   const getNextAccount = () => {
-    const { address } = instruction.accounts![accountIndex]!;
+    const accountMeta = instruction.accounts![accountIndex]!;
     accountIndex += 1;
-    return address;
+    return accountMeta;
   };
   return {
+    programAddress: instruction.programAddress,
     accounts: {
       source: getNextAccount(),
       baseAccount: getNextAccount(),

@@ -107,16 +107,18 @@ export function getAddMemoInstructionRaw<
   } as AddMemoInstruction<TProgram, TRemainingAccounts>;
 }
 
-export type ParsedAddMemoInstruction = {
+export type ParsedAddMemoInstruction<
+  TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'
+> = {
+  programAddress: Address<TProgram>;
   data: AddMemoInstructionData;
 };
 
-export function parseAddMemoInstruction<
-  TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'
->(
+export function parseAddMemoInstruction<TProgram extends string>(
   instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
-): ParsedAddMemoInstruction {
+): ParsedAddMemoInstruction<TProgram> {
   return {
+    programAddress: instruction.programAddress,
     data: getAddMemoInstructionDataDecoder().decode(instruction.data),
   };
 }

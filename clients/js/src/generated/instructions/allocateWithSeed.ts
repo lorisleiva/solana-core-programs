@@ -264,30 +264,38 @@ export function getAllocateWithSeedInstructionRaw<
   >;
 }
 
-export type ParsedAllocateWithSeedInstruction = {
+export type ParsedAllocateWithSeedInstruction<
+  TProgram extends string = '11111111111111111111111111111111',
+  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[]
+> = {
+  programAddress: Address<TProgram>;
   accounts: {
-    newAccount: Address;
-    baseAccount: Address;
+    newAccount: TAccountMetas[0];
+    baseAccount: TAccountMetas[1];
   };
   data: AllocateWithSeedInstructionData;
 };
 
 export function parseAllocateWithSeedInstruction<
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string,
+  TAccountMetas extends readonly IAccountMeta[]
 >(
-  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
-): ParsedAllocateWithSeedInstruction {
-  if (!instruction.accounts || instruction.accounts.length < 2) {
+  instruction: IInstruction<TProgram> &
+    IInstructionWithAccounts<TAccountMetas> &
+    IInstructionWithData<Uint8Array>
+): ParsedAllocateWithSeedInstruction<TProgram, TAccountMetas> {
+  if (instruction.accounts.length < 2) {
     // TODO: Coded error.
     throw new Error('Not enough accounts');
   }
   let accountIndex = 0;
   const getNextAccount = () => {
-    const { address } = instruction.accounts![accountIndex]!;
+    const accountMeta = instruction.accounts![accountIndex]!;
     accountIndex += 1;
-    return address;
+    return accountMeta;
   };
   return {
+    programAddress: instruction.programAddress,
     accounts: {
       newAccount: getNextAccount(),
       baseAccount: getNextAccount(),
