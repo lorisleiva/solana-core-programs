@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "programs/address-lookup-table"
+]
+
+resolver = "2"
