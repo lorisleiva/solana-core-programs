@@ -30,6 +30,7 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
+import {} from '../shared';
 
 export type RequestUnitsInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',

@@ -278,11 +278,12 @@ export function getInitializeNonceAccountInstructionRaw<
       accountMetaWithDefault(accounts.nonceAccount, AccountRole.WRITABLE),
       accountMetaWithDefault(
         accounts.recentBlockhashesSysvar ??
-          'SysvarRecentB1ockHashes11111111111111111111',
+          ('SysvarRecentB1ockHashes11111111111111111111' as Address<'SysvarRecentB1ockHashes11111111111111111111'>),
         AccountRole.READONLY
       ),
       accountMetaWithDefault(
-        accounts.rentSysvar ?? 'SysvarRent111111111111111111111111111111111',
+        accounts.rentSysvar ??
+          ('SysvarRent111111111111111111111111111111111' as Address<'SysvarRent111111111111111111111111111111111'>),
         AccountRole.READONLY
       ),
       ...(remainingAccounts ?? []),

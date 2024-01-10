@@ -7,7 +7,9 @@
  */
 
 import { Address } from '@solana/addresses';
-import { Program } from '../shared';
+import { getU8Encoder } from '@solana/codecs-numbers';
+import { Program } from '@solana/programs';
+import { memcmp } from '../shared';
 
 export const SPL_COMPUTE_BUDGET_PROGRAM_ADDRESS =
   'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
@@ -15,9 +17,42 @@ export const SPL_COMPUTE_BUDGET_PROGRAM_ADDRESS =
 export type SplComputeBudgetProgram =
   Program<'ComputeBudget111111111111111111111111111111'>;
 
-export function createSplComputeBudgetProgram(): SplComputeBudgetProgram {
+export function getSplComputeBudgetProgram(): SplComputeBudgetProgram {
   return {
     name: 'splComputeBudget',
     address: SPL_COMPUTE_BUDGET_PROGRAM_ADDRESS,
   };
+}
+
+export enum SplComputeBudgetInstruction {
+  RequestUnits,
+  RequestHeapFrame,
+  SetComputeUnitLimit,
+  SetComputeUnitPrice,
+  SetLoadedAccountsDataSizeLimit,
+}
+
+export function identifySplComputeBudgetInstruction(
+  instruction: { data: Uint8Array } | Uint8Array
+): SplComputeBudgetInstruction {
+  const data =
+    instruction instanceof Uint8Array ? instruction : instruction.data;
+  if (memcmp(data, getU8Encoder().encode(0), 0)) {
+    return SplComputeBudgetInstruction.RequestUnits;
+  }
+  if (memcmp(data, getU8Encoder().encode(1), 0)) {
+    return SplComputeBudgetInstruction.RequestHeapFrame;
+  }
+  if (memcmp(data, getU8Encoder().encode(2), 0)) {
+    return SplComputeBudgetInstruction.SetComputeUnitLimit;
+  }
+  if (memcmp(data, getU8Encoder().encode(3), 0)) {
+    return SplComputeBudgetInstruction.SetComputeUnitPrice;
+  }
+  if (memcmp(data, getU8Encoder().encode(4), 0)) {
+    return SplComputeBudgetInstruction.SetLoadedAccountsDataSizeLimit;
+  }
+  throw new Error(
+    'The provided instruction could not be identified as a splComputeBudget instruction.'
+  );
 }

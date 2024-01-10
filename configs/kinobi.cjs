@@ -15,18 +15,22 @@ const kinobi = k.createFromIdls([
 
 // Update programs.
 kinobi.update(
-  new k.UpdateProgramsVisitor({
+  k.updateProgramsVisitor({
     //
   })
 );
 
 // Update accounts.
 kinobi.update(
-  new k.UpdateAccountsVisitor({
+  k.updateAccountsVisitor({
     addressLookupTable: {
       seeds: [
-        k.publicKeySeed("authority", "The address of the LUT's authority"),
-        k.variableSeed(
+        k.variablePdaSeedNode(
+          "authority",
+          k.publicKeyTypeNode(),
+          "The address of the LUT's authority"
+        ),
+        k.variablePdaSeedNode(
           "recentSlot",
           k.numberTypeNode("u64"),
           "The recent slot associated with the LUT"
@@ -38,23 +42,27 @@ kinobi.update(
 
 // Update instructions.
 kinobi.update(
-  new k.UpdateInstructionsVisitor({
+  k.updateInstructionsVisitor({
     createAccount: {
-      bytesCreatedOnChain: k.bytesFromArg("space"),
+      byteDeltas: [k.instructionByteDeltaNode(k.argumentValueNode("space"))],
     },
     createLookupTable: {
-      bytesCreatedOnChain: k.bytesFromNumber(56),
+      byteDeltas: [k.instructionByteDeltaNode(k.numberValueNode(56))],
       accounts: {
-        address: { defaultsTo: k.pdaDefault("addressLookupTable") },
+        address: { defaultValue: k.pdaValueNode("addressLookupTable") },
       },
       args: {
-        bump: { defaultsTo: k.accountBumpDefault("address") },
+        bump: { defaultValue: k.accountBumpValueNode("address") },
       },
     },
     extendLookupTable: {
-      bytesCreatedOnChain: k.resolverDefault("resolveExtendLookupTableBytes", [
-        k.dependsOnArg("addresses"),
-      ]),
+      byteDeltas: [
+        k.instructionByteDeltaNode(
+          k.resolverValueNode("resolveExtendLookupTableBytes", {
+            dependsOn: [k.argumentValueNode("addresses")],
+          })
+        ),
+      ],
     },
     //
   })
@@ -62,16 +70,16 @@ kinobi.update(
 
 // Set account discriminators.
 kinobi.update(
-  new k.SetAccountDiscriminatorFromFieldVisitor({
-    addressLookupTable: { field: "discriminator", value: k.vScalar(1) },
+  k.setAccountDiscriminatorFromFieldVisitor({
+    addressLookupTable: { field: "discriminator", value: k.numberValueNode(1) },
   })
 );
 
 // Set default values for structs.
 kinobi.update(
-  new k.SetStructDefaultValuesVisitor({
+  k.setStructDefaultValuesVisitor({
     addressLookupTable: {
-      padding: { ...k.vScalar(0), strategy: "omitted" },
+      padding: { value: k.numberValueNode(0), strategy: "omitted" },
     },
   })
 );
@@ -79,12 +87,12 @@ kinobi.update(
 // Render JavaScript.
 const jsDir = path.join(clientDir, "js", "src", "generated");
 const prettier = require(path.join(clientDir, "js", ".prettierrc.json"));
-kinobi.accept(new k.RenderJavaScriptExperimentalVisitor(jsDir, { prettier }));
+kinobi.accept(k.renderJavaScriptExperimentalVisitor(jsDir, { prettier }));
 
 // Render Rust.
 const crateDir = path.join(clientDir, "rust");
 kinobi.accept(
-  new k.RenderRustVisitor(path.join(crateDir, "src", "generated"), {
+  k.renderRustVisitor(path.join(crateDir, "src", "generated"), {
     formatCode: true,
     crateFolder: crateDir,
   })

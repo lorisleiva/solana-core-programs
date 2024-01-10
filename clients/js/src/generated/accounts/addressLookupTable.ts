@@ -18,10 +18,8 @@ import {
 } from '@solana/accounts';
 import {
   Address,
-  ProgramDerivedAddress,
   getAddressDecoder,
   getAddressEncoder,
-  getProgramDerivedAddress,
 } from '@solana/addresses';
 import {
   Codec,
@@ -52,6 +50,7 @@ import {
   getOptionDecoder,
   getOptionEncoder,
 } from '@solana/options';
+import { AddressLookupTableSeeds, findAddressLookupTablePda } from '../pdas';
 
 export type AddressLookupTable<TAddress extends string = string> = Account<
   AddressLookupTableAccountData,
@@ -177,29 +176,6 @@ export async function safeFetchAllAddressLookupTable(
     .map((maybeAccount) =>
       decodeAddressLookupTable(maybeAccount as EncodedAccount)
     );
-}
-
-export type AddressLookupTableSeeds = {
-  /** The address of the LUT's authority */
-  authority: Address;
-  /** The recent slot associated with the LUT */
-  recentSlot: number | bigint;
-};
-
-export async function findAddressLookupTablePda(
-  seeds: AddressLookupTableSeeds,
-  config: { programAddress?: Address | undefined } = {}
-): Promise<ProgramDerivedAddress> {
-  const {
-    programAddress = 'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>,
-  } = config;
-  return getProgramDerivedAddress({
-    programAddress,
-    seeds: [
-      getAddressEncoder().encode(seeds.authority),
-      getU64Encoder().encode(seeds.recentSlot),
-    ],
-  });
 }
 
 export async function fetchAddressLookupTableFromSeeds(

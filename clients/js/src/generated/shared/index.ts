@@ -129,8 +129,8 @@ export function accountMetaWithDefault<
  * Defines an instruction that stores additional bytes on-chain.
  * @internal
  */
-export type IInstructionWithBytesCreatedOnChain = {
-  bytesCreatedOnChain: number;
+export type IInstructionWithByteDelta = {
+  byteDelta: number;
 };
 
 /**
@@ -184,15 +184,8 @@ export function isTransactionSigner<TAddress extends string = string>(
   );
 }
 
-export type Program<TAddress extends string = string> = {
-  name: string;
-  address: Address<TAddress>;
-  getErrorFromCode?: (code: number, cause?: Error) => Error;
-};
-
-export type ProgramWithErrors<
-  TErrorCode extends number = number,
-  TError extends Error = Error
-> = {
-  getErrorFromCode: (code: TErrorCode, cause?: Error) => TError;
-};
+export function memcmp(data: Uint8Array, bytes: Uint8Array, offset: number) {
+  const slice = data.slice(offset, offset + bytes.length);
+  if (slice.length !== bytes.length) return false;
+  return bytes.every((b, i) => b === slice[i]);
+}

@@ -39,7 +39,7 @@ import {
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import {
-  IInstructionWithBytesCreatedOnChain,
+  IInstructionWithByteDelta,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
@@ -167,7 +167,7 @@ export function getCreateAccountInstruction<
   TAccountPayer,
   TAccountNewAccount
 > &
-  IInstructionWithBytesCreatedOnChain;
+  IInstructionWithByteDelta;
 export function getCreateAccountInstruction<
   TAccountPayer extends string,
   TAccountNewAccount extends string,
@@ -175,14 +175,14 @@ export function getCreateAccountInstruction<
 >(
   input: CreateAccountInput<TAccountPayer, TAccountNewAccount>
 ): CreateAccountInstruction<TProgram, TAccountPayer, TAccountNewAccount> &
-  IInstructionWithBytesCreatedOnChain;
+  IInstructionWithByteDelta;
 export function getCreateAccountInstruction<
   TAccountPayer extends string,
   TAccountNewAccount extends string,
   TProgram extends string = '11111111111111111111111111111111'
 >(
   input: CreateAccountInput<TAccountPayer, TAccountNewAccount>
-): IInstruction & IInstructionWithBytesCreatedOnChain {
+): IInstruction & IInstructionWithByteDelta {
   // Program address.
   const programAddress =
     '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
@@ -203,8 +203,11 @@ export function getCreateAccountInstruction<
   // Original args.
   const args = { ...input };
 
-  // Bytes created on chain.
-  const bytesCreatedOnChain = Number(args.space) + BASE_ACCOUNT_SIZE;
+  // Bytes created or reallocated by the instruction.
+  const byteDelta: number = [Number(args.space) + BASE_ACCOUNT_SIZE].reduce(
+    (a, b) => a + b,
+    0
+  );
 
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(
@@ -219,7 +222,7 @@ export function getCreateAccountInstruction<
     programAddress
   );
 
-  return Object.freeze({ ...instruction, bytesCreatedOnChain });
+  return Object.freeze({ ...instruction, byteDelta });
 }
 
 export function getCreateAccountInstructionRaw<

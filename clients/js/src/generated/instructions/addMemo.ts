@@ -19,6 +19,7 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
+import {} from '../shared';
 
 export type AddMemoInstruction<
   TProgram extends string = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo',

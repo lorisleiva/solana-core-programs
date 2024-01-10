@@ -7,7 +7,7 @@
  */
 
 import { BASE_ACCOUNT_SIZE } from '@solana/accounts';
-import { Address, ProgramDerivedAddress } from '@solana/addresses';
+import { Address } from '@solana/addresses';
 import {
   Codec,
   Decoder,
@@ -39,13 +39,12 @@ import {
   WritableSignerAccount,
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
-import { findAddressLookupTablePda } from '../accounts';
+import { findAddressLookupTablePda } from '../pdas';
 import {
-  IInstructionWithBytesCreatedOnChain,
+  IInstructionWithByteDelta,
   ResolvedAccount,
   accountMetaWithDefault,
   expectAddress,
-  expectProgramDerivedAddress,
   expectSome,
   getAccountMetasWithSigners,
 } from '../shared';
@@ -160,12 +159,12 @@ export type CreateLookupTableAsyncInput<
   TAccountPayer extends string,
   TAccountSystemProgram extends string
 > = {
-  address?: ProgramDerivedAddress<TAccountAddress>;
+  address?: Address<TAccountAddress>;
   authority: Address<TAccountAuthority>;
   payer: Address<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
-  recentSlot: CreateLookupTableInstructionDataArgs['recentSlot'];
-  bump?: CreateLookupTableInstructionDataArgs['bump'];
+  recentSlot?: CreateLookupTableInstructionDataArgs['recentSlot'];
+  bump: CreateLookupTableInstructionDataArgs['bump'];
 };
 
 export type CreateLookupTableAsyncInputWithSigners<
@@ -174,12 +173,12 @@ export type CreateLookupTableAsyncInputWithSigners<
   TAccountPayer extends string,
   TAccountSystemProgram extends string
 > = {
-  address?: ProgramDerivedAddress<TAccountAddress>;
+  address?: Address<TAccountAddress>;
   authority: TransactionSigner<TAccountAuthority>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
-  recentSlot: CreateLookupTableInstructionDataArgs['recentSlot'];
-  bump?: CreateLookupTableInstructionDataArgs['bump'];
+  recentSlot?: CreateLookupTableInstructionDataArgs['recentSlot'];
+  bump: CreateLookupTableInstructionDataArgs['bump'];
 };
 
 export async function getCreateLookupTableInstructionAsync<
@@ -203,7 +202,7 @@ export async function getCreateLookupTableInstructionAsync<
     TAccountPayer,
     TAccountSystemProgram
   > &
-    IInstructionWithBytesCreatedOnChain
+    IInstructionWithByteDelta
 >;
 export async function getCreateLookupTableInstructionAsync<
   TAccountAddress extends string,
@@ -226,7 +225,7 @@ export async function getCreateLookupTableInstructionAsync<
     TAccountPayer,
     TAccountSystemProgram
   > &
-    IInstructionWithBytesCreatedOnChain
+    IInstructionWithByteDelta
 >;
 export async function getCreateLookupTableInstructionAsync<
   TAccountAddress extends string,
@@ -241,7 +240,7 @@ export async function getCreateLookupTableInstructionAsync<
     TAccountPayer,
     TAccountSystemProgram
   >
-): Promise<IInstruction & IInstructionWithBytesCreatedOnChain> {
+): Promise<IInstruction & IInstructionWithByteDelta> {
   // Program address.
   const programAddress =
     'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
@@ -276,14 +275,10 @@ export async function getCreateLookupTableInstructionAsync<
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
-    accounts.systemProgram.isWritable = false;
-  }
-  if (!args.bump) {
-    args.bump = expectProgramDerivedAddress(accounts.address.value)[1];
   }
 
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 56 + BASE_ACCOUNT_SIZE;
+  // Bytes created or reallocated by the instruction.
+  const byteDelta: number = [56 + BASE_ACCOUNT_SIZE].reduce((a, b) => a + b, 0);
 
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(
@@ -298,7 +293,7 @@ export async function getCreateLookupTableInstructionAsync<
     programAddress
   );
 
-  return Object.freeze({ ...instruction, bytesCreatedOnChain });
+  return Object.freeze({ ...instruction, byteDelta });
 }
 
 export type CreateLookupTableInput<
@@ -307,12 +302,12 @@ export type CreateLookupTableInput<
   TAccountPayer extends string,
   TAccountSystemProgram extends string
 > = {
-  address: ProgramDerivedAddress<TAccountAddress>;
+  address: Address<TAccountAddress>;
   authority: Address<TAccountAuthority>;
   payer: Address<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
-  recentSlot: CreateLookupTableInstructionDataArgs['recentSlot'];
-  bump?: CreateLookupTableInstructionDataArgs['bump'];
+  recentSlot?: CreateLookupTableInstructionDataArgs['recentSlot'];
+  bump: CreateLookupTableInstructionDataArgs['bump'];
 };
 
 export type CreateLookupTableInputWithSigners<
@@ -321,12 +316,12 @@ export type CreateLookupTableInputWithSigners<
   TAccountPayer extends string,
   TAccountSystemProgram extends string
 > = {
-  address: ProgramDerivedAddress<TAccountAddress>;
+  address: Address<TAccountAddress>;
   authority: TransactionSigner<TAccountAuthority>;
   payer: TransactionSigner<TAccountPayer>;
   systemProgram?: Address<TAccountSystemProgram>;
-  recentSlot: CreateLookupTableInstructionDataArgs['recentSlot'];
-  bump?: CreateLookupTableInstructionDataArgs['bump'];
+  recentSlot?: CreateLookupTableInstructionDataArgs['recentSlot'];
+  bump: CreateLookupTableInstructionDataArgs['bump'];
 };
 
 export function getCreateLookupTableInstruction<
@@ -349,7 +344,7 @@ export function getCreateLookupTableInstruction<
   TAccountPayer,
   TAccountSystemProgram
 > &
-  IInstructionWithBytesCreatedOnChain;
+  IInstructionWithByteDelta;
 export function getCreateLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
@@ -370,7 +365,7 @@ export function getCreateLookupTableInstruction<
   TAccountPayer,
   TAccountSystemProgram
 > &
-  IInstructionWithBytesCreatedOnChain;
+  IInstructionWithByteDelta;
 export function getCreateLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
@@ -384,7 +379,7 @@ export function getCreateLookupTableInstruction<
     TAccountPayer,
     TAccountSystemProgram
   >
-): IInstruction & IInstructionWithBytesCreatedOnChain {
+): IInstruction & IInstructionWithByteDelta {
   // Program address.
   const programAddress =
     'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
@@ -413,14 +408,10 @@ export function getCreateLookupTableInstruction<
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
-    accounts.systemProgram.isWritable = false;
-  }
-  if (!args.bump) {
-    args.bump = expectProgramDerivedAddress(accounts.address.value)[1];
   }
 
-  // Bytes created on chain.
-  const bytesCreatedOnChain = 56 + BASE_ACCOUNT_SIZE;
+  // Bytes created or reallocated by the instruction.
+  const byteDelta: number = [56 + BASE_ACCOUNT_SIZE].reduce((a, b) => a + b, 0);
 
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(
@@ -435,7 +426,7 @@ export function getCreateLookupTableInstruction<
     programAddress
   );
 
-  return Object.freeze({ ...instruction, bytesCreatedOnChain });
+  return Object.freeze({ ...instruction, byteDelta });
 }
 
 export function getCreateLookupTableInstructionRaw<
@@ -472,11 +463,8 @@ export function getCreateLookupTableInstructionRaw<
       accountMetaWithDefault(accounts.authority, AccountRole.READONLY_SIGNER),
       accountMetaWithDefault(accounts.payer, AccountRole.WRITABLE_SIGNER),
       accountMetaWithDefault(
-        accounts.systemProgram ?? {
-          address:
-            '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>,
-          role: AccountRole.READONLY,
-        },
+        accounts.systemProgram ??
+          ('11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>),
         AccountRole.READONLY
       ),
       ...(remainingAccounts ?? []),

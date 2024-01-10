@@ -44,7 +44,7 @@ import {
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import { resolveExtendLookupTableBytes } from '../../hooked';
 import {
-  IInstructionWithBytesCreatedOnChain,
+  IInstructionWithByteDelta,
   ResolvedAccount,
   accountMetaWithDefault,
   getAccountMetasWithSigners,
@@ -198,7 +198,7 @@ export function getExtendLookupTableInstruction<
   TAccountPayer,
   TAccountSystemProgram
 > &
-  IInstructionWithBytesCreatedOnChain;
+  IInstructionWithByteDelta;
 export function getExtendLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
@@ -219,7 +219,7 @@ export function getExtendLookupTableInstruction<
   TAccountPayer,
   TAccountSystemProgram
 > &
-  IInstructionWithBytesCreatedOnChain;
+  IInstructionWithByteDelta;
 export function getExtendLookupTableInstruction<
   TAccountAddress extends string,
   TAccountAuthority extends string,
@@ -233,7 +233,7 @@ export function getExtendLookupTableInstruction<
     TAccountPayer,
     TAccountSystemProgram
   >
-): IInstruction & IInstructionWithBytesCreatedOnChain {
+): IInstruction & IInstructionWithByteDelta {
   // Program address.
   const programAddress =
     'AddressLookupTab1e1111111111111111111111111' as Address<'AddressLookupTab1e1111111111111111111111111'>;
@@ -265,11 +265,12 @@ export function getExtendLookupTableInstruction<
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
-    accounts.systemProgram.isWritable = false;
   }
 
-  // Bytes created on chain.
-  const bytesCreatedOnChain = resolveExtendLookupTableBytes(resolverScope);
+  // Bytes created or reallocated by the instruction.
+  const byteDelta: number = [
+    resolveExtendLookupTableBytes(resolverScope),
+  ].reduce((a, b) => a + b, 0);
 
   // Get account metas and signers.
   const accountMetas = getAccountMetasWithSigners(
@@ -284,7 +285,7 @@ export function getExtendLookupTableInstruction<
     programAddress
   );
 
-  return Object.freeze({ ...instruction, bytesCreatedOnChain });
+  return Object.freeze({ ...instruction, byteDelta });
 }
 
 export function getExtendLookupTableInstructionRaw<
@@ -321,11 +322,8 @@ export function getExtendLookupTableInstructionRaw<
       accountMetaWithDefault(accounts.authority, AccountRole.READONLY_SIGNER),
       accountMetaWithDefault(accounts.payer, AccountRole.WRITABLE_SIGNER),
       accountMetaWithDefault(
-        accounts.systemProgram ?? {
-          address:
-            '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>,
-          role: AccountRole.READONLY,
-        },
+        accounts.systemProgram ??
+          ('11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>),
         AccountRole.READONLY
       ),
       ...(remainingAccounts ?? []),

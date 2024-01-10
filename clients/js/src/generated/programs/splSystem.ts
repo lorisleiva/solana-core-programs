@@ -7,12 +7,14 @@
  */
 
 import { Address } from '@solana/addresses';
+import { getU32Encoder } from '@solana/codecs-numbers';
+import { Program, ProgramWithErrors } from '@solana/programs';
 import {
   SplSystemProgramError,
   SplSystemProgramErrorCode,
   getSplSystemProgramErrorFromCode,
 } from '../errors';
-import { Program, ProgramWithErrors } from '../shared';
+import { memcmp } from '../shared';
 
 export const SPL_SYSTEM_PROGRAM_ADDRESS =
   '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
@@ -20,7 +22,7 @@ export const SPL_SYSTEM_PROGRAM_ADDRESS =
 export type SplSystemProgram = Program<'11111111111111111111111111111111'> &
   ProgramWithErrors<SplSystemProgramErrorCode, SplSystemProgramError>;
 
-export function createSplSystemProgram(): SplSystemProgram {
+export function getSplSystemProgram(): SplSystemProgram {
   return {
     name: 'splSystem',
     address: SPL_SYSTEM_PROGRAM_ADDRESS,
@@ -28,4 +30,73 @@ export function createSplSystemProgram(): SplSystemProgram {
       return getSplSystemProgramErrorFromCode(code, cause);
     },
   };
+}
+
+export enum SplSystemAccount {
+  Nonce,
+}
+
+export enum SplSystemInstruction {
+  CreateAccount,
+  Assign,
+  TransferSol,
+  CreateAccountWithSeed,
+  AdvanceNonceAccount,
+  WithdrawNonceAccount,
+  InitializeNonceAccount,
+  AuthorizeNonceAccount,
+  Allocate,
+  AllocateWithSeed,
+  AssignWithSeed,
+  TransferSolWithSeed,
+  UpgradeNonceAccount,
+}
+
+export function identifySplSystemInstruction(
+  instruction: { data: Uint8Array } | Uint8Array
+): SplSystemInstruction {
+  const data =
+    instruction instanceof Uint8Array ? instruction : instruction.data;
+  if (memcmp(data, getU32Encoder().encode(0), 0)) {
+    return SplSystemInstruction.CreateAccount;
+  }
+  if (memcmp(data, getU32Encoder().encode(1), 0)) {
+    return SplSystemInstruction.Assign;
+  }
+  if (memcmp(data, getU32Encoder().encode(2), 0)) {
+    return SplSystemInstruction.TransferSol;
+  }
+  if (memcmp(data, getU32Encoder().encode(3), 0)) {
+    return SplSystemInstruction.CreateAccountWithSeed;
+  }
+  if (memcmp(data, getU32Encoder().encode(4), 0)) {
+    return SplSystemInstruction.AdvanceNonceAccount;
+  }
+  if (memcmp(data, getU32Encoder().encode(5), 0)) {
+    return SplSystemInstruction.WithdrawNonceAccount;
+  }
+  if (memcmp(data, getU32Encoder().encode(6), 0)) {
+    return SplSystemInstruction.InitializeNonceAccount;
+  }
+  if (memcmp(data, getU32Encoder().encode(7), 0)) {
+    return SplSystemInstruction.AuthorizeNonceAccount;
+  }
+  if (memcmp(data, getU32Encoder().encode(8), 0)) {
+    return SplSystemInstruction.Allocate;
+  }
+  if (memcmp(data, getU32Encoder().encode(9), 0)) {
+    return SplSystemInstruction.AllocateWithSeed;
+  }
+  if (memcmp(data, getU32Encoder().encode(10), 0)) {
+    return SplSystemInstruction.AssignWithSeed;
+  }
+  if (memcmp(data, getU32Encoder().encode(11), 0)) {
+    return SplSystemInstruction.TransferSolWithSeed;
+  }
+  if (memcmp(data, getU32Encoder().encode(12), 0)) {
+    return SplSystemInstruction.UpgradeNonceAccount;
+  }
+  throw new Error(
+    'The provided instruction could not be identified as a splSystem instruction.'
+  );
 }

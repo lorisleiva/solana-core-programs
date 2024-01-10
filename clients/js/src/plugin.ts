@@ -1,16 +1,16 @@
 import {
-  createSplAddressLookupTableProgram,
-  createSplComputeBudgetProgram,
-  createSplMemoProgram,
-  createSplSystemProgram,
+  getSplAddressLookupTableProgram,
+  getSplComputeBudgetProgram,
+  getSplMemoProgram,
+  getSplSystemProgram,
 } from './generated';
 
 export const splCore = () => ({
   install() {
     // TODO: Register these programs somewhere.
-    createSplAddressLookupTableProgram();
-    createSplComputeBudgetProgram();
-    createSplMemoProgram();
-    createSplSystemProgram();
+    getSplAddressLookupTableProgram();
+    getSplComputeBudgetProgram();
+    getSplMemoProgram();
+    getSplSystemProgram();
   },
 });

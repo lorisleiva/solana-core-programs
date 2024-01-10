@@ -253,7 +253,7 @@ export function getAdvanceNonceAccountInstructionRaw<
       accountMetaWithDefault(accounts.nonceAccount, AccountRole.WRITABLE),
       accountMetaWithDefault(
         accounts.recentBlockhashesSysvar ??
-          'SysvarRecentB1ockHashes11111111111111111111',
+          ('SysvarRecentB1ockHashes11111111111111111111' as Address<'SysvarRecentB1ockHashes11111111111111111111'>),
         AccountRole.READONLY
       ),
       accountMetaWithDefault(

@@ -7,7 +7,7 @@
  */
 
 import { Address } from '@solana/addresses';
-import { Program } from '../shared';
+import { Program } from '@solana/programs';
 
 export const SPL_MEMO_PROGRAM_ADDRESS =
   'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo' as Address<'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'>;
@@ -15,9 +15,13 @@ export const SPL_MEMO_PROGRAM_ADDRESS =
 export type SplMemoProgram =
   Program<'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo'>;
 
-export function createSplMemoProgram(): SplMemoProgram {
+export function getSplMemoProgram(): SplMemoProgram {
   return {
     name: 'splMemo',
     address: SPL_MEMO_PROGRAM_ADDRESS,
   };
+}
+
+export enum SplMemoInstruction {
+  AddMemo,
 }
