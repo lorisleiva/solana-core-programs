@@ -30,7 +30,6 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
-import {} from '../shared';
 
 export type RequestHeapFrameInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',

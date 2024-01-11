@@ -11,7 +11,10 @@ import {
   EncodedAccount,
   FetchAccountConfig,
   FetchAccountsConfig,
+  MaybeAccount,
+  MaybeEncodedAccount,
   assertAccountExists,
+  assertAccountsExist,
   decodeAccount,
   fetchEncodedAccount,
   fetchEncodedAccounts,
@@ -56,6 +59,9 @@ export type AddressLookupTable<TAddress extends string = string> = Account<
   AddressLookupTableAccountData,
   TAddress
 >;
+
+export type MaybeAddressLookupTable<TAddress extends string = string> =
+  MaybeAccount<AddressLookupTableAccountData, TAddress>;
 
 export type AddressLookupTableAccountData = {
   discriminator: number;
@@ -125,9 +131,15 @@ export function getAddressLookupTableAccountDataCodec(): Codec<
 
 export function decodeAddressLookupTable<TAddress extends string = string>(
   encodedAccount: EncodedAccount<TAddress>
-): AddressLookupTable<TAddress> {
+): AddressLookupTable<TAddress>;
+export function decodeAddressLookupTable<TAddress extends string = string>(
+  encodedAccount: MaybeEncodedAccount<TAddress>
+): MaybeAddressLookupTable<TAddress>;
+export function decodeAddressLookupTable<TAddress extends string = string>(
+  encodedAccount: EncodedAccount<TAddress> | MaybeEncodedAccount<TAddress>
+): AddressLookupTable<TAddress> | MaybeAddressLookupTable<TAddress> {
   return decodeAccount(
-    encodedAccount,
+    encodedAccount as MaybeEncodedAccount<TAddress>,
     getAddressLookupTableAccountDataDecoder()
   );
 }
@@ -137,20 +149,20 @@ export async function fetchAddressLookupTable<TAddress extends string = string>(
   address: Address<TAddress>,
   config?: FetchAccountConfig
 ): Promise<AddressLookupTable<TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchMaybeAddressLookupTable(rpc, address, config);
   assertAccountExists(maybeAccount);
-  return decodeAddressLookupTable(maybeAccount);
+  return maybeAccount;
 }
 
-export async function safeFetchAddressLookupTable<
+export async function fetchMaybeAddressLookupTable<
   TAddress extends string = string
 >(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
   config?: FetchAccountConfig
-): Promise<AddressLookupTable<TAddress> | null> {
+): Promise<MaybeAddressLookupTable<TAddress>> {
   const maybeAccount = await fetchEncodedAccount(rpc, address, config);
-  return maybeAccount.exists ? decodeAddressLookupTable(maybeAccount) : null;
+  return decodeAddressLookupTable(maybeAccount);
 }
 
 export async function fetchAllAddressLookupTable(
@@ -158,24 +170,24 @@ export async function fetchAllAddressLookupTable(
   addresses: Array<Address>,
   config?: FetchAccountsConfig
 ): Promise<AddressLookupTable[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
-  return maybeAccounts.map((maybeAccount) => {
-    assertAccountExists(maybeAccount);
-    return decodeAddressLookupTable(maybeAccount);
-  });
+  const maybeAccounts = await fetchAllMaybeAddressLookupTable(
+    rpc,
+    addresses,
+    config
+  );
+  assertAccountsExist(maybeAccounts);
+  return maybeAccounts;
 }
 
-export async function safeFetchAllAddressLookupTable(
+export async function fetchAllMaybeAddressLookupTable(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Array<Address>,
   config?: FetchAccountsConfig
-): Promise<AddressLookupTable[]> {
+): Promise<MaybeAddressLookupTable[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
-  return maybeAccounts
-    .filter((maybeAccount) => maybeAccount.exists)
-    .map((maybeAccount) =>
-      decodeAddressLookupTable(maybeAccount as EncodedAccount)
-    );
+  return maybeAccounts.map((maybeAccount) =>
+    decodeAddressLookupTable(maybeAccount)
+  );
 }
 
 export async function fetchAddressLookupTableFromSeeds(
@@ -183,17 +195,21 @@ export async function fetchAddressLookupTableFromSeeds(
   seeds: AddressLookupTableSeeds,
   config: FetchAccountConfig & { programAddress?: Address } = {}
 ): Promise<AddressLookupTable> {
-  const { programAddress, ...fetchConfig } = config;
-  const [address] = await findAddressLookupTablePda(seeds, { programAddress });
-  return fetchAddressLookupTable(rpc, address, fetchConfig);
+  const maybeAccount = await fetchMaybeAddressLookupTableFromSeeds(
+    rpc,
+    seeds,
+    config
+  );
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
 }
 
-export async function safeFetchAddressLookupTableFromSeeds(
+export async function fetchMaybeAddressLookupTableFromSeeds(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   seeds: AddressLookupTableSeeds,
   config: FetchAccountConfig & { programAddress?: Address } = {}
-): Promise<AddressLookupTable | null> {
+): Promise<MaybeAddressLookupTable> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findAddressLookupTablePda(seeds, { programAddress });
-  return safeFetchAddressLookupTable(rpc, address, fetchConfig);
+  return fetchMaybeAddressLookupTable(rpc, address, fetchConfig);
 }
