@@ -1,7 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import '@solana/webcrypto-ed25519-polyfill';
 
-import { pipe } from '@solana/functional';
 import {
   generateKeyPairSigner,
   signTransactionWithSigners,
@@ -20,6 +19,7 @@ import {
   createTransaction,
   getSignatureFromTransaction,
   lamports,
+  pipe,
   setTransactionFeePayer,
   setTransactionLifetimeUsingBlockhash,
 } from '@solana/web3.js';
@@ -29,7 +29,7 @@ type Client = {
   rpcSubscriptions: ReturnType<typeof createSolanaRpcSubscriptions>;
 };
 
-export const createClient = (): Client => {
+export const createDefaultSolanaClient = (): Client => {
   const rpc = createSolanaRpc({
     transport: createDefaultRpcTransport({ url: 'http://127.0.0.1:8899' }),
   });

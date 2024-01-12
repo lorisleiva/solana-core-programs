@@ -1,15 +1,15 @@
-import { pipe } from '@solana/functional';
-import { lamports } from '@solana/rpc-types';
 import { generateKeyPairSigner } from '@solana/signers';
 import {
   AccountRole,
   Address,
   appendTransactionInstruction,
+  lamports,
+  pipe,
 } from '@solana/web3.js';
 import test from 'ava';
 import { getTransferSolInstruction, parseTransferSolInstruction } from '../src';
 import {
-  createClient,
+  createDefaultSolanaClient,
   createDefaultTransaction,
   generateKeyPairSignerWithSol,
   getBalance,
@@ -18,7 +18,7 @@ import {
 
 test('it can transfer SOL from one account to another', async (t) => {
   // Given a source account with 3 SOL and a destination account with no SOL.
-  const client = createClient();
+  const client = createDefaultSolanaClient();
   const source = await generateKeyPairSignerWithSol(client, 3_000_000_000n);
   const destination = (await generateKeyPairSigner()).address;
 

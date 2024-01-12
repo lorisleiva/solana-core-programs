@@ -1,6 +1,5 @@
-import { pipe } from '@solana/functional';
 import { generateKeyPairSigner } from '@solana/signers';
-import { appendTransactionInstruction } from '@solana/web3.js';
+import { appendTransactionInstruction, pipe } from '@solana/web3.js';
 import test from 'ava';
 import {
   Nonce,
@@ -12,7 +11,7 @@ import {
   getInitializeNonceAccountInstruction,
 } from '../src';
 import {
-  createClient,
+  createDefaultSolanaClient,
   createDefaultTransaction,
   generateKeyPairSignerWithSol,
   signAndSendTransaction,
@@ -20,7 +19,7 @@ import {
 
 test('it can create and initialize a durable nonce account', async (t) => {
   // Given some brand now payer, authority, and nonce KeyPairSigners.
-  const client = createClient();
+  const client = createDefaultSolanaClient();
   const payer = await generateKeyPairSignerWithSol(client);
   const nonce = await generateKeyPairSigner();
   const nonceAuthority = await generateKeyPairSigner();
@@ -46,15 +45,12 @@ test('it can create and initialize a durable nonce account', async (t) => {
   );
 
   // Then we expect the nonce account to exist with the following data.
-  t.like(
-    await fetchNonce(client.rpc, nonce.address, { commitment: 'confirmed' }),
-    <Nonce>{
-      address: nonce.address,
-      data: {
-        version: NonceVersion.Current,
-        state: NonceState.Initialized,
-        authority: nonceAuthority.address,
-      },
-    }
-  );
+  t.like(await fetchNonce(client.rpc, nonce.address), <Nonce>{
+    address: nonce.address,
+    data: {
+      version: NonceVersion.Current,
+      state: NonceState.Initialized,
+      authority: nonceAuthority.address,
+    },
+  });
 });
