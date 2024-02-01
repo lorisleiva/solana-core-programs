@@ -2,10 +2,22 @@
   "name": "@lorisleiva/spl-core",
   "version": "0.1.0",
   "description": "Core Solana programs",
+  "sideEffects": false,
+  "module": "dist/src/index.mjs",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.mjs",
+      "require": "./dist/src/index.js"
+    }
+  },
+  "files": [
+    "/dist/src"
+  ],
   "scripts": {
-    "build": "rimraf dist && tsc -p tsconfig.json",
+    "build": "rimraf dist && node ./build.cjs && tsc -p tsconfig.json",
     "build:docs": "typedoc",
     "test": "ava",
     "lint": "eslint --ext js,ts,tsx src",
@@ -13,9 +25,6 @@
     "format": "prettier --check src test",
     "format:fix": "prettier --write src test"
   },
-  "files": [
-    "/dist/src"
-  ],
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
@@ -46,6 +55,7 @@
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.46.1",
     "ava": "^5.1.0",
+    "esbuild": "^0.20.0",
     "eslint": "^8.0.1",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-config-prettier": "^8.5.0",
@@ -60,7 +70,9 @@
     "vercel": "^28.16.0"
   },
   "ava": {
-    "require": ["./test/_globals.js"],
+    "require": [
+      "./test/_globals.js"
+    ],
     "typescript": {
       "compile": false,
       "rewritePaths": {
