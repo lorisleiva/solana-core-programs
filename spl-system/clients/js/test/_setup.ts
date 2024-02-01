@@ -2,10 +2,6 @@
 import '@solana/webcrypto-ed25519-polyfill';
 
 import {
-  generateKeyPairSigner,
-  signTransactionWithSigners,
-} from '@solana/signers';
-import {
   Address,
   Commitment,
   CompilableTransaction,
@@ -17,11 +13,13 @@ import {
   createSolanaRpc,
   createSolanaRpcSubscriptions,
   createTransaction,
+  generateKeyPairSigner,
   getSignatureFromTransaction,
   lamports,
   pipe,
   setTransactionFeePayer,
   setTransactionLifetimeUsingBlockhash,
+  signTransactionWithSigners,
 } from '@solana/web3.js';
 
 type Client = {
