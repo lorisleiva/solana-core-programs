@@ -1,0 +1,7 @@
+{
+  "name": "spl-system",
+  "private": true,
+  "scripts": {
+    "generate:clients": "node ./kinobi.cjs"
+  }
+}
