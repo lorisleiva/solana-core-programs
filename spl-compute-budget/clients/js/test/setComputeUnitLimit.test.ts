@@ -9,11 +9,11 @@ import {
 } from './_setup';
 
 test('it sets the compute unit limit of a transaction', async (t) => {
-  // Given a source account with 3 SOL and a destination account with no SOL.
+  // Given a payer wallet.
   const client = createDefaultSolanaClient();
   const payer = await generateKeyPairSignerWithSol(client);
 
-  // When the source account transfers 1 SOL to the destination account.
+  // When we create a transaction with a compute unit limit of 600,000.
   const setComputeUnit = getSetComputeUnitLimitInstruction({ units: 600_000 });
   await pipe(
     await createDefaultTransaction(client, payer.address),
