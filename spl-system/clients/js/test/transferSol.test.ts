@@ -1,8 +1,8 @@
-import { generateKeyPairSigner } from '@solana/signers';
 import {
   AccountRole,
   Address,
   appendTransactionInstruction,
+  generateKeyPairSigner,
   lamports,
   pipe,
 } from '@solana/web3.js';

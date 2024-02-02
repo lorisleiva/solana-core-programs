@@ -1,5 +1,8 @@
-import { generateKeyPairSigner } from '@solana/signers';
-import { appendTransactionInstruction, pipe } from '@solana/web3.js';
+import {
+  appendTransactionInstruction,
+  generateKeyPairSigner,
+  pipe,
+} from '@solana/web3.js';
 import test from 'ava';
 import {
   Nonce,

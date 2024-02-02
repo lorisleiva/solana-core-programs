@@ -34,8 +34,9 @@ kinobi.update(
       byteDeltas: [k.instructionByteDeltaNode(k.numberValueNode(56))],
       accounts: {
         address: { defaultValue: k.pdaValueNode("addressLookupTable") },
+        payer: { defaultValue: k.accountValueNode("authority") },
       },
-      args: {
+      arguments: {
         bump: { defaultValue: k.accountBumpValueNode("address") },
       },
     },
@@ -48,7 +49,6 @@ kinobi.update(
         ),
       ],
     },
-    //
   })
 );
 

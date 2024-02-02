@@ -1,0 +1,9 @@
+{
+  "name": "spl-compute-budget",
+  "private": true,
+  "scripts": {
+    "generate:clients": "node ./kinobi.cjs",
+    "test:clients": "pnpm test:clients:js",
+    "test:clients:js": "(cd ./clients/js && pnpm build && pnpm test)"
+  }
+}
