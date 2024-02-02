@@ -1,8 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
-    "generate:clients": {
-      "outputs": ["clients"]
-    }
+    "generate:clients": { "outputs": ["clients"] },
+    "test:clients": {}
   }
 }

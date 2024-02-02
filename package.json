@@ -3,6 +3,7 @@
   "scripts": {
     "generate": "pnpm generate:clients",
     "generate:clients": "turbo run generate:clients",
+    "test:clients": "turbo run test:clients",
     "validator": "CI=1 amman start --config ./configs/validator.cjs",
     "validator:debug": "amman start --config ./configs/validator.cjs",
     "validator:logs": "CI=1 amman logs",
