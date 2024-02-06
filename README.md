@@ -1,10 +1,8 @@
-# Spl Core
+# Core Solana programs
 
-Core Solana programs
+This project contains the following programs and their clients:
 
-## Clients
-
-This project contains the following clients:
-
-- [JavaScript](./clients/js/README.md)
-- [Rust](./clients/rust/README.md)
+- [Spl Address Lookup Table](./spl-address-lookup-table)
+- [Spl Compute Budget](./spl-compute-budget)
+- [Spl Memo](./spl-memo)
+- [Spl System](./spl-system)
