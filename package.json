@@ -1,18 +1,18 @@
 {
   "private": true,
   "scripts": {
-    "clients:rust:test": "./configs/scripts/client/test-rust.sh",
-    "clients:js:test": "./configs/scripts/client/test-js.sh",
     "generate": "pnpm generate:clients",
-    "generate:clients": "node ./configs/kinobi.cjs",
+    "generate:clients": "turbo run generate:clients",
+    "test:clients": "turbo run test:clients",
     "validator": "CI=1 amman start --config ./configs/validator.cjs",
     "validator:debug": "amman start --config ./configs/validator.cjs",
     "validator:logs": "CI=1 amman logs",
     "validator:stop": "amman stop"
   },
   "devDependencies": {
-    "@metaplex-foundation/kinobi": "^0.17.1",
     "@metaplex-foundation/amman": "^0.12.1",
+    "@metaplex-foundation/kinobi": "^0.17.3",
+    "turbo": "^1.12.2",
     "typescript": "^4.9.4"
   },
   "packageManager": "pnpm@8.9.0"

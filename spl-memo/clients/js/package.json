@@ -1,0 +1,83 @@
+{
+  "name": "@loranza/spl-memo",
+  "version": "0.1.0",
+  "description": "Program client for the Memo program",
+  "sideEffects": false,
+  "module": "dist/src/index.mjs",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.mjs",
+      "require": "./dist/src/index.js"
+    }
+  },
+  "files": [
+    "/dist/src"
+  ],
+  "scripts": {
+    "build": "rimraf dist && node ./build.cjs && tsc -p tsconfig.json",
+    "build:docs": "typedoc",
+    "test": "ava",
+    "lint": "eslint --ext js,ts,tsx src",
+    "lint:fix": "eslint --fix --ext js,ts,tsx src",
+    "format": "prettier --check src test",
+    "format:fix": "prettier --write src test"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": "https://github.com/lorisleiva/solana-core-programs.git",
+  "author": "Loris Leiva",
+  "license": "MIT",
+  "dependencies": {
+    "@solana/accounts": "2.0.0-experimental.71dcc4e",
+    "@solana/addresses": "2.0.0-experimental.71dcc4e",
+    "@solana/codecs-core": "2.0.0-experimental.71dcc4e",
+    "@solana/codecs-data-structures": "2.0.0-experimental.71dcc4e",
+    "@solana/codecs-numbers": "2.0.0-experimental.71dcc4e",
+    "@solana/codecs-strings": "2.0.0-experimental.71dcc4e",
+    "@solana/instructions": "2.0.0-experimental.71dcc4e",
+    "@solana/keys": "2.0.0-experimental.71dcc4e",
+    "@solana/options": "2.0.0-experimental.71dcc4e",
+    "@solana/programs": "2.0.0-experimental.71dcc4e",
+    "@solana/signers": "2.0.0-experimental.71dcc4e",
+    "@solana/transactions": "2.0.0-experimental.71dcc4e"
+  },
+  "devDependencies": {
+    "@ava/typescript": "^3.0.1",
+    "@solana/web3.js": "2.0.0-experimental.71dcc4e",
+    "@solana/webcrypto-ed25519-polyfill": "2.0.0-experimental.71dcc4e",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.46.1",
+    "ava": "^5.1.0",
+    "esbuild": "^0.20.0",
+    "eslint": "^8.0.1",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.5.1",
+    "rimraf": "^3.0.2",
+    "typedoc": "^0.23.16",
+    "typedoc-plugin-expand-object-like-types": "^0.1.1",
+    "typedoc-plugin-missing-exports": "^1.0.0",
+    "typescript": "^4.6.2",
+    "vercel": "^28.16.0"
+  },
+  "ava": {
+    "require": [
+      "./test/_globals.js"
+    ],
+    "typescript": {
+      "compile": false,
+      "rewritePaths": {
+        "src/": "dist/src/",
+        "test/": "dist/test/"
+      }
+    }
+  },
+  "packageManager": "pnpm@8.2.0"
+}
