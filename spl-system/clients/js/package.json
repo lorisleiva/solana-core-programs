@@ -14,7 +14,8 @@
     }
   },
   "files": [
-    "/dist"
+    "./dist/types",
+    "./dist/index*"
   ],
   "scripts": {
     "build": "rimraf dist && tsup && tsc -p ./tsconfig.declarations.json",
