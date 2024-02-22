@@ -3,21 +3,21 @@
   "version": "0.1.0",
   "description": "Program client from the System program",
   "sideEffects": false,
-  "module": "dist/src/index.mjs",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "module": "dist/index.mjs",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/src/index.d.ts",
-      "import": "./dist/src/index.mjs",
-      "require": "./dist/src/index.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     }
   },
   "files": [
-    "/dist/src"
+    "/dist"
   ],
   "scripts": {
-    "build": "rimraf dist && node ./build.cjs && tsc -p tsconfig.json",
+    "build": "rimraf dist && tsup && tsc",
     "build:docs": "typedoc",
     "test": "ava",
     "lint": "eslint --ext js,ts,tsx src",
@@ -33,27 +33,27 @@
   "author": "Loris Leiva",
   "license": "MIT",
   "dependencies": {
-    "@solana/accounts": "2.0.0-experimental.71dcc4e",
-    "@solana/addresses": "2.0.0-experimental.71dcc4e",
-    "@solana/codecs-core": "2.0.0-experimental.71dcc4e",
-    "@solana/codecs-data-structures": "2.0.0-experimental.71dcc4e",
-    "@solana/codecs-numbers": "2.0.0-experimental.71dcc4e",
-    "@solana/codecs-strings": "2.0.0-experimental.71dcc4e",
-    "@solana/instructions": "2.0.0-experimental.71dcc4e",
-    "@solana/keys": "2.0.0-experimental.71dcc4e",
-    "@solana/options": "2.0.0-experimental.71dcc4e",
-    "@solana/programs": "2.0.0-experimental.71dcc4e",
-    "@solana/signers": "2.0.0-experimental.71dcc4e",
-    "@solana/transactions": "2.0.0-experimental.71dcc4e"
+    "@solana/accounts": "2.0.0-experimental.12ae1c6",
+    "@solana/addresses": "2.0.0-experimental.12ae1c6",
+    "@solana/codecs-core": "2.0.0-experimental.12ae1c6",
+    "@solana/codecs-data-structures": "2.0.0-experimental.12ae1c6",
+    "@solana/codecs-numbers": "2.0.0-experimental.12ae1c6",
+    "@solana/codecs-strings": "2.0.0-experimental.12ae1c6",
+    "@solana/instructions": "2.0.0-experimental.12ae1c6",
+    "@solana/keys": "2.0.0-experimental.12ae1c6",
+    "@solana/options": "2.0.0-experimental.12ae1c6",
+    "@solana/programs": "2.0.0-experimental.12ae1c6",
+    "@solana/signers": "2.0.0-experimental.12ae1c6",
+    "@solana/transactions": "2.0.0-experimental.12ae1c6",
+    "tsup": "^8.0.2"
   },
   "devDependencies": {
     "@ava/typescript": "^3.0.1",
-    "@solana/web3.js": "2.0.0-experimental.71dcc4e",
-    "@solana/webcrypto-ed25519-polyfill": "2.0.0-experimental.71dcc4e",
+    "@solana/web3.js": "2.0.0-experimental.12ae1c6",
+    "@solana/webcrypto-ed25519-polyfill": "2.0.0-experimental.12ae1c6",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.46.1",
     "ava": "^5.1.0",
-    "esbuild": "^0.20.0",
     "eslint": "^8.0.1",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-config-prettier": "^8.5.0",
@@ -64,19 +64,14 @@
     "typedoc": "^0.23.16",
     "typedoc-plugin-expand-object-like-types": "^0.1.1",
     "typedoc-plugin-missing-exports": "^1.0.0",
-    "typescript": "^4.6.2",
-    "vercel": "^28.16.0"
+    "typescript": "^5.3.3"
   },
   "ava": {
     "require": [
       "./test/_globals.js"
     ],
     "typescript": {
-      "compile": false,
-      "rewritePaths": {
-        "src/": "dist/src/",
-        "test/": "dist/test/"
-      }
+      "compile": "tsc"
     }
   },
   "packageManager": "pnpm@8.2.0"
