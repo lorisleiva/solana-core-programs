@@ -17,7 +17,7 @@
     "/dist"
   ],
   "scripts": {
-    "build": "rimraf dist && tsup && tsc",
+    "build": "rimraf dist && tsup && tsc -p ./tsconfig.declarations.json",
     "build:docs": "typedoc",
     "test": "ava",
     "lint": "eslint --ext js,ts,tsx src",
@@ -48,12 +48,12 @@
     "tsup": "^8.0.2"
   },
   "devDependencies": {
-    "@ava/typescript": "^3.0.1",
+    "@ava/typescript": "^4.1.0",
     "@solana/web3.js": "2.0.0-experimental.12ae1c6",
     "@solana/webcrypto-ed25519-polyfill": "2.0.0-experimental.12ae1c6",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.46.1",
-    "ava": "^5.1.0",
+    "ava": "^6.1.1",
     "eslint": "^8.0.1",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-config-prettier": "^8.5.0",
@@ -71,7 +71,11 @@
       "./test/_globals.js"
     ],
     "typescript": {
-      "compile": "tsc"
+      "compile": "tsc",
+      "rewritePaths": {
+        "src/": "dist/ava/src/",
+        "test/": "dist/ava/test/"
+      }
     }
   },
   "packageManager": "pnpm@8.2.0"

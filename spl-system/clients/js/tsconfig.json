@@ -4,22 +4,21 @@
       "composite": false,
       "declaration": true,
       "declarationMap": true,
-      "emitDeclarationOnly": true,
       "esModuleInterop": true,
       "forceConsistentCasingInFileNames": true,
       "inlineSources": false,
       "isolatedModules": true,
-      "lib": ["DOM", "ES2017", "ES2022.Error"],
+      "module": "commonjs",
       "moduleResolution": "node",
       "noFallthroughCasesInSwitch": true,
       "noUnusedLocals": true,
       "noUnusedParameters": true,
-      "outDir": "./dist/types",
+      "outDir": "./dist/ava",
       "preserveWatchOutput": true,
       "skipLibCheck": true,
       "strict": true,
       "target": "ESNext"
   },
   "exclude": ["node_modules"],
-  "include": ["src"]
+  "include": ["src", "test"]
 }
