@@ -1,6 +1,6 @@
 {
   "name": "@loranza/spl-system",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Program client from the System program",
   "sideEffects": false,
   "module": "dist/index.mjs",
