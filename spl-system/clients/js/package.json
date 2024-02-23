@@ -18,7 +18,7 @@
     "./dist/index*"
   ],
   "scripts": {
-    "build": "rimraf dist && tsup && tsc -p ./tsconfig.declarations.json",
+    "build": "tsup --clean && tsc -p ./tsconfig.declarations.json",
     "build:docs": "typedoc",
     "test": "ava",
     "lint": "eslint --ext js,ts,tsx src",
@@ -61,7 +61,6 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.5.1",
-    "rimraf": "^3.0.2",
     "typedoc": "^0.23.16",
     "typedoc-plugin-expand-object-like-types": "^0.1.1",
     "typedoc-plugin-missing-exports": "^1.0.0",
