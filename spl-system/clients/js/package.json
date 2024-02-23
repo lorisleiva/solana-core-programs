@@ -3,22 +3,22 @@
   "version": "0.1.2",
   "description": "Program client from the System program",
   "sideEffects": false,
-  "module": "dist/index.mjs",
-  "main": "dist/index.js",
+  "module": "dist/src/index.mjs",
+  "main": "dist/src/index.js",
   "types": "dist/types/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.mjs",
+      "require": "./dist/src/index.js"
     }
   },
   "files": [
-    "./dist/types",
-    "./dist/index*"
+    "./dist/src",
+    "./dist/types"
   ],
   "scripts": {
-    "build": "tsup --clean && tsc -p ./tsconfig.declarations.json",
+    "build": "tsup && tsc -p ./tsconfig.declarations.json",
     "build:docs": "typedoc",
     "test": "ava",
     "lint": "eslint --ext js,ts,tsx src",
@@ -68,14 +68,12 @@
   },
   "ava": {
     "require": [
-      "@solana/webcrypto-ed25519-polyfill",
-      "./test/_globals.js"
+      "@solana/webcrypto-ed25519-polyfill"
     ],
     "typescript": {
-      "compile": "tsc",
+      "compile": false,
       "rewritePaths": {
-        "src/": "dist/ava/src/",
-        "test/": "dist/ava/test/"
+        "test/": "dist/test/"
       }
     }
   },
