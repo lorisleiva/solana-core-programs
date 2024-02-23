@@ -1,15 +1,11 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import '@solana/webcrypto-ed25519-polyfill';
-
 import {
   Address,
   Commitment,
   CompilableTransaction,
   ITransactionWithBlockhashLifetime,
-  createDefaultAirdropRequester,
+  airdropFactory,
   createDefaultRpcSubscriptionsTransport,
   createDefaultRpcTransport,
-  createDefaultTransactionSender,
   createSolanaRpc,
   createSolanaRpcSubscriptions,
   createTransaction,
@@ -17,6 +13,7 @@ import {
   getSignatureFromTransaction,
   lamports,
   pipe,
+  sendAndConfirmTransactionFactory,
   setTransactionFeePayer,
   setTransactionLifetimeUsingBlockhash,
   signTransactionWithSigners,
@@ -44,9 +41,8 @@ export const generateKeyPairSignerWithSol = async (
   client: Client,
   putativeLamports: bigint = 1_000_000_000n
 ) => {
-  const airdropRequester = createDefaultAirdropRequester(client);
   const signer = await generateKeyPairSigner();
-  await airdropRequester({
+  await airdropFactory(client)({
     recipientAddress: signer.address,
     lamports: lamports(putativeLamports),
     commitment: 'confirmed',
@@ -75,7 +71,7 @@ export const signAndSendTransaction = async (
 ) => {
   const signedTransaction = await signTransactionWithSigners(transaction);
   const signature = getSignatureFromTransaction(signedTransaction);
-  await createDefaultTransactionSender(client)(signedTransaction, {
+  await sendAndConfirmTransactionFactory(client)(signedTransaction, {
     commitment,
   });
   return signature;
