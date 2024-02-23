@@ -68,6 +68,7 @@
   },
   "ava": {
     "require": [
+      "@solana/webcrypto-ed25519-polyfill",
       "./test/_globals.js"
     ],
     "typescript": {

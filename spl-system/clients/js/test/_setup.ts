@@ -1,6 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import '@solana/webcrypto-ed25519-polyfill';
-
 import {
   Address,
   Commitment,
