@@ -20,16 +20,12 @@ export enum NonceVersion {
 
 export type NonceVersionArgs = NonceVersion;
 
-export function getNonceVersionEncoder() {
-  return getScalarEnumEncoder(NonceVersion, {
-    size: getU32Encoder(),
-  }) satisfies Encoder<NonceVersionArgs>;
+export function getNonceVersionEncoder(): Encoder<NonceVersionArgs> {
+  return getScalarEnumEncoder(NonceVersion, { size: getU32Encoder() });
 }
 
-export function getNonceVersionDecoder() {
-  return getScalarEnumDecoder(NonceVersion, {
-    size: getU32Decoder(),
-  }) satisfies Decoder<NonceVersion>;
+export function getNonceVersionDecoder(): Decoder<NonceVersion> {
+  return getScalarEnumDecoder(NonceVersion, { size: getU32Decoder() });
 }
 
 export function getNonceVersionCodec(): Codec<NonceVersionArgs, NonceVersion> {

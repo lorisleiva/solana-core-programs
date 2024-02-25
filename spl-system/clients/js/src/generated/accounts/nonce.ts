@@ -67,24 +67,24 @@ export type NonceAccountDataArgs = {
   lamportsPerSignature: number | bigint;
 };
 
-export function getNonceAccountDataEncoder() {
-  return getStructEncoder<NonceAccountDataArgs>([
+export function getNonceAccountDataEncoder(): Encoder<NonceAccountDataArgs> {
+  return getStructEncoder([
     ['version', getNonceVersionEncoder()],
     ['state', getNonceStateEncoder()],
     ['authority', getAddressEncoder()],
     ['blockhash', getAddressEncoder()],
     ['lamportsPerSignature', getU64Encoder()],
-  ]) satisfies Encoder<NonceAccountDataArgs>;
+  ]);
 }
 
-export function getNonceAccountDataDecoder() {
-  return getStructDecoder<NonceAccountData>([
+export function getNonceAccountDataDecoder(): Decoder<NonceAccountData> {
+  return getStructDecoder([
     ['version', getNonceVersionDecoder()],
     ['state', getNonceStateDecoder()],
     ['authority', getAddressDecoder()],
     ['blockhash', getAddressDecoder()],
     ['lamportsPerSignature', getU64Decoder()],
-  ]) satisfies Decoder<NonceAccountData>;
+  ]);
 }
 
 export function getNonceAccountDataCodec(): Codec<

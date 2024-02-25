@@ -67,19 +67,15 @@ export type UpgradeNonceAccountInstructionData = { discriminator: number };
 
 export type UpgradeNonceAccountInstructionDataArgs = {};
 
-export function getUpgradeNonceAccountInstructionDataEncoder() {
+export function getUpgradeNonceAccountInstructionDataEncoder(): Encoder<UpgradeNonceAccountInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{ discriminator: number }>([
-      ['discriminator', getU32Encoder()],
-    ]),
+    getStructEncoder([['discriminator', getU32Encoder()]]),
     (value) => ({ ...value, discriminator: 12 })
-  ) satisfies Encoder<UpgradeNonceAccountInstructionDataArgs>;
+  );
 }
 
-export function getUpgradeNonceAccountInstructionDataDecoder() {
-  return getStructDecoder<UpgradeNonceAccountInstructionData>([
-    ['discriminator', getU32Decoder()],
-  ]) satisfies Decoder<UpgradeNonceAccountInstructionData>;
+export function getUpgradeNonceAccountInstructionDataDecoder(): Decoder<UpgradeNonceAccountInstructionData> {
+  return getStructDecoder([['discriminator', getU32Decoder()]]);
 }
 
 export function getUpgradeNonceAccountInstructionDataCodec(): Codec<

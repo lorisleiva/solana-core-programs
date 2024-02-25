@@ -76,21 +76,21 @@ export type AssignInstructionData = {
 
 export type AssignInstructionDataArgs = { programAddress: Address };
 
-export function getAssignInstructionDataEncoder() {
+export function getAssignInstructionDataEncoder(): Encoder<AssignInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{ discriminator: number; programAddress: Address }>([
+    getStructEncoder([
       ['discriminator', getU32Encoder()],
       ['programAddress', getAddressEncoder()],
     ]),
     (value) => ({ ...value, discriminator: 1 })
-  ) satisfies Encoder<AssignInstructionDataArgs>;
+  );
 }
 
-export function getAssignInstructionDataDecoder() {
-  return getStructDecoder<AssignInstructionData>([
+export function getAssignInstructionDataDecoder(): Decoder<AssignInstructionData> {
+  return getStructDecoder([
     ['discriminator', getU32Decoder()],
     ['programAddress', getAddressDecoder()],
-  ]) satisfies Decoder<AssignInstructionData>;
+  ]);
 }
 
 export function getAssignInstructionDataCodec(): Codec<

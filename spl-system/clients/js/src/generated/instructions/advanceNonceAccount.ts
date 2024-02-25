@@ -91,19 +91,15 @@ export type AdvanceNonceAccountInstructionData = { discriminator: number };
 
 export type AdvanceNonceAccountInstructionDataArgs = {};
 
-export function getAdvanceNonceAccountInstructionDataEncoder() {
+export function getAdvanceNonceAccountInstructionDataEncoder(): Encoder<AdvanceNonceAccountInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{ discriminator: number }>([
-      ['discriminator', getU32Encoder()],
-    ]),
+    getStructEncoder([['discriminator', getU32Encoder()]]),
     (value) => ({ ...value, discriminator: 4 })
-  ) satisfies Encoder<AdvanceNonceAccountInstructionDataArgs>;
+  );
 }
 
-export function getAdvanceNonceAccountInstructionDataDecoder() {
-  return getStructDecoder<AdvanceNonceAccountInstructionData>([
-    ['discriminator', getU32Decoder()],
-  ]) satisfies Decoder<AdvanceNonceAccountInstructionData>;
+export function getAdvanceNonceAccountInstructionDataDecoder(): Decoder<AdvanceNonceAccountInstructionData> {
+  return getStructDecoder([['discriminator', getU32Decoder()]]);
 }
 
 export function getAdvanceNonceAccountInstructionDataCodec(): Codec<

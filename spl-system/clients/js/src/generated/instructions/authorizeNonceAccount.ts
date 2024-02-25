@@ -87,21 +87,21 @@ export type AuthorizeNonceAccountInstructionDataArgs = {
   newNonceAuthority: Address;
 };
 
-export function getAuthorizeNonceAccountInstructionDataEncoder() {
+export function getAuthorizeNonceAccountInstructionDataEncoder(): Encoder<AuthorizeNonceAccountInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{ discriminator: number; newNonceAuthority: Address }>([
+    getStructEncoder([
       ['discriminator', getU32Encoder()],
       ['newNonceAuthority', getAddressEncoder()],
     ]),
     (value) => ({ ...value, discriminator: 7 })
-  ) satisfies Encoder<AuthorizeNonceAccountInstructionDataArgs>;
+  );
 }
 
-export function getAuthorizeNonceAccountInstructionDataDecoder() {
-  return getStructDecoder<AuthorizeNonceAccountInstructionData>([
+export function getAuthorizeNonceAccountInstructionDataDecoder(): Decoder<AuthorizeNonceAccountInstructionData> {
+  return getStructDecoder([
     ['discriminator', getU32Decoder()],
     ['newNonceAuthority', getAddressDecoder()],
-  ]) satisfies Decoder<AuthorizeNonceAccountInstructionData>;
+  ]);
 }
 
 export function getAuthorizeNonceAccountInstructionDataCodec(): Codec<

@@ -20,16 +20,12 @@ export enum NonceState {
 
 export type NonceStateArgs = NonceState;
 
-export function getNonceStateEncoder() {
-  return getScalarEnumEncoder(NonceState, {
-    size: getU32Encoder(),
-  }) satisfies Encoder<NonceStateArgs>;
+export function getNonceStateEncoder(): Encoder<NonceStateArgs> {
+  return getScalarEnumEncoder(NonceState, { size: getU32Encoder() });
 }
 
-export function getNonceStateDecoder() {
-  return getScalarEnumDecoder(NonceState, {
-    size: getU32Decoder(),
-  }) satisfies Decoder<NonceState>;
+export function getNonceStateDecoder(): Decoder<NonceState> {
+  return getScalarEnumDecoder(NonceState, { size: getU32Decoder() });
 }
 
 export function getNonceStateCodec(): Codec<NonceStateArgs, NonceState> {

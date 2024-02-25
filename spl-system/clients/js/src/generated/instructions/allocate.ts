@@ -74,21 +74,21 @@ export type AllocateInstructionData = { discriminator: number; space: bigint };
 
 export type AllocateInstructionDataArgs = { space: number | bigint };
 
-export function getAllocateInstructionDataEncoder() {
+export function getAllocateInstructionDataEncoder(): Encoder<AllocateInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{ discriminator: number; space: number | bigint }>([
+    getStructEncoder([
       ['discriminator', getU32Encoder()],
       ['space', getU64Encoder()],
     ]),
     (value) => ({ ...value, discriminator: 8 })
-  ) satisfies Encoder<AllocateInstructionDataArgs>;
+  );
 }
 
-export function getAllocateInstructionDataDecoder() {
-  return getStructDecoder<AllocateInstructionData>([
+export function getAllocateInstructionDataDecoder(): Decoder<AllocateInstructionData> {
+  return getStructDecoder([
     ['discriminator', getU32Decoder()],
     ['space', getU64Decoder()],
-  ]) satisfies Decoder<AllocateInstructionData>;
+  ]);
 }
 
 export function getAllocateInstructionDataCodec(): Codec<

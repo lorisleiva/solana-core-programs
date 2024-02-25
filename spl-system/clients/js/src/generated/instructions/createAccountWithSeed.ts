@@ -111,16 +111,9 @@ export type CreateAccountWithSeedInstructionDataArgs = {
   programAddress: Address;
 };
 
-export function getCreateAccountWithSeedInstructionDataEncoder() {
+export function getCreateAccountWithSeedInstructionDataEncoder(): Encoder<CreateAccountWithSeedInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{
-      discriminator: number;
-      base: Address;
-      seed: string;
-      amount: number | bigint;
-      space: number | bigint;
-      programAddress: Address;
-    }>([
+    getStructEncoder([
       ['discriminator', getU32Encoder()],
       ['base', getAddressEncoder()],
       ['seed', getStringEncoder()],
@@ -129,18 +122,18 @@ export function getCreateAccountWithSeedInstructionDataEncoder() {
       ['programAddress', getAddressEncoder()],
     ]),
     (value) => ({ ...value, discriminator: 3 })
-  ) satisfies Encoder<CreateAccountWithSeedInstructionDataArgs>;
+  );
 }
 
-export function getCreateAccountWithSeedInstructionDataDecoder() {
-  return getStructDecoder<CreateAccountWithSeedInstructionData>([
+export function getCreateAccountWithSeedInstructionDataDecoder(): Decoder<CreateAccountWithSeedInstructionData> {
+  return getStructDecoder([
     ['discriminator', getU32Decoder()],
     ['base', getAddressDecoder()],
     ['seed', getStringDecoder()],
     ['amount', getU64Decoder()],
     ['space', getU64Decoder()],
     ['programAddress', getAddressDecoder()],
-  ]) satisfies Decoder<CreateAccountWithSeedInstructionData>;
+  ]);
 }
 
 export function getCreateAccountWithSeedInstructionDataCodec(): Codec<

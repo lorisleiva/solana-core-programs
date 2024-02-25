@@ -92,30 +92,25 @@ export type AssignWithSeedInstructionDataArgs = {
   programAddress: Address;
 };
 
-export function getAssignWithSeedInstructionDataEncoder() {
+export function getAssignWithSeedInstructionDataEncoder(): Encoder<AssignWithSeedInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{
-      discriminator: number;
-      base: Address;
-      seed: string;
-      programAddress: Address;
-    }>([
+    getStructEncoder([
       ['discriminator', getU32Encoder()],
       ['base', getAddressEncoder()],
       ['seed', getStringEncoder()],
       ['programAddress', getAddressEncoder()],
     ]),
     (value) => ({ ...value, discriminator: 10 })
-  ) satisfies Encoder<AssignWithSeedInstructionDataArgs>;
+  );
 }
 
-export function getAssignWithSeedInstructionDataDecoder() {
-  return getStructDecoder<AssignWithSeedInstructionData>([
+export function getAssignWithSeedInstructionDataDecoder(): Decoder<AssignWithSeedInstructionData> {
+  return getStructDecoder([
     ['discriminator', getU32Decoder()],
     ['base', getAddressDecoder()],
     ['seed', getStringDecoder()],
     ['programAddress', getAddressDecoder()],
-  ]) satisfies Decoder<AssignWithSeedInstructionData>;
+  ]);
 }
 
 export function getAssignWithSeedInstructionDataCodec(): Codec<

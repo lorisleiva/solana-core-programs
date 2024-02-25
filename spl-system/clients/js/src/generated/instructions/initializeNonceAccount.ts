@@ -101,21 +101,21 @@ export type InitializeNonceAccountInstructionDataArgs = {
   nonceAuthority: Address;
 };
 
-export function getInitializeNonceAccountInstructionDataEncoder() {
+export function getInitializeNonceAccountInstructionDataEncoder(): Encoder<InitializeNonceAccountInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{ discriminator: number; nonceAuthority: Address }>([
+    getStructEncoder([
       ['discriminator', getU32Encoder()],
       ['nonceAuthority', getAddressEncoder()],
     ]),
     (value) => ({ ...value, discriminator: 6 })
-  ) satisfies Encoder<InitializeNonceAccountInstructionDataArgs>;
+  );
 }
 
-export function getInitializeNonceAccountInstructionDataDecoder() {
-  return getStructDecoder<InitializeNonceAccountInstructionData>([
+export function getInitializeNonceAccountInstructionDataDecoder(): Decoder<InitializeNonceAccountInstructionData> {
+  return getStructDecoder([
     ['discriminator', getU32Decoder()],
     ['nonceAuthority', getAddressDecoder()],
-  ]) satisfies Decoder<InitializeNonceAccountInstructionData>;
+  ]);
 }
 
 export function getInitializeNonceAccountInstructionDataCodec(): Codec<

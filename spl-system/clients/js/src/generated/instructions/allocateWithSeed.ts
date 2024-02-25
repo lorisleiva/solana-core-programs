@@ -99,15 +99,9 @@ export type AllocateWithSeedInstructionDataArgs = {
   programAddress: Address;
 };
 
-export function getAllocateWithSeedInstructionDataEncoder() {
+export function getAllocateWithSeedInstructionDataEncoder(): Encoder<AllocateWithSeedInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{
-      discriminator: number;
-      base: Address;
-      seed: string;
-      space: number | bigint;
-      programAddress: Address;
-    }>([
+    getStructEncoder([
       ['discriminator', getU32Encoder()],
       ['base', getAddressEncoder()],
       ['seed', getStringEncoder()],
@@ -115,17 +109,17 @@ export function getAllocateWithSeedInstructionDataEncoder() {
       ['programAddress', getAddressEncoder()],
     ]),
     (value) => ({ ...value, discriminator: 9 })
-  ) satisfies Encoder<AllocateWithSeedInstructionDataArgs>;
+  );
 }
 
-export function getAllocateWithSeedInstructionDataDecoder() {
-  return getStructDecoder<AllocateWithSeedInstructionData>([
+export function getAllocateWithSeedInstructionDataDecoder(): Decoder<AllocateWithSeedInstructionData> {
+  return getStructDecoder([
     ['discriminator', getU32Decoder()],
     ['base', getAddressDecoder()],
     ['seed', getStringDecoder()],
     ['space', getU64Decoder()],
     ['programAddress', getAddressDecoder()],
-  ]) satisfies Decoder<AllocateWithSeedInstructionData>;
+  ]);
 }
 
 export function getAllocateWithSeedInstructionDataCodec(): Codec<

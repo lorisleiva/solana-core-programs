@@ -121,24 +121,21 @@ export type WithdrawNonceAccountInstructionDataArgs = {
   withdrawAmount: number | bigint;
 };
 
-export function getWithdrawNonceAccountInstructionDataEncoder() {
+export function getWithdrawNonceAccountInstructionDataEncoder(): Encoder<WithdrawNonceAccountInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{
-      discriminator: number;
-      withdrawAmount: number | bigint;
-    }>([
+    getStructEncoder([
       ['discriminator', getU32Encoder()],
       ['withdrawAmount', getU64Encoder()],
     ]),
     (value) => ({ ...value, discriminator: 5 })
-  ) satisfies Encoder<WithdrawNonceAccountInstructionDataArgs>;
+  );
 }
 
-export function getWithdrawNonceAccountInstructionDataDecoder() {
-  return getStructDecoder<WithdrawNonceAccountInstructionData>([
+export function getWithdrawNonceAccountInstructionDataDecoder(): Decoder<WithdrawNonceAccountInstructionData> {
+  return getStructDecoder([
     ['discriminator', getU32Decoder()],
     ['withdrawAmount', getU64Decoder()],
-  ]) satisfies Decoder<WithdrawNonceAccountInstructionData>;
+  ]);
 }
 
 export function getWithdrawNonceAccountInstructionDataCodec(): Codec<

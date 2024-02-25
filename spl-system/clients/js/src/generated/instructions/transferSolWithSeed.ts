@@ -105,30 +105,25 @@ export type TransferSolWithSeedInstructionDataArgs = {
   fromOwner: Address;
 };
 
-export function getTransferSolWithSeedInstructionDataEncoder() {
+export function getTransferSolWithSeedInstructionDataEncoder(): Encoder<TransferSolWithSeedInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{
-      discriminator: number;
-      amount: number | bigint;
-      fromSeed: string;
-      fromOwner: Address;
-    }>([
+    getStructEncoder([
       ['discriminator', getU32Encoder()],
       ['amount', getU64Encoder()],
       ['fromSeed', getStringEncoder()],
       ['fromOwner', getAddressEncoder()],
     ]),
     (value) => ({ ...value, discriminator: 11 })
-  ) satisfies Encoder<TransferSolWithSeedInstructionDataArgs>;
+  );
 }
 
-export function getTransferSolWithSeedInstructionDataDecoder() {
-  return getStructDecoder<TransferSolWithSeedInstructionData>([
+export function getTransferSolWithSeedInstructionDataDecoder(): Decoder<TransferSolWithSeedInstructionData> {
+  return getStructDecoder([
     ['discriminator', getU32Decoder()],
     ['amount', getU64Decoder()],
     ['fromSeed', getStringDecoder()],
     ['fromOwner', getAddressDecoder()],
-  ]) satisfies Decoder<TransferSolWithSeedInstructionData>;
+  ]);
 }
 
 export function getTransferSolWithSeedInstructionDataCodec(): Codec<
